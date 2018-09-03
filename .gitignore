@@ -24,3 +24,7 @@ $RECYCLE.BIN/
 *.pyc
 *.pyc
 *.pyc
+
+#Directories to ignore
+raw_data/
+project_data/
