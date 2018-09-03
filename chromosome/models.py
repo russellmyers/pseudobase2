@@ -31,6 +31,50 @@ class ChromosomeBase(models.Model):
         '''Define the string representation of this class of object.'''
         return '%s %s' % (self.strain.name, self.chromosome)
   
+    def has_insertions(self,stAbs,endAbs):
+        #check if selected region has inserts, ie at least one position with > 1 base
+        #Note: returns false if selected region is out of bounds
+        
+        if (endAbs < self.start_position):
+            return False
+        if (stAbs > self.end_position):
+            return False
+        
+        start = self._position_offset(stAbs)
+        end = self._position_offset(endAbs)
+        
+        if (stAbs < self.start_position):
+            start = self._position_offset(self.start_position)
+        if (endAbs >= self.end_position):
+            end = self._position_offset(self.end_position - 1)
+            
+        
+        #pdb.set_trace()
+        f = open(self.data_file_path)
+    
+        try:
+            start_offset = self._get_byte_offset_from_index(start)
+                # The end position is incremented by 1 because users expect the
+            # results to be inclusive.
+            end_offset = self._get_byte_offset_from_index(end + 1) 
+            if end_offset is None:
+                return False
+            
+            seq_num_bytes = end_offset - start_offset
+            
+            if (seq_num_bytes == end + 1 - start):
+                return False
+            else:
+                return True
+            
+  
+        finally:
+            f.close()
+    
+        return False
+
+
+
     def _position_offset(self, position):
         '''Return position as offset by the start_position.
         
@@ -143,6 +187,17 @@ class ChromosomeBase(models.Model):
         if position > self.end_position or position < self.start_position:
             return False
         return True
+
+    def wrap_data(self,bases):
+        
+       try:
+            eval('textwrap.TextWrapper(break_on_hyphens=False)')
+            tw = textwrap.TextWrapper(width=75, 
+                 break_on_hyphens=False)
+       except TypeError:
+            tw = textwrap.TextWrapper(width=75)
+       return tw.wrap(bases)
+
   
     def fasta_header(self, start_position, end_position, delimiter='|'):
         '''Return a FASTA-compliant header containing sequence metadata.
@@ -196,15 +251,73 @@ class ChromosomeBase(models.Model):
             if wrapped:
                 # We have to go through this little eval dance because the
                 # "break_on_hyphens" keyword arg only exists in python 2.6+.
-                try:
-                    eval('textwrap.TextWrapper(break_on_hyphens=False)')
-                    tw = textwrap.TextWrapper(width=75, 
-                      break_on_hyphens=False)
-                except TypeError:
-                    tw = textwrap.TextWrapper(width=75)
-                return tw.wrap(bases)
+                return self.wrap_data(bases)
+#                try:
+#                    eval('textwrap.TextWrapper(break_on_hyphens=False)')
+#                    tw = textwrap.TextWrapper(width=75, 
+#                      break_on_hyphens=False)
+#                except TypeError:
+#                    tw = textwrap.TextWrapper(width=75)
+#                return tw.wrap(bases)
             else:
                 return bases
+
+    def fasta_bases_formatted(self, start_position, end_position, max_bases=None,wrapped=True):
+        #re-Formatted version of fasta bases - cater for aligning insertions
+        
+        bases = self.get_bases_per_position(start_position,end_position)
+        
+        bases_str = ''
+        for i,base in enumerate(bases):
+            bases_str += bases[i]
+            if (max_bases):
+                if len(bases[i]) < max_bases[i]:
+                   bases_str += '_' * (max_bases[i] - len(bases[i])) 
+               
+        if wrapped:
+            return self.wrap_data(bases_str)
+        else:
+            return bases_str
+
+
+    def get_bases_per_position(self,start_position,end_position):
+        #Get bases at each position (some positions have multiple bases, ie insertions)
+ 
+        if hasattr(self, 'cached_bases_data'):
+            print('Has cached bases')
+            if  (self.cached_bases_data['start_position'] == start_position 
+                 and  self.cached_bases_data['end_position'] == end_position):
+                 print ('...and cache matches!')
+                 bases = self.cached_bases_data['bases']
+                 return bases
+           
+        else:
+            print ('!!!!!!!No cached bases')
+          
+        if self.outside_bounds(start_position,end_position):
+            bases = self.pad(start_position,end_position + 1)
+            return bases
+        
+        start_position_clipped = start_position if start_position >= self.start_position else self.start_position
+        end_position_clipped = end_position if end_position <= self.end_position else self.end_position
+        bases = ['N' for i in range(start_position,start_position_clipped)]
+      
+        if  (self.has_insertions(start_position,end_position)):
+                
+            for i in range(start_position_clipped,end_position_clipped + 1):
+                bases_this_pos = self._base_data(self._position_offset(i),self._position_offset(i))
+                if (bases_this_pos):
+                    bases.append(bases_this_pos)
+                else:
+                    bases.append('X')
+        else:
+                base_data = self._base_data(self._position_offset(start_position_clipped),self._position_offset(end_position_clipped))
+                bases.extend(list(base_data))             
+
+        bases.extend(['N' for i in range(end_position_clipped+1,end_position+1)])    
+         
+        self.cached_bases_data = {'start_position':start_position,'end_position':end_position,'bases':bases}
+        return bases
 
     def pad(self,base_from,base_to):
         pad = ChromosomeBase.pad_char * (base_to - base_from)
@@ -220,6 +333,18 @@ class ChromosomeBase(models.Model):
         
         return False
 
+    @staticmethod
+    def max_num_bases_per_position(bases_per_position):
+        # could be done with numpy much easier/quicker
+        
+        max_bases = []
+        for j in range(0,len(bases_per_position[0])):
+            max_num = 0
+            for i in range(0,len(bases_per_position)):
+                if len(bases_per_position[i][j]) > max_num:
+                    max_num = len(bases_per_position[i][j])
+            max_bases.append(max_num)        
+        return max_bases         
  
     @staticmethod  
     def multi_strain_fasta(chromosome, species, start, end):
@@ -238,9 +363,16 @@ class ChromosomeBase(models.Model):
         chromosomes = ChromosomeBase.objects.filter(
           chromosome=chromosome).filter(strain__species__in=species).order_by(
             '-strain__is_reference', 'strain__species__id', 'strain__name')
+
+        bases_per_position = []
+        for c in chromosomes:
+            bases_per_position.append(c.get_bases_per_position(start,end))
+        max_bases = ChromosomeBase.max_num_bases_per_position(bases_per_position)
+ 
+    
     
         for c in chromosomes:
-            yield (c.fasta_header(start, end), c.fasta_bases(start, end))
+            yield (c.fasta_header(start, end), c.fasta_bases_formatted(start, end,max_bases))
   
     @staticmethod
     def generate_file_tag():
