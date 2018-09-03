@@ -23,6 +23,9 @@ class ChromosomeBase(models.Model):
     start_position = models.PositiveIntegerField()
     end_position = models.PositiveIntegerField()
     file_tag = models.CharField(max_length=32)
+
+    pad_char = 'N' #For unknown bases outside bounds of self.start_position, self.end_position
+
   
     def __str__(self):
         '''Define the string representation of this class of object.'''
@@ -58,7 +61,7 @@ class ChromosomeBase(models.Model):
         format = 'I'
         format_size = struct.calcsize(format)
 
-        f = open(self.index_file_path)
+        f = open(self.index_file_path,'rb')
 
         try:
             f.seek(n * format_size)
@@ -161,22 +164,34 @@ class ChromosomeBase(models.Model):
         '''
 
         error_data = []
+        
+        start_position_clipped = start_position if start_position >= self.start_position  else self.start_position
+        end_position_clipped   = end_position   if end_position <= self.end_position else self.end_position
+        
         if not self.valid_position(start_position):
-            error_data.append(
-              'Invalid start position (%s); must be at least %s.' % \
-                (start_position, self.start_position))
+            #error_data.append(
+            #  'Invalid start position (%s); must be at least %s.' % \
+            #    (start_position, self.start_position))
+            pass
         if not self.valid_position(end_position):
-            error_data.append(
-              'Invalid end position (%s); must be no more than %s.' % \
-                (end_position, self.end_position))
+            #error_data.append(
+            #  'Invalid end position (%s); must be no more than %s.' % \
+            #   (end_position, self.end_position))
+            pass
 
         if error_data:
             return error_data
         else:
             start = self._position_offset(start_position)
             end = self._position_offset(end_position)
-            bases = self._base_data(self._position_offset(start_position),
-              self._position_offset(end_position))
+            if self.outside_bounds(start_position,end_position):
+                bases = self.pad(start_position,end_position + 1)
+            else:    
+                bases = self._base_data(self._position_offset(start_position_clipped),
+                  self._position_offset(end_position_clipped))
+                bases = self.pad(start_position,start_position_clipped) \
+                        + bases  \
+                        + self.pad(end_position_clipped,end_position)
       
             if wrapped:
                 # We have to go through this little eval dance because the
@@ -190,6 +205,21 @@ class ChromosomeBase(models.Model):
                 return tw.wrap(bases)
             else:
                 return bases
+
+    def pad(self,base_from,base_to):
+        pad = ChromosomeBase.pad_char * (base_to - base_from)
+        return pad
+    
+    def outside_bounds(self,start_position,end_position):
+        #Check if requested start/end range is completely outside bounds
+        # eg requested positions 01..100 and chromsome start pos is 120
+        # or requested positions 1000000..1100000 and chromsome end pos is 900000
+        
+        if (start_position > self.end_position) or (end_position < self.start_position):
+            return True
+        
+        return False
+
  
     @staticmethod  
     def multi_strain_fasta(chromosome, species, start, end):

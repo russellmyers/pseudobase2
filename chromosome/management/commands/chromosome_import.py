@@ -173,7 +173,7 @@ class Command(BaseCommand):
     
         # Open our data files.
         data_file = open(cb.data_file_path, 'w')
-        index_file = open(cb.index_file_path, 'w')
+        index_file = open(cb.index_file_path, 'wb')
         coverage_file = open(cb.coverage_file_path, 'w')
     
         try:
