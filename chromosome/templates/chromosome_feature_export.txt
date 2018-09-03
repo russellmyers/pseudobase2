@@ -1,0 +1,3 @@
+{% for h, b in fasta_objects %}{{ h|safe }}
+{% for bl in b %}{{ bl }}
+{% endfor %}{% empty %}No data matching specified query!{% endfor %}

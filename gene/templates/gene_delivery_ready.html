@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_title %}Gene Batch Request Results{% endblock %}
+
+{% block header %}Gene Batch Request Results{% endblock %}
+
+{% block content %}
+<center>
+The results of your batch gene request are now ready.  They can be downloaded using the link below:<br />
+<br />
+<a href={{ results_url }}>pseudobase_results.zip</a>, {{ results_size }}<br />(Available until: <em>{{ expiration }}</em>)
+</center>
+</table>
+{% endblock %}

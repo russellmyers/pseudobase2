@@ -1,0 +1,55 @@
+body {
+    font-family: courier, "courier new", monospace;
+    font-size: 90%;
+}
+
+h1 {
+    font-size: 150%;
+}
+
+ul.errorlist {
+    color: #9E0000;
+}
+
+.help_text {
+    font-size: 80%;
+    font-style: italic;
+}
+
+table {
+    background-color: #81B390;
+    font-size: inherit;
+    border-collapse: collapse;
+    margin: 0px;
+    padding: 10px;
+}
+
+table.outer {
+    border: 2px solid green;
+}
+
+th.outer {
+    border: 2px solid green;
+    background-color: silver;
+    padding: 2px;
+    vertical-align: top;
+    font-size: 110%;
+}
+
+td.outer {
+    border: 2px solid green;
+}
+
+th {
+    vertical-align: top;
+    text-align: right;
+    padding: 6px;
+    border-right: 2px solid green;
+}
+
+td {
+    vertical-align: top;
+    border: 0px;
+    margin: 0px;
+    padding: 6px;
+}

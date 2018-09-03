@@ -1,0 +1,21 @@
+# Fixtures to load species data.
+#
+# Original list of species from Mohamed Noor:
+# D.pseudoobscura (ps or pse), D.pseudoobscura bogotana (bog),
+# D.persimilis (per), D.miranda (mir), D.lowei (low)
+
+-   fields: {name: D.pseudoobscura, symbol: pse}
+    model: common.species
+    pk: 1
+-   fields: {name: D.pseudoobscura bogotana, symbol: bog}
+    model: common.species
+    pk: 2
+-   fields: {name: D.persimilis, symbol: per}
+    model: common.species
+    pk: 3
+-   fields: {name: D.miranda, symbol: mir}
+    model: common.species
+    pk: 4
+-   fields: {name: D.lowei, symbol: low}
+    model: common.species
+    pk: 5

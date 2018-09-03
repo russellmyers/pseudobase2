@@ -1,0 +1,5 @@
+{% extends "fasta.html" %}
+
+{% block content %}
+<pre>{% for h, b in fasta_objects %}{{ h|safe }}<br />{% for bl in b %}{{ bl }}<br />{% endfor %}{% empty %}No data matching specified query!{% endfor %}</pre>
+{% endblock %}

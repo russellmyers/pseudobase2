@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_title %}Gene Batch Request Submission{% endblock %}
+
+{% block header %}Gene Batch Request Submission{% endblock %}
+
+{% block content %}
+<center>
+Your batch gene request has been submitted.<br />
+<br />
+Results are typically available within a few minutes.  Please allow additional time for large requests.<br />
+<br />
+Once the request has been processed, your results will be available here:<br />
+<a href='{% url "common.views.delivery" delivery_tag %}'>{{ full_delivery_url }}</a><br />
+<br />
+The results will remain available for seven (7) days, at which point they will be purged.<br />
+<br />
+If you submitted a valid e-mail address as part of your request, you will receive an e-mail notification when your results are ready.
+<br />
+</center>
+{% endblock %}

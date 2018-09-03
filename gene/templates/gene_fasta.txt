@@ -1,0 +1,5 @@
+{% if not fasta_output %}
+No data matching specified query!
+{% else %}
+{{ fasta_ouput|safe }}
+{% endif %}

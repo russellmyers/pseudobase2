@@ -1,0 +1,52 @@
+# Fixtures to load Chromosome data
+#
+# Original list of chromosomes from Mohamed Noor:
+# 2, 3, 4_group1, 4_group2, 4_group3, 4_group4, 4_group5, XL_group1a,
+# XL_group1e, XL_group3a, XL_group3b, XR_group3a, XR_group5, XR_group6,
+# XR_group8
+
+-   fields: {name: '2'}
+    model: common.chromosome
+    pk: 1
+-   fields: {name: '3'}
+    model: common.chromosome
+    pk: 2
+-   fields: {name: 4_group1}
+    model: common.chromosome
+    pk: 3
+-   fields: {name: 4_group2}
+    model: common.chromosome
+    pk: 4
+-   fields: {name: 4_group3}
+    model: common.chromosome
+    pk: 5
+-   fields: {name: 4_group4}
+    model: common.chromosome
+    pk: 6
+-   fields: {name: 4_group5}
+    model: common.chromosome
+    pk: 7
+-   fields: {name: XL_group1a}
+    model: common.chromosome
+    pk: 8
+-   fields: {name: XL_group1e}
+    model: common.chromosome
+    pk: 9
+-   fields: {name: XL_group3a}
+    model: common.chromosome
+    pk: 10
+-   fields: {name: XL_group3b}
+    model: common.chromosome
+    pk: 11
+-   fields: {name: XR_group3a}
+    model: common.chromosome
+    pk: 12
+-   fields: {name: XR_group5}
+    model: common.chromosome
+    pk: 13
+-   fields: {name: XR_group6}
+    model: common.chromosome
+    pk: 14
+-   fields: {name: XR_group8}
+    model: common.chromosome
+    pk: 15

@@ -1,0 +1,13 @@
+- fields:
+    email: django@biology.duke.edu
+    first_name: ''
+    groups: []
+    is_active: true
+    is_staff: true
+    is_superuser: true
+    last_name: ''
+    password: pbkdf2_sha256$10000$z0eeovdy4Zdl$Y9JIpeO7+y0IZ8aW1fsZ8peZ3gsxmk5bBB+LtIqCeHE=
+    user_permissions: []
+    username: root
+  model: auth.user
+  pk: 1
