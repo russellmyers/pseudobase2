@@ -32,66 +32,66 @@
 # Under D. lowei (low):
 # lowei
 
--   fields: {name: 'American Fork Canyon, UT 12', species: 1}
+-   fields: {name: 'American Fork Canyon, UT 12', species: 1, is_reference: false}
     model: common.strain
     pk: 1
--   fields: {name: 'Flagstaff, AZ 14', species: 1}
+-   fields: {name: 'Flagstaff, AZ 14', species: 1, is_reference: false}
     model: common.strain
     pk: 2
--   fields: {name: 'Flagstaff, AZ 16', species: 1}
+-   fields: {name: 'Flagstaff, AZ 16', species: 1, is_reference: false}
     model: common.strain
     pk: 3
--   fields: {name: 'Flagstaff, AZ 18', species: 1}
+-   fields: {name: 'Flagstaff, AZ 18', species: 1, is_reference: false}
     model: common.strain
     pk: 4
--   fields: {name: 'Mather, CA 32', species: 1}
+-   fields: {name: 'Mather, CA 32', species: 1, is_reference: false}
     model: common.strain
     pk: 5
--   fields: {name: 'Mather, CA TL', species: 1}
+-   fields: {name: 'Mather, CA TL', species: 1, is_reference: false}
     model: common.strain
     pk: 6
 -   fields: {name: 'Mesa Verde, CO 2-25 reference line', species: 1, is_reference: true}
     model: common.strain
     pk: 7
--   fields: {name: 'Mount St. Helena, CA 9', species: 1}
+-   fields: {name: 'Mount St. Helena, CA 9', species: 1, is_reference: false}
     model: common.strain
     pk: 8
--   fields: {name: 'Mount St. Helena, CA 24', species: 1}
+-   fields: {name: 'Mount St. Helena, CA 24', species: 1, is_reference: false}
     model: common.strain
     pk: 9
--   fields: {name: 'San Antonio, NM, Pikes Peak 1134', species: 1}
+-   fields: {name: 'San Antonio, NM, Pikes Peak 1134', species: 1, is_reference: false}
     model: common.strain
     pk: 10
--   fields: {name: 'San Antonio, NM, Pikes Peak 1137', species: 1}
+-   fields: {name: 'San Antonio, NM, Pikes Peak 1137', species: 1, is_reference: false}
     model: common.strain
     pk: 11
--   fields: {name: El Recreo white mutant line, species: 2}
+-   fields: {name: El Recreo white mutant line, species: 2, is_reference: false}
     model: common.strain
     pk: 12
--   fields: {name: Torobarroso, species: 2}
+-   fields: {name: Torobarroso, species: 2, is_reference: false}
     model: common.strain
     pk: 13
--   fields: {name: 'Mount St. Helena, CA 1993', species: 3}
+-   fields: {name: 'Mount St. Helena, CA 1993', species: 3, is_reference: false}
     model: common.strain
     pk: 14
--   fields: {name: 'Mount St. Helena, CA 39', species: 3}
+-   fields: {name: 'Mount St. Helena, CA 39', species: 3, is_reference: false}
     model: common.strain
     pk: 15
--   fields: {name: 'Mount St. Helena, CA 3', species: 3}
+-   fields: {name: 'Mount St. Helena, CA 3', species: 3, is_reference: false}
     model: common.strain
     pk: 16  
--   fields: {name: Santa Cruz Island, species: 3}
+-   fields: {name: Santa Cruz Island, species: 3, is_reference: false}
     model: common.strain
     pk: 17
--   fields: {name: 'Mount St. Helena, CA 22', species: 4}
+-   fields: {name: 'Mount St. Helena, CA 22', species: 4, is_reference: false}
     model: common.strain
     pk: 18
--   fields: {name: SP138, species: 4}
+-   fields: {name: SP138, species: 4, is_reference: false}
     model: common.strain
     pk: 19
--   fields: {name: MAO, species: 4}
+-   fields: {name: MAO, species: 4, is_reference: false}
     model: common.strain
     pk: 20
--   fields: {name: Lowei, species: 5}
+-   fields: {name: Lowei, species: 5, is_reference: false}
     model: common.strain
     pk: 21
