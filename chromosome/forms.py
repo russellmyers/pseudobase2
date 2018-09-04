@@ -35,13 +35,13 @@ class PositionRangeField(forms.CharField):
         # character or two or more non-numeric characters (including periods
         # and commas) in a sequence.
         position_match = re.compile(
-          r'^([0-9.,]+[0-9]+)([^0-9,.]|[^0-9]{2,})([0-9]+[0-9.,]+)$').match
+           r'^(?P<grp1>([0-9.,]+[0-9]+)|([1-9]))(?P<grp2>[^0-9,.]|[^0-9]{2,})(?P<grp3>([0-9])|([0-9]+[0-9.,]+))$').match
         position_sub = re.compile(r'\D').sub
         p_m = position_match(value)
         if p_m:
             try:
-                start = position_sub('', p_m.group(1))
-                end = position_sub('', p_m.group(3))
+                start = position_sub('', p_m.group('grp1'))
+                end = position_sub('', p_m.group('grp3'))
                 positions = (int(start), int(end))
             except ValueError:
                 # An error is raised later if the range can't be parsed.
