@@ -72,11 +72,16 @@ class PositionRangeField(forms.CharField):
 class SearchForm(forms.Form):
     '''A form that handles searching by chromosome.'''
     
+    hold_msg = 'Hold down "Control", or "Command" on a Mac, to select more than one.'
+    
     species = forms.ModelMultipleChoiceField(queryset=Species.objects.all(),
       widget=forms.SelectMultiple(
         attrs={'size': '4', 'id': 'chromosome_species_id'}),
       error_messages={'required': 'At least one species must be selected.'})
-  
+      
+    species.help_text = species.help_text.replace(hold_msg, '')  
+    species.help_text = 'Select one or more species'
+    
     chromosome = forms.ModelChoiceField(queryset=Chromosome.objects.all(),
       error_messages={'required': 'A chromosome must be selected.'})
   

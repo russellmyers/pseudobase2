@@ -52,10 +52,16 @@ class BatchFileField(forms.FileField):
 class SearchForm(forms.Form):
     '''A form that handles searching by gene (and "batch gene").'''
 
+    hold_msg = 'Hold down "Control", or "Command" on a Mac, to select more than one.'
+
     species = forms.ModelMultipleChoiceField(queryset=Species.objects.all(),
       widget=forms.SelectMultiple(
         attrs={'size': '4', 'id': 'gene_species_id' }),
       error_messages={'required': 'At least one species must be selected.'})
+
+    species.help_text = species.help_text.replace(hold_msg, '')  
+    species.help_text = 'Select one or more species'
+
   
     gene = forms.CharField(max_length=255, required=False,
       help_text='<span class="help_text">Supported formats:<br />&nbsp;&nbsp;'
