@@ -25,6 +25,7 @@ class ChromosomeBase(models.Model):
     file_tag = models.CharField(max_length=32)
 
     pad_char = 'N' #For unknown bases outside bounds of self.start_position, self.end_position
+    realign_char = '-'  # where insertions occur in a strain, re-align other strains padded with this char
 
   
     def __str__(self):
@@ -272,7 +273,7 @@ class ChromosomeBase(models.Model):
             bases_str += bases[i]
             if (max_bases):
                 if len(bases[i]) < max_bases[i]:
-                   bases_str += '_' * (max_bases[i] - len(bases[i])) 
+                   bases_str += ChromosomeBase.realign_char * (max_bases[i] - len(bases[i])) 
                
         if wrapped:
             return self.wrap_data(bases_str)
@@ -338,6 +339,9 @@ class ChromosomeBase(models.Model):
         # could be done with numpy much easier/quicker
         
         max_bases = []
+        if (len(bases_per_position) == 0):
+            return max_bases
+        
         for j in range(0,len(bases_per_position[0])):
             max_num = 0
             for i in range(0,len(bases_per_position)):
@@ -372,7 +376,10 @@ class ChromosomeBase(models.Model):
     
     
         for c in chromosomes:
-            yield (c.fasta_header(start, end), c.fasta_bases_formatted(start, end,max_bases))
+            if (len(chromosomes) < 2):
+                yield (c.fasta_header(start, end), c.fasta_bases(start, end))
+            else:    
+                yield (c.fasta_header(start, end), c.fasta_bases_formatted(start, end,max_bases))
   
     @staticmethod
     def generate_file_tag():

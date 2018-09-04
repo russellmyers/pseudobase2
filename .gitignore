@@ -28,3 +28,4 @@ $RECYCLE.BIN/
 #Directories to ignore
 raw_data/
 project_data/
+pseudo_activate.bat
