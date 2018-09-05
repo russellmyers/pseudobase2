@@ -1,7 +1,7 @@
 '''ALl URL definitions and configuration for the pseudobase project.'''
 
 from django.conf import settings
-from django.conf.urls import include, patterns
+from django.conf.urls import include, patterns, url
 from django.conf.urls.static import static
 from django.contrib import admin
 
@@ -10,7 +10,11 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
   # The main index page
-  (r'^$', 'common.views.index'),
+ 
+   url(r'^$', 'common.views.index',name='index'),
+  
+   url(r'^info/$','common.views.info',name='info'),
+
   
   # The page handling file deliveries
   (r'^delivery/(.+)$', 'common.views.delivery'),

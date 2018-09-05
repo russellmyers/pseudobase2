@@ -23,6 +23,8 @@ def _render_search_forms(request,
     custom_data = {}
     custom_data['chromosome_form'] = chromosome_form
     custom_data['gene_form'] = gene_form
+    custom_data['tab'] = 'Home'
+
   
     # The StatCounter should only display when debugging is not enabled
     custom_data['display_counter'] = not settings.DEBUG
@@ -122,6 +124,13 @@ def index(request):
         elif request.POST['search_type'] == 'Search by gene':
             return _render_gene_search(request)
     return _render_search_forms(request)
+
+
+def info(request):
+    custom_data = {}
+    custom_data['tab'] = 'More Info'
+    return render_to_response('info.html', custom_data,
+      context_instance=RequestContext(request))
 
 
 def delivery(request, code):

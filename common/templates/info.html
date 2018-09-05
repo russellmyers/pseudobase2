@@ -1,0 +1,79 @@
+<html><title>Pseudobase information</title>
+{% extends "base.html" %}
+
+{% block page_title %}Information{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>Pseudobase Information</h1>
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div> 
+    {% endblock header %}
+    
+    
+    {% block content %}
+<div class = "col-md-1">
+</div>   
+<div class="col-md-10 border border-primary" style="background-color:white";>    
+    <h4>Lines available (not all lines available for all queries)</h4>
+    
+    <table cellpadding = 5><tr><td>
+    <p>
+    <i><b>D. pseudoobscura</b></i>: 11 lines- <br>
+    --American Fork Canyon, UT 12, collected 1997<br>
+    --Flagstaff, AZ 14, collected 1997<br>
+    --Flagstaff, AZ 16, collected 1997<br>
+    --Flagstaff, AZ 18, collected 1997<br>
+    --Mather, CA 32, collected 1997<br>
+    --Mather, CA TL, collected 1959<br>
+    --Mesa Verde, CO 2-25 genome reference line<br>
+    --Mount St. Helena, CA 9, collected 1997<br>
+    --Mount St. Helena, CA 24, collected 1997<br>
+    --San Antonio, NM, Pikes Peak 1134, collected 2006<br>
+    --San Antonio, NM, Pikes Peak 1137, collected 2006<br>
+    </p>
+    </td><td>
+    <p>
+    <i><b>D. peudoobscura bogotana</b></i>: 2 lines<br>
+    --El Recreo white mutant line, collected 1978<br>
+    --Torobarroso, collected 1997<br>
+    </p>
+    <p>
+    <i><b>D. persimilis</b></i>: 4 lines<br>
+    --Mount St. Helena, CA 3 genome line, collected 1997<br>
+    --Mount St. Helena, CA 1993, collected 1993<br>
+    --Mount St. Helena, CA 39, collected 1997<br>
+    --Santa Cruz Island, collected 2004<br>
+    </p>
+    </td><td>
+    <p>
+    <i><b>D. miranda</b></i>: 3 lines<br>
+    --Mount St. Helena, CA 22, collected 1997<br>
+    --SP138, from D Bachtrog<br>
+    --MAO, from D Bachtrog<br>
+    </p>
+    </td></tr></table>
+    
+    <p>
+    <h4>Sequencing Information</h4></p>
+    <p>
+    For each line, DNA from 15-20 virgin female inbred flies was extracted using the GentraSystems PureGene DNA preparation and sequenced with Illumina Genome Analyzer IIx at The University of North Carolina-Chapel Hill High Throughput Sequencing Facility. Illumina reads were aligned to the <i>Drosophila pseudoobscura</i> reference genome v2.9 using bwa-0.5.5 (default alignment settings were used except the maximum number of gap extensions was set to 4). Consensus assemblies for each resequenced line were generated using the bwa alignments and Samtools 0.1.6 pileup. Default pileup settings were used except the theta parameter (error dependency coefficient) in the maq consensus calling model was set to 0.9, and the number of haplotypes in the sample was set to one because each resequenced line was inbred.
+    </p>
+    <p>
+        The raw traces used to generate the alignments here are available from the NIH NCBI Short Read Archive under accession SRP007802. Additional related sequences are available under PRJNA277849.
+    </p>
+</div>
+<div class = "col-md-1">
+</div>   
+
+{% endblock content %}
