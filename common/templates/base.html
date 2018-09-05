@@ -14,13 +14,35 @@
 </head>
 <body>
 <center>
-<img align="middle" src="{{ STATIC_URL }}img/pseudobase_header.jpg" alt="Pseudobase" width="750" />
-<br />
-<br />
+<!--img align="middle" src="{{ STATIC_URL }}img/pseudobase_header.jpg" alt="Pseudobase" width="750" /-->
+<!--br /-->
+<!--br /-->
 {% block links %}
 <a href=/>Back to Search Pseudobase</a>
 {% endblock %}
-<hr />
+<!--hr /-->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #5f788a;"> <!--style= "background-color: #e3f2fd;-->
+      <a href="#" class="navbar-left"><img src="{{ STATIC_URL }}img/pseudobase_header_a_rounded.gif" alt="Pseudobase" width="250px"></a>
+      <!--a class="navbar-brand" href="#"> Pseudobase</a-->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link {%if tab == 'Home' %}active{% endif %}" href="#">Home <span class="sr-only">(current)</span></a>
+          <!--a class="nav-item nav-link" href="#">Search</a-->
+          <a class="nav-item nav-link {%if tab == 'More Info' %}active{% endif %}" href="#">More Info</a>
+          <a class="nav-item nav-link" href="#">Links</a>
+        </div>
+        <!--
+        <div class="navbar-nav ml-auto">  
+          <a class="nav-item nav-link" href="#">Links</a>
+        </div> 
+        -->
+       </div>
+      </div>
+</nav>
+<br>
 <h1>{% block header %}Search by gene or by region in the reference <i>D. pseudoobscura</i> genome sequence{% endblock %}</h1>
 <br />
 <div>

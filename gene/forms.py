@@ -56,11 +56,11 @@ class SearchForm(forms.Form):
 
     species = forms.ModelMultipleChoiceField(queryset=Species.objects.all(),
       widget=forms.SelectMultiple(
-        attrs={'size': '4', 'id': 'gene_species_id' }),
+        attrs={'style':'font-size:90%;', 'id': 'gene_species_id' }),
       error_messages={'required': 'At least one species must be selected.'})
 
     species.help_text = species.help_text.replace(hold_msg, '')  
-    species.help_text = 'Select one or more species'
+    species.help_text = '<span class = "help_text">Select one or more species</span>'
 
   
     gene = forms.CharField(max_length=255, required=False,

@@ -6,31 +6,38 @@
 
 {% block content %}
 <center>
-<table class="outer" width="80%">
+<table class="outer table table-bordered" width="80%">
 	<tr>
-		<th class="outer"><center>By gene (outputs CDS)</center></th>
-		<th class="outer"><center>By chromosome</center></th>
+	   <thead class = "thead">
+		<th scope="col" class="outer table-secondary"><center>By gene (outputs CDS)</center></th>
+		<th scope="col" class="outer table-secondary"><center>By chromosome</center></th>
+		
 	</tr>
+	</thead>
+	<tbody>
 	<tr>
-		<td width="50%" height="100%" class="outer"><center>
+		<td scope="row" width="50%" height="100%" class="outer"><center>
+		<div class = "form-group">
 		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
 		<table width="100%">
 		{{ gene_form.as_table }}
 		</table>
-		<input type="submit" name="search_type" value="Search by gene" />
+		<input type="submit" class="btn btn-default" name="search_type" value="Search by gene" />
 		</form>
 		</center>
 		</td>
-		<td width="50%" height="100%" class="outer"><center>
+		<td scope="row" width="50%" height="100%" class="outer"><center>
 		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
 		<table width="100%">
 		{{ chromosome_form.as_table }}
-		<tr class="inner"><td align="center" colspan="2"><input type="submit" name="search_type" value="Search by chromosome" /></td></tr>
+		<tr class="inner"><td align="center" colspan="2"><input type="submit" class="btn btn-default" name="search_type" value="Search by chromosome" /></td></tr>
 		</table>
+		</div>
 		</form>
 		</center>
 		</td>
 	</tr>
+	</tbody>
 </table>
 </center>
 {% endblock %}
