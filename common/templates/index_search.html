@@ -5,12 +5,13 @@
 {% block links %}{% endblock %}
 
 {% block content %}
+<div class="container">
 <center>
 <table class="outer table table-bordered" width="80%">
 	<tr>
 	   <thead class = "thead">
-		<th scope="col" class="outer table-dark"><center>By gene (outputs CDS)</center></th>
-		<th scope="col" class="outer table-dark"><center>By chromosome</center></th>
+		<th scope="col" class="outer table-secondary"><center>By gene (outputs CDS)</center></th>
+		<th scope="col" class="outer table-secondary"><center>By chromosome</center></th>
 		
 	</tr>
 	</thead>
@@ -19,7 +20,7 @@
 		<td scope="row" width="50%" height="100%" class="outer"><center>
 		<div class = "form-group">
 		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-		<table width="100%">
+		<table class = "table"  width="100%">
 		{{ gene_form.as_table }}
 		</table>
 		<br>
@@ -29,7 +30,7 @@
 		</td>
 		<td scope="row" width="50%" height="100%" class="outer"><center>
 		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-		<table width="100%">
+		<table  class="table" width="100%">
 		{{ chromosome_form.as_table }}
 		</table>
 		<br>
@@ -49,6 +50,8 @@
 <a href="{% url 'info' %}">Information on sequences/ strains</a>
 </h3>
 </center>
+</div>
+
 {% endblock %}
 
 {% block script %}
