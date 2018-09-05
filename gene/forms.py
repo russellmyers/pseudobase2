@@ -65,8 +65,8 @@ class SearchForm(forms.Form):
   
     gene = forms.CharField(max_length=255, required=False,
       help_text='<span class="help_text">Supported formats:<br />&nbsp;&nbsp;'
-        'Gene name (e.g. atl)<br />&nbsp;&nbsp;GA ID (e.g. GA26895)<br />'
-        '&nbsp;&nbsp;CG ID (e.g. CG10064)<br />&nbsp;&nbsp;GLEANR ID (e.g. '
+        'Gene name (e.g. atl), &nbsp;&nbsp;GA ID (e.g. GA26895)<br />'
+        '&nbsp;&nbsp;CG ID (e.g. CG10064), &nbsp;&nbsp;GLEANR ID (e.g. '
         'GLEANR_4729)<br />&nbsp;&nbsp;FlyBase ID (e.g. FBgn0248267)</span>')
 
     gene_batch_file = BatchFileField(required=False,
