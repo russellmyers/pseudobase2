@@ -94,7 +94,40 @@ class ChromosomeBase(models.Model):
         '''
         
         return (position - self.start_position)
-  
+ 
+    def _get_byte_offset_ranges_from_index(self, start,end):
+        '''Look up byte offsets of data in position start - end (inclusive) from the index.
+        
+        Note: The index file keeps track of the number of bytes from the start of
+        the data file where any particular position begins.
+        
+        '''
+    
+        format = 'I'
+        format_size = struct.calcsize(format)
+
+        f = open(self.index_file_path,'rb')
+
+        try:
+            f.seek(start * format_size)
+            data = f.read(format_size * (end + 1 - start))
+        finally:
+            f.close()
+      
+        if not data:
+            # This happens if we request a position that doesn't exist.
+            # Typically, this is only seen when requesting a position that is
+            # after the end of the data file.
+            return None
+        else:
+            
+            data_list = [data[i:i+format_size] for i in range(0, len(data), format_size)]
+            unpacked = []
+            for d in data_list:
+                unpacked.append(struct.unpack(format, d)[0])
+                
+            return unpacked   
+    
     def _get_byte_offset_from_index(self, n):
         '''Look up the byte offset of the data in position n from the index.
         
@@ -304,13 +337,24 @@ class ChromosomeBase(models.Model):
         bases = ['N' for i in range(start_position,start_position_clipped)]
       
         if  (self.has_insertions(start_position,end_position)):
-                
-            for i in range(start_position_clipped,end_position_clipped + 1):
-                bases_this_pos = self._base_data(self._position_offset(i),self._position_offset(i))
-                if (bases_this_pos):
-                    bases.append(bases_this_pos)
+            bases_str_in_clipped_range = self._base_data(self._position_offset(start_position_clipped),
+                  self._position_offset(end_position_clipped))
+            offsets = self._get_byte_offset_ranges_from_index(self._position_offset(start_position_clipped),self._position_offset(end_position_clipped))
+            st_offset = offsets[0]
+            bases_list_in_clipped_range = []
+            for i,off in enumerate(offsets):
+                if (i < len(offsets)-1):
+                    bases_list_in_clipped_range.append(bases_str_in_clipped_range[off - st_offset: offsets[i+1] - st_offset])
                 else:
-                    bases.append('X')
+                    bases_list_in_clipped_range.append(bases_str_in_clipped_range[off - st_offset:])
+                
+            bases.extend(bases_list_in_clipped_range)
+#            for i in range(start_position_clipped,end_position_clipped + 1):
+#                bases_this_pos = self._base_data(self._position_offset(i),self._position_offset(i))
+#                if (bases_this_pos):
+#                    bases.append(bases_this_pos)
+#                else:
+#                    bases.append('X')
         else:
                 base_data = self._base_data(self._position_offset(start_position_clipped),self._position_offset(end_position_clipped))
                 bases.extend(list(base_data))             
