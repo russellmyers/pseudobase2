@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container">
 <center>
-<table class="outer table table-bordered" width="80%">
+<table class="outer table table-bordered"  width="80%">
 	<tr>
 	   <thead class = "thead">
 		<th scope="col" class="outer table-secondary"><center>By gene (outputs CDS)</center></th>
@@ -17,10 +17,10 @@
 	</thead>
 	<tbody>
 	<tr>
-		<td scope="row" width="50%" height="100%" class="outer"><center>
+		<td style="border-color:lightblue;" scope="row" width="50%" height="100%" class="outer"><center>
 		<div class = "form-group">
 		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-		<table class = "table"  width="100%">
+		<table class = "table"  width="100%"  style="background-color:inherit;">
 		{{ gene_form.as_table }}
 		</table>
 		<br>
@@ -28,9 +28,9 @@
 		</form>
 		</center>
 		</td>
-		<td scope="row" width="50%" height="100%" class="outer"><center>
+		<td style="border-color:lightblue;" scope="row" width="50%" height="100%" class="outer"><center>
 		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-		<table  class="table" width="100%">
+		<table  class="table" style="background-color:inherit;" width="100%">
 		{{ chromosome_form.as_table }}
 		</table>
 		<br>
