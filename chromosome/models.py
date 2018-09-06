@@ -232,6 +232,15 @@ class ChromosomeBase(models.Model):
             tw = textwrap.TextWrapper(width=75)
        return tw.wrap(bases)
 
+    def clip(self,start_position,end_position):
+
+        # clip seleced start and end positions to positions available for strain/chromosome in the database
+        start_position_clipped = start_position if start_position >= self.start_position  else self.start_position
+        end_position_clipped   = end_position   if end_position <= self.end_position else self.end_position
+        
+        return start_position_clipped,end_position_clipped
+
+        
   
     def fasta_header(self, start_position, end_position, delimiter='|'):
         '''Return a FASTA-compliant header containing sequence metadata.
@@ -243,6 +252,7 @@ class ChromosomeBase(models.Model):
         return r'>%s' % delimiter.join((self.strain.species.name,
           self.strain.name, self.chromosome.name,
           '%s..%s' % (start_position, end_position)))
+        
   
     def fasta_bases(self, start_position, end_position, wrapped=True):
         '''Return the sequence data for the specified range.
@@ -251,11 +261,13 @@ class ChromosomeBase(models.Model):
         to 75 characters for format compliance.
         
         '''
+        if start_position > self.end_position:
+           return self.wrap_data('No data beyond base %s available for this strain' % (str(self.end_position)))
+ 
 
         error_data = []
         
-        start_position_clipped = start_position if start_position >= self.start_position  else self.start_position
-        end_position_clipped   = end_position   if end_position <= self.end_position else self.end_position
+        start_position_clipped,end_position_clipped = self.clip(start_position,end_position)
         
         if not self.valid_position(start_position):
             #error_data.append(
@@ -299,6 +311,9 @@ class ChromosomeBase(models.Model):
     def fasta_bases_formatted(self, start_position, end_position, max_bases=None,wrapped=True):
         #re-Formatted version of fasta bases - cater for aligning insertions
         
+        if start_position > self.end_position:
+           return self.wrap_data('No data beyond base %s available for this strain' % (str(self.end_position)))
+        
         bases = self.get_bases_per_position(start_position,end_position)
         
         bases_str = ''
@@ -332,8 +347,8 @@ class ChromosomeBase(models.Model):
             bases = self.pad(start_position,end_position + 1)
             return bases
         
-        start_position_clipped = start_position if start_position >= self.start_position else self.start_position
-        end_position_clipped = end_position if end_position <= self.end_position else self.end_position
+        start_position_clipped,end_position_clipped = self.clip(start_position,end_position)
+
         bases = ['N' for i in range(start_position,start_position_clipped)]
       
         if  (self.has_insertions(start_position,end_position)):
