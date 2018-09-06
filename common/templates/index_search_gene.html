@@ -6,7 +6,7 @@
    <div class = "row">
 
 		<div class = "form-group col-md-12" >
-		          <h1>By Gene</h1>
+		          <h2>By Gene</h2>
 
        	{{ gene_form_form.non_field_errors }}
         	{% for field in gene_form %}
@@ -19,11 +19,11 @@
                       </b>
  
                   </div>    
-                  <div class = "col-md-5">
+                  <div class = "col-md-6">
                        {{ field.errors }}
                        {{ field }}
                        {% if field.help_text %}
-                          <br>
+                          
                       <!--p class = "help"-->
                          {{ field.help_text|safe }}
                       <!--/p-->   
