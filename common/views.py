@@ -15,7 +15,7 @@ from chromosome.models import ChromosomeBase
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
 
 
-def _render_search_forms(request,
+def _render_search_forms(request,search_tab='',
   chromosome_form=chromosome.forms.SearchForm(),
   gene_form=gene.forms.SearchForm()):
     '''Render the default search page with both search forms.'''
@@ -24,12 +24,14 @@ def _render_search_forms(request,
     custom_data['chromosome_form'] = chromosome_form
     custom_data['gene_form'] = gene_form
     custom_data['tab'] = 'Home'
+    custom_data['search_tab'] = search_tab
 
   
     # The StatCounter should only display when debugging is not enabled
     custom_data['display_counter'] = not settings.DEBUG
   
-    return render_to_response('index_search.html', custom_data,
+    search_page = 'index_search_gene.html' if (search_tab == '') else 'index_search_chrom.html'
+    return render_to_response(search_page, custom_data,
       context_instance=RequestContext(request))
 
 
@@ -117,13 +119,14 @@ def _convert_bytes(n):
 
 def index(request):
     '''Handle requests for the main "search" page and validate submissions.'''
+    search_tab = request.GET.get('search_tab','')
 
     if request.method == 'POST':
         if request.POST['search_type'] == 'Search by chromosome':
             return _render_chromosome_search(request)
         elif request.POST['search_type'] == 'Search by gene':
             return _render_gene_search(request)
-    return _render_search_forms(request)
+    return _render_search_forms(request,search_tab)
 
 
 def info(request):

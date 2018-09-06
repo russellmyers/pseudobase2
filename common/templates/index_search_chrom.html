@@ -1,0 +1,53 @@
+{% extends "index_search.html" %}
+
+{% block searchtab %}
+<div class = "container">
+   <div class = "row">
+
+
+		<!--div class = "col-md-12 border border-primary border-top-0 rounded"-->
+		<div class = "form-group col-md-12" >
+		          <h1>By chromosome</h1>
+     
+
+
+    		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
+    		<!--
+        		<table  class="table " style="background-color:inherit;"> 
+        		   		{{ chromosome_form.as_table }}
+        		</table>
+        	-->
+        	{{ chromosome_form.non_field_errors }}
+        	{% for field in chromosome_form %}
+        	     <br>
+                <div class="row fieldWrapper">
+                  
+                  <div class = "col-md-4">
+                      <b>
+                      {{ field.label_tag }}
+                      </b>
+ 
+                  </div>    
+                  <div class = "col-md-5">
+                       {{ field.errors }}
+                       {{ field }}
+                       {% if field.help_text %}
+                      <!--p class = "help"-->
+                         {{ field.help_text|safe }}
+                      <!--/p-->   
+                      {% endif %}
+                  </div>    
+               </div>
+          {% endfor %}	
+        		<br>
+        		<!--tr class="inner"><td align="center" colspan="2"--><input type="submit" class="btn btn-default" name="search_type" value="Search by chromosome" /><!--/td></tr-->
+        
+        		
+        		</form>
+        		
+       </div>  		
+   
+   </div>    
+    	
+</div>
+{% endblock searchtab %}

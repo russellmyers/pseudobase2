@@ -6,43 +6,18 @@
 
 {% block content %}
 <div class="container">
-<center>
-<table class="outer table table-bordered"  width="80%">
-	<tr>
-	   <thead class = "thead">
-		<th scope="col" class="outer table-secondary"><center>By gene (outputs CDS)</center></th>
-		<th scope="col" class="outer table-secondary"><center>By chromosome</center></th>
-		
-	</tr>
-	</thead>
-	<tbody>
-	<tr>
-		<td style="border-color:lightblue;" scope="row" width="50%" height="100%" class="outer"><center>
-		<div class = "form-group">
-		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-		<table class = "table"  width="100%"  style="background-color:inherit;">
-		{{ gene_form.as_table }}
-		</table>
-		<br>
-		<input type="submit" class="btn btn-default" name="search_type" value="Search by gene" />
-		</form>
-		</center>
-		</td>
-		<td style="border-color:lightblue;" scope="row" width="50%" height="100%" class="outer"><center>
-		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-		<table  class="table" style="background-color:inherit;" width="100%">
-		{{ chromosome_form.as_table }}
-		</table>
-		<br>
-		<!--tr class="inner"><td align="center" colspan="2"--><input type="submit" class="btn btn-default" name="search_type" value="Search by chromosome" /><!--/td></tr-->
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link {%if search_tab == '' %} active {% endif %}" href="{% url 'index' %}">by Gene</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {%if search_tab == 'chrom' %} active {% endif %}" href="{% url 'index' %}?search_tab=chrom">by Chromosome</a>
+  </li>
 
-		</div>
-		</form>
-		</center>
-		</td>
-	</tr>
-	</tbody>
-</table>
+</ul>
+{% block searchtab %}
+
+{% endblock searchtab %}
 <br />
 <br />
 <!--hr /-->
