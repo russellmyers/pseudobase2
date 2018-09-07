@@ -56,7 +56,7 @@ class SearchForm(forms.Form):
 
     species = forms.ModelMultipleChoiceField(queryset=Species.objects.all(),
       widget=forms.SelectMultiple(
-        attrs={'class': 'form-control','style':'font-size:90%;', 'id': 'gene_species_id' }),
+        attrs={'class': 'form-control form-control-sm col-9','style':'font-size:90%;', 'id': 'gene_species_id' }),
       error_messages={'required': 'At least one species must be selected.'})
 
     species.help_text = species.help_text.replace(hold_msg, '')  
@@ -66,7 +66,7 @@ class SearchForm(forms.Form):
     gene = forms.CharField(max_length=255, required=False,
         #Added widget for ootstrap
         widget=forms.TextInput(
-        attrs={'class': 'form-control'}),
+        attrs={'class': 'form-control form-control-sm col-9', 'placeholder':'eg GA26895'}),
       help_text='<div class="mt-0 pt-0 help_text">Supported formats:<br />&nbsp;&nbsp;'
         'Gene name (e.g. atl), &nbsp;&nbsp;GA ID (e.g. GA26895)<br />'
         '&nbsp;&nbsp;CG ID (e.g. CG10064), &nbsp;&nbsp;GLEANR ID (e.g. '
@@ -75,7 +75,7 @@ class SearchForm(forms.Form):
     gene_batch_file = BatchFileField(required=False,
         #Added widget for ootstrap
         widget=forms.FileInput(
-        attrs={'class': 'form-control'}),                               
+        attrs={'class': 'form-control form-control-sm col-9'}),                               
       help_text='<div class="mt-0 pt-0 help_text">Example gene batch file: <a '
         'href="/static/examples/gene_batch_example.html">gene_batch_example'
         '</a></div>')

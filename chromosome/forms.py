@@ -76,7 +76,7 @@ class SearchForm(forms.Form):
     
     species = forms.ModelMultipleChoiceField(queryset=Species.objects.all(),
       widget=forms.SelectMultiple(
-        attrs={'class': 'form-control', 'style':'font-size:90%;','id': 'chromosome_species_id'}),
+        attrs={'class': 'form-control form-control-sm col-9',  'style':'font-size:90%;','id': 'chromosome_species_id'}),
       error_messages={'required': 'At least one species must be selected.'})
       
     species.help_text = species.help_text.replace(hold_msg, '')  
@@ -85,12 +85,12 @@ class SearchForm(forms.Form):
     chromosome = forms.ModelChoiceField(queryset=Chromosome.objects.all(),
        # Added widget for bootstrap                                 
        widget=forms.Select(
-        attrs={'class': 'form-control'}),                                        
+        attrs={'class': 'form-control form-control-sm col-9 '}),                                        
       error_messages={'required': 'A chromosome must be selected.'})
   
     position = PositionRangeField(max_length=20,
         #Added widget for ootstrap
         widget=forms.TextInput(
-        attrs={'class': 'form-control'}),                                  
+        attrs={'class': 'form-control form-control-sm col-9','placeholder':'eg 1..1000'}),                                  
                                   help_text=\
       '<div class="help_text">Format: &lt;start&gt;..&lt;end&gt;</div>')
