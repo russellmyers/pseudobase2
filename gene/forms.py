@@ -67,10 +67,10 @@ class SearchForm(forms.Form):
         #Added widget for ootstrap
         widget=forms.TextInput(
         attrs={'class': 'form-control form-control-sm col-9', 'placeholder':'eg GA26895'}),
-      help_text='<div class="mt-0 pt-0 help_text">Supported formats:<br />&nbsp;&nbsp;'
-        'Gene name (e.g. atl), &nbsp;&nbsp;GA ID (e.g. GA26895)<br />'
-        '&nbsp;&nbsp;CG ID (e.g. CG10064), &nbsp;&nbsp;GLEANR ID (e.g. '
-        'GLEANR_4729)<br />&nbsp;&nbsp;FlyBase ID (e.g. FBgn0248267)</div>')
+      help_text='<div class="mt-0 pt-0 help_text_sm">Supported formats:<br />&nbsp;&nbsp;'
+        'Gene name (e.g. atl), &nbsp;&nbsp;GA ID (e.g. GA26895)'
+        '&nbsp;&nbsp;CG ID (e.g. CG10064), &nbsp;&nbsp;<br />GLEANR ID (e.g. '
+        'GLEANR_4729)&nbsp;&nbsp;FlyBase ID (e.g. FBgn0248267)</div>')
 
     gene_batch_file = BatchFileField(required=False,
         #Added widget for ootstrap

@@ -34,6 +34,13 @@ ul.errorlist {
     
 }
 
+.help_text_sm {
+
+    font-size: 70%;
+    font-style: italic;
+    
+}
+
 /*
 table {
     background-color: #81B390;
