@@ -17,7 +17,9 @@
         		   		{{ chromosome_form.as_table }}
         		</table>
         	-->
-        	{{ chromosome_form.non_field_errors }}
+        	<div class="alert-message block-message error">
+            	{{ chromosome_form.non_field_errors }}
+          </div>  	
         	{% for field in chromosome_form %}
         	     <br>
                 <div class="row fieldWrapper">
@@ -29,8 +31,14 @@
  
                   </div>    
                   <div class = "col-md-5">
-                       {{ field.errors }}
+                       {% if field.errors  %}
+                           <div class="alert-message block-message error">
+                               {{ field.errors }}
+                           </div>
+                       {% endif %}  
                        {{ field }}
+    
+  
                        {% if field.help_text %}
                       <!--p class = "help"-->
                          {{ field.help_text|safe }}
