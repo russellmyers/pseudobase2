@@ -33,8 +33,19 @@
           <a class="nav-item nav-link {%if tab == 'Home' %}active{% endif %}" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
           <!--a class="nav-item nav-link" href="#">Search</a-->
           <a class="nav-item nav-link {%if tab == 'More Info' %}active{% endif %}" href="{% url 'info' %}">Sequences/Strains Info</a>
-          <a class="nav-item nav-link" href="#">Links</a>
-        </div>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Links
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="http://sites.google.com/site/noorlabduke/home">Noor Laboratory</a>
+              <a class="dropdown-item" href="http://biology.duke.edu">Duke University</a>
+              <a class="dropdown-item" href="http://nigms.nih.gov/">National Institute of General Medical Sciences</a>
+              <a class="dropdown-item" href="https://www.ncbi.nlm.nih.gov/sra/?term=SRP007802">NIH NCBI Short Read Archive</a>
+
+            </div>
+          </li>            
+       </div>
         <!--
         <div class="navbar-nav ml-auto">  
           <a class="nav-item nav-link" href="#">Links</a>
