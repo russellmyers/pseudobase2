@@ -8,10 +8,10 @@
 <div class="container">
 <ul class="nav nav-tabs">
   <li class="nav-item">
-    <a class="nav-link {%if search_tab == '' %} active {% endif %}" href="{% url 'index' %}">by Gene</a>
+    <a class="nav-link {%if session_search_tab == 'gene' %} active {% endif %}" href="{% url 'index' %}?search_tab=gene">by Gene</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {%if search_tab == 'chrom' %} active {% endif %}" href="{% url 'index' %}?search_tab=chrom">by Chromosome</a>
+    <a class="nav-link {%if session_search_tab == 'chromosome' %} active {% endif %}" href="{% url 'index' %}?search_tab=chromosome">by Chromosome</a>
   </li>
 
 </ul>
