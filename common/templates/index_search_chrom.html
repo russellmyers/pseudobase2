@@ -2,60 +2,93 @@
 
 {% block searchtab %}
 <div class = "container">
-   <div class = "row">
 
 
 		<!--div class = "col-md-12 border border-primary border-top-0 rounded"-->
-		<div class = "form-group col-md-12" >
-		          <h2>By chromosome</h2>
-     
-
-
-    		<form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
-    		<!--
-        		<table  class="table " style="background-color:inherit;"> 
-        		   		{{ chromosome_form.as_table }}
-        		</table>
-        	-->
-        	<div class="alert-message block-message error">
-            	{{ chromosome_form.non_field_errors }}
-          </div>  	
-        	{% for field in chromosome_form %}
-        	     <br>
-                <div class="row fieldWrapper">
-                  
-                  <div class = "col-md-4">
-                      <b>
-                      {{ field.label_tag }}
-                      </b>
  
-                  </div>    
-                  <div class = "col-md-5">
-                       {% if field.errors  %}
-                           <div class="alert-message block-message error">
-                               {{ field.errors }}
-                           </div>
-                       {% endif %}  
-                       {{ field }}
+		<!--div class = "form-group col-md-12" -->
     
-  
-                       {% if field.help_text %}
-                      <!--p class = "help"-->
-                         {{ field.help_text|safe }}
-                      <!--/p-->   
-                      {% endif %}
-                  </div>    
-               </div>
-          {% endfor %}	
-        		<br>
-        		<!--tr class="inner"><td align="center" colspan="2"--><input type="submit" class="btn btn-default" name="search_type" value="Search by chromosome" /><!--/td></tr-->
+    <h2>By chromosome</h2>
+
+
+    <form action="/" method="post" enctype="multipart/form-data">{% csrf_token %}
+        	
+        <div class="alert-message block-message error">
+           	{{ chromosome_form.non_field_errors }}
+        </div>  
+        <div class = "row">
         
+            <div class = "col-md-1">
+            </div>
+            <div class = "form-group col-md-4"> 
+                <br>
+                <div class="row fieldWrapper">
+                          
+                    <div class = "col-md-2">
+                        <b> {{ chromosome_form.species.label_tag }} </b>
+         
+                    </div>    
+                    <div class = "col-md-10">
+                        {% if chromosome_form.species.errors  %}
+                            <div class="alert-message block-message error">
+                                {{ chromosome_form.species.errors }}
+                            </div>
+                        {% endif %}  
+                        {{ chromosome_form.species }}
+                        {% if chromosome_form.species.help_text %}
+                              <!--p class = "help"-->
+                            {{ chromosome_form.species.help_text|safe }}
+                              <!--/p-->   
+                        {% endif %}
+                    </div>    
+                </div>
+                    
+            </div>
+                
+            <div class = "form-group col-md-6"> 
+                  	
+          
+                {% for field in chromosome_form %}
+                    {% if field.label == 'Species' %}
+                	  
+                	  
+                    {% else %}
+                        <br>
+                        <div class="row fieldWrapper">
+                          
+                            <div class = "col-md-3">
+                                <b> {{ field.label_tag }} </b>
+                              
+                            </div>    
+                            <div class = "col-md-9">
+                                {% if field.errors  %}
+                                    <div class="alert-message block-message error">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}  
+                               {{ field }}
+            
+          
+                                {% if field.help_text %}
+                              <!--p class = "help"-->
+                                    {{ field.help_text|safe }}
+                              <!--/p-->   
+                                {% endif %}
+                            </div>    
+                        </div>
+                    {% endif %}
+                {% endfor %}	
+            </div>	
+            <div class = "col-md-1">
+            </div>
+        </div>
+        <div class = "row justify-content-center">
+             <input type="submit" class="btn btn-primary mt-3" name="search_type" value="Search by chromosome" /><!--/td></tr-->
+        </div>
+  
         		
-        		</form>
-        		
-       </div>  		
-   
-   </div>    
+        </div>	
+    </form>        	
     	
 </div>
 {% endblock searchtab %}
