@@ -36,3 +36,7 @@ static/css/.base_REMOTE_7584.css.swp
 static/css/base_BACKUP_7584.css
 static/css/base_LOCAL_7584.css
 static/css/base_REMOTE_7584.css
+*.tmp
+media/pseudobase_update_toolkit.xlsx
+*.bat
+*.swp

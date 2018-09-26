@@ -110,7 +110,7 @@ MIDDLEWARE_CLASSES = (
   'django.contrib.auth.middleware.AuthenticationMiddleware',
   'django.contrib.messages.middleware.MessageMiddleware',
   'django.middleware.clickjacking.XFrameOptionsMiddleware',
-  'django_pdb.middleware.PdbMiddleware',
+#  'django_pdb.middleware.PdbMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -122,7 +122,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-  'django_pdb',
+#  'django_pdb',
   'django.contrib.auth',
   'django.contrib.contenttypes',
   'django.contrib.sessions',
