@@ -1,0 +1,129 @@
+# Fixtures to load strain data.
+#
+# Original list of species from Mohamed Noor:
+#
+# Under D. pseudoobscura (ps or pse):
+# AFC12 (American Fork Canyon, UT 12)
+# Flg14 (Flagstaff, AZ 14)
+# Flg16 (Flagstaff, AZ 16)
+# Flg18 (Flagstaff, AZ 18)
+# Mather32 (Mather, CA 32)
+# MatherTL (Mather, CA TL)
+# MV2-25 (Mesa Verde, CO 2-25 reference line)
+# MSH9 (Mount St. Helenca, CA 9)
+# MSH24 (Mount St. Helena, CA 24)
+# PP1134 (San Antonio, NM, Pikes Peak 1134)
+# PP1137 (San Antonio, NM, Pikes Peak 1137)
+#
+# Under D. peudoobscura bogotana:
+# BOGNUZ (El Recreo white mutant line)
+# BOGTORO (Torobarroso)
+#
+# Under D. persimilis (per):
+# MSH1993 (Mount St. Helena, CA 1993)
+# MSH39 (Mount St. Helena, CA 39) -- won't have data for all chromosomes
+# SCI_SR (Santa Cruz Island)
+#
+# Under D. miranda (mir):
+# MSH22 (Mount St. Helena, CA 22)
+# SP138
+# MAO
+#
+# Under D. lowei (low):
+# lowei
+
+-   fields: {symbol: 'AFC12', strain: 1}
+    model: common.strainsymbol
+    pk: 1
+-   fields: {symbol: 'FLG14', strain: 2}
+    model: common.strainsymbol
+    pk: 2   
+-   fields: {symbol: 'FLG16', strain: 3}
+    model: common.strainsymbol
+    pk: 3  
+-   fields: {symbol: 'FLG18', strain: 4}
+    model: common.strainsymbol
+    pk: 4     
+-   fields: {symbol: 'MATHER32', strain: 5}
+    model: common.strainsymbol
+    pk: 5
+-   fields: {symbol: 'MATHERTL', strain: 6}
+    model: common.strainsymbol
+    pk: 6
+-   fields: {symbol: 'MV2-25', strain: 7}
+    model: common.strainsymbol
+    pk: 7 
+-   fields: {symbol: 'MSH9', strain: 8}
+    model: common.strainsymbol
+    pk: 8
+-   fields: {symbol: 'MSH24', strain: 9}
+    model: common.strainsymbol
+    pk: 9    
+-   fields: {symbol: 'PP1134', strain: 10}
+    model: common.strainsymbol
+    pk: 10 
+-   fields: {symbol: 'BDAPP1134', strain: 10}
+    model: common.strainsymbol
+    pk: 11 
+-   fields: {symbol: 'PP1137', strain: 11}
+    model: common.strainsymbol
+    pk: 12 
+-   fields: {symbol: 'BDAPP1137', strain: 11}
+    model: common.strainsymbol
+    pk: 13
+-   fields: {symbol: 'BOGNUZ', strain: 12}
+    model: common.strainsymbol
+    pk: 14   
+-   fields: {symbol: 'BOGERW', strain: 12}
+    model: common.strainsymbol
+    pk: 15 
+-   fields: {symbol: 'ERW', strain: 12}
+    model: common.strainsymbol
+    pk: 16
+-   fields: {symbol: 'BOGTORO', strain: 13}
+    model: common.strainsymbol
+    pk: 17 
+-   fields: {symbol: 'TORO', strain: 13}
+    model: common.strainsymbol
+    pk: 18  
+-   fields: {symbol: 'MSH1993', strain: 14}
+    model: common.strainsymbol
+    pk: 19      
+-   fields: {symbol: 'MSH39', strain: 15}
+    model: common.strainsymbol
+    pk: 20            
+-   fields: {symbol: 'MSH3', strain: 16}
+    model: common.strainsymbol
+    pk: 21       
+-   fields: {symbol: 'SCI_SR', strain: 17}
+    model: common.strainsymbol
+    pk: 22          
+-   fields: {symbol: 'SCI', strain: 17}
+    model: common.strainsymbol
+    pk: 23          
+-   fields: {symbol: 'MSH22', strain: 18}
+    model: common.strainsymbol
+    pk: 24 
+-   fields: {symbol: 'SP138', strain: 19}
+    model: common.strainsymbol
+    pk: 25     
+-   fields: {symbol: 'MAO', strain: 20}
+    model: common.strainsymbol
+    pk: 26           
+-   fields: {symbol: 'ARIZ', strain: 21}
+    model: common.strainsymbol
+    pk: 27 
+-   fields: {symbol: 'SCISR', strain: 17}
+    model: common.strainsymbol
+    pk: 28     
+    
+            
+       
+        
+    
+    
+    
+         
+         
+                     
+
