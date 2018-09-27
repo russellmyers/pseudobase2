@@ -21,6 +21,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('species', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['common.Species'])),
+            ('is_reference', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'common', ['Strain'])
 
@@ -58,6 +59,7 @@ class Migration(SchemaMigration):
         u'common.strain': {
             'Meta': {'object_name': 'Strain'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_reference': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'species': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['common.Species']"})
         }
