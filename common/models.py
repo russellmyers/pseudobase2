@@ -34,6 +34,11 @@ class Strain(models.Model):
         '''Define the string representation of this class of object.'''
         return '%s, %s' % (self.name, self.species.name)
 
+class StrainSymbol(models.Model):
+    '''Short symbols identifying a strain, used for importing mainly. Can be many symbols mapping to one strain.'''
+    symbol = models.CharField(max_length=255,unique=True)
+    strain = models.ForeignKey(Strain)
+
 
 class Chromosome(models.Model):
     '''Data about a particular chromosome.'''
