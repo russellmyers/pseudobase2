@@ -29,7 +29,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 
-from common.models import Strain, Chromosome
+from common.models import Chromosome, StrainSymbol
 from gene.models import Gene, GeneImportLog
 
 
@@ -45,42 +45,49 @@ class Command(BaseCommand):
         First, translate the "short name" of the strain into the appropriate
         "full name".  Then, look up the "full name" to get the related object
         which we can then use for associations.
-        
-        NOTE: We could (should) do this programmatically if we added a table
-        that mapped common strain notation to the appropriate Strain object.
-        It isn't necessary during the time crunch (a.k.a. now), but it should
-        probably be done if the translation table ends up changing often.
-    
         '''
+        
+#       OLD NOTE: We could (should) do this programmatically if we added a table
+#       that mapped common strain notation to the appropriate Strain object.
+#       It isn't necessary during the time crunch (a.k.a. now), but it should
+#       probably be done if the translation table ends up changing often.
+        
+        
+#       NEW NOTE: DONE! Below hard coded strain_translation is now replaced with StrainSymbol table:        
 
-        STRAIN_TRANSLATION = {
-          'AFC12':    'American Fork Canyon, UT 12',
-          'FLAG14':   'Flagstaff, AZ 14',
-          'FLAG16':   'Flagstaff, AZ 16',
-          'FLAG18':   'Flagstaff, AZ 18',
-          'MATHER32': 'Mather, CA 32',
-          'MATHERTL': 'Mather, CA TL',
-          'MV2_25':   'Mesa Verde, CO 2-25 reference line',
-          'MSH9':     'Mount St. Helena, CA 9',
-          'MSH24':    'Mount St. Helena, CA 24',
-          'PP1134':   'San Antonio, NM, Pikes Peak 1134',
-          'PP1137':   'San Antonio, NM, Pikes Peak 1137',
-          'ERW':      'El Recreo white mutant line',
-          'TORO':     'Torobarroso',
-          'MSH1993':  'Mount St. Helena, CA 1993',
-          'MSH39':    'Mount St. Helena, CA 39',
-          'SCISR':    'Santa Cruz Island',
-          'MSH22':    'Mount St. Helena, CA 22',
-          'MSH3':     'Mount St. Helena, CA 3',
-          'SP138':    'SP138',
-          'MAO':      'MAO',
-          'ARIZ':     'Lowei',
-        }
+
+#        STRAIN_TRANSLATION = {
+#          'AFC12':    'American Fork Canyon, UT 12',
+#          'FLAG14':   'Flagstaff, AZ 14',
+#          'FLAG16':   'Flagstaff, AZ 16',
+#          'FLAG18':   'Flagstaff, AZ 18',
+#          'MATHER32': 'Mather, CA 32',
+#          'MATHERTL': 'Mather, CA TL',
+#          'MV2_25':   'Mesa Verde, CO 2-25 reference line',
+#          'MSH9':     'Mount St. Helena, CA 9',
+#          'MSH24':    'Mount St. Helena, CA 24',
+#          'PP1134':   'San Antonio, NM, Pikes Peak 1134',
+#          'PP1137':   'San Antonio, NM, Pikes Peak 1137',
+#          'ERW':      'El Recreo white mutant line',
+#          'TORO':     'Torobarroso',
+#          'MSH1993':  'Mount St. Helena, CA 1993',
+#          'MSH39':    'Mount St. Helena, CA 39',
+#          'SCISR':    'Santa Cruz Island',
+#          'MSH22':    'Mount St. Helena, CA 22',
+#          'MSH3':     'Mount St. Helena, CA 3',
+#          'SP138':    'SP138',
+#          'MAO':      'MAO',
+#          'ARIZ':     'Lowei',
+#        }
     
-        if strain.upper() in STRAIN_TRANSLATION:
-            lookup_strain = STRAIN_TRANSLATION[strain.upper()]
-        s = Strain.objects.get(name=lookup_strain)
-        return (s, False)
+#        if strain.upper() in STRAIN_TRANSLATION:
+#            lookup_strain = STRAIN_TRANSLATION[strain.upper()]
+        try:
+            s = StrainSymbol.objects.get(symbol=strain.upper()).strain
+            return (s, False)
+        except:
+            print ('not found: ',strain.upper())
+            raise
   
     def _lookup_chromosome(self, chromosome):
         '''Load a Chromosome object for association by its name.'''

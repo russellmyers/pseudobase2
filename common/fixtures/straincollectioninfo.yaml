@@ -1,0 +1,65 @@
+# Fixtures to load strain collection info data.
+#
+
+-   fields: {strain: 1, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 1
+-   fields: {strain: 2, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 2
+-   fields: {strain: 3, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 3
+-   fields: {strain: 4, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 4 
+-   fields: {strain: 5, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 5
+-   fields: {strain: 6, year: 1959, info: ''}
+    model: common.straincollectioninfo 
+    pk: 6
+-   fields: {strain: 7, info: ''}
+    model: common.straincollectioninfo
+    pk: 7    
+-   fields: {strain: 8, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 8
+-   fields: {strain: 9, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 9
+-   fields: {strain: 10, year: 2006, info: ''}
+    model: common.straincollectioninfo
+    pk: 10
+-   fields: {strain: 11, year: 2006, info: ''}
+    model: common.straincollectioninfo
+    pk: 11 
+-   fields: {strain: 12, year: 1978, info: ''}
+    model: common.straincollectioninfo
+    pk: 12
+-   fields: {strain: 13, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 13  
+-   fields: {strain: 14, year: 1993, info: ''}
+    model: common.straincollectioninfo
+    pk: 14 
+-   fields: {strain: 15, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 15
+-   fields: {strain: 16, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 16   
+-   fields: {strain: 17, year: 2004, info: ''}
+    model: common.straincollectioninfo
+    pk: 17  
+-   fields: {strain: 18, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 18
+-   fields: {strain: 19, info: 'from D Bachtrog'}
+    model: common.straincollectioninfo
+    pk: 19   
+-   fields: {strain: 20, info: 'from D Bachtrog'}
+    model: common.straincollectioninfo
+    pk: 20      
+         
+                                           

@@ -6,6 +6,8 @@ import shutil
 import django.utils.timezone
 from django.conf import settings
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+import datetime
 
 
 class Species(models.Model):
@@ -33,6 +35,26 @@ class Strain(models.Model):
     def __str__(self):
         '''Define the string representation of this class of object.'''
         return '%s, %s' % (self.name, self.species.name)
+
+class StrainCollectionInfo(models.Model):
+    strain = models.OneToOneField(
+        Strain,
+        on_delete=models.PROTECT
+    )
+    year = models.PositiveIntegerField(
+            blank=True,
+            null=True,
+            validators=[
+                MinValueValidator(1900), 
+                MaxValueValidator(datetime.datetime.now().year)],
+            help_text="Use the following format: <YYYY>")
+    info = models.TextField(blank=True)
+    
+    class Meta:
+        verbose_name_plural = 'Strain collection info'
+    
+    def __str__(self):
+        return '%s' % (self.strain.name)
 
 class StrainSymbol(models.Model):
     '''Short symbols identifying a strain, used for importing mainly. Can be many symbols mapping to one strain.'''

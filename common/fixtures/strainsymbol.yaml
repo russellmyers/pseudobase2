@@ -116,9 +116,18 @@
 -   fields: {symbol: 'SCISR', strain: 17}
     model: common.strainsymbol
     pk: 28     
-    
-            
-       
+-   fields: {symbol: 'MV2_25', strain: 7}
+    model: common.strainsymbol
+    pk: 29     
+-   fields: {symbol: 'FLAG14', strain: 2}
+    model: common.strainsymbol
+    pk: 30   
+-   fields: {symbol: 'FLAG16', strain: 3}
+    model: common.strainsymbol
+    pk: 31  
+-   fields: {symbol: 'FLAG18', strain: 4}
+    model: common.strainsymbol            
+    pk: 32       
         
     
     
