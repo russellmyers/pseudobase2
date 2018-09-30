@@ -25,7 +25,7 @@
 <div class = "col-md-1">
 </div>   
 <div class="col-md-10 border border-primary" style="background-color:white";>    
-    <h4 ">Lines available (not all lines available for all queries)</h4>
+    <h4 class="mt-2">Lines available (not all lines available for all queries)</h4>
     <div class = "card-columns mt-4">  
         {% for species in species_tab %}
             <div class = "card">
@@ -37,11 +37,11 @@
                       lines
                    {% endif %}   
                </h6>
-               
+                 <ul class="list-unstyled">
                  {% for line in species.lines %}
                        
-                        <span style = "text-align: left"> {{ line }}</span>
-                        <br>
+                        <li class="text-left">-- {{ line }}</li>
+                        
                  {% endfor %}       
                
             </div>    
