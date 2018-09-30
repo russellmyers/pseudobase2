@@ -8,15 +8,18 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Strain.is_reference'
-        db.add_column(u'common_strain', 'is_reference',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
+        # Adding model 'StrainSymbol'
+        db.create_table(u'common_strainsymbol', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('symbol', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
+            ('strain', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['common.Strain'])),
+        ))
+        db.send_create_signal(u'common', ['StrainSymbol'])
 
 
     def backwards(self, orm):
-        # Deleting field 'Strain.is_reference'
-        db.delete_column(u'common_strain', 'is_reference')
+        # Deleting model 'StrainSymbol'
+        db.delete_table(u'common_strainsymbol')
 
 
     models = {
@@ -37,6 +40,12 @@ class Migration(SchemaMigration):
             'is_reference': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'species': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['common.Species']"})
+        },
+        u'common.strainsymbol': {
+            'Meta': {'object_name': 'StrainSymbol'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'strain': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['common.Strain']"}),
+            'symbol': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         }
     }
 
