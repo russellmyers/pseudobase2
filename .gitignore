@@ -28,14 +28,14 @@ $RECYCLE.BIN/
 #Directories to ignore
 raw_data/
 project_data/
-*.pyc
-*.pyc
+pseudo_activate.bat
 *.tmp
-*.pptx
-media/pseudobase_update_toolkit.xlsx
-*.bat
 *.swp
 static/css/base_BACKUP_7584.css
 static/css/base_LOCAL_7584.css
 static/css/base_REMOTE_7584.css
+media/Pseudobase_chromosome_test_results.pptx
+media/pseudobase_update_toolkit.xlsx
+*.bat
 *.pyc
+*.pptx
