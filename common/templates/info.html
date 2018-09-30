@@ -17,7 +17,7 @@
     </center>
   </div>
   <div class = "col-md-1">
-  </div> 
+  </div>
     {% endblock header %}
     
     
@@ -25,44 +25,29 @@
 <div class = "col-md-1">
 </div>   
 <div class="col-md-10 border border-primary" style="background-color:white";>    
-    <h4>Lines available (not all lines available for all queries)</h4>
+    <h4 ">Lines available (not all lines available for all queries)</h4>
+    <div class = "card-columns mt-4">  
+        {% for species in species_tab %}
+            <div class = "card">
+               <h5 class="card-title"><i><b>{{ species.name }}</i></b></h4>
+               <h6 class = "card-subtitle mb-2 text-muted">{{ species.num_lines }}
+                   {% if species.num_lines == 1 %}
+                      line
+                   {% else %}   
+                      lines
+                   {% endif %}   
+               </h6>
+               
+                 {% for line in species.lines %}
+                       
+                        <span style = "text-align: left"> {{ line }}</span>
+                        <br>
+                 {% endfor %}       
+               
+            </div>    
+        {% endfor %}   
+    </div>     
     
-    <table cellpadding = 5><tr><td>
-    <p>
-    <i><b>D. pseudoobscura</b></i>: 11 lines- <br>
-    --American Fork Canyon, UT 12, collected 1997<br>
-    --Flagstaff, AZ 14, collected 1997<br>
-    --Flagstaff, AZ 16, collected 1997<br>
-    --Flagstaff, AZ 18, collected 1997<br>
-    --Mather, CA 32, collected 1997<br>
-    --Mather, CA TL, collected 1959<br>
-    --Mesa Verde, CO 2-25 genome reference line<br>
-    --Mount St. Helena, CA 9, collected 1997<br>
-    --Mount St. Helena, CA 24, collected 1997<br>
-    --San Antonio, NM, Pikes Peak 1134, collected 2006<br>
-    --San Antonio, NM, Pikes Peak 1137, collected 2006<br>
-    </p>
-    </td><td>
-    <p>
-    <i><b>D. peudoobscura bogotana</b></i>: 2 lines<br>
-    --El Recreo white mutant line, collected 1978<br>
-    --Torobarroso, collected 1997<br>
-    </p>
-    <p>
-    <i><b>D. persimilis</b></i>: 4 lines<br>
-    --Mount St. Helena, CA 3 genome line, collected 1997<br>
-    --Mount St. Helena, CA 1993, collected 1993<br>
-    --Mount St. Helena, CA 39, collected 1997<br>
-    --Santa Cruz Island, collected 2004<br>
-    </p>
-    </td><td>
-    <p>
-    <i><b>D. miranda</b></i>: 3 lines<br>
-    --Mount St. Helena, CA 22, collected 1997<br>
-    --SP138, from D Bachtrog<br>
-    --MAO, from D Bachtrog<br>
-    </p>
-    </td></tr></table>
     
     <p>
     <h4>Sequencing Information</h4></p>
