@@ -28,6 +28,7 @@ $RECYCLE.BIN/
 #Directories to ignore
 raw_data/
 project_data/
+**/*.pyc
 pseudo_activate.bat
 *.tmp
 *.swp

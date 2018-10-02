@@ -35,6 +35,34 @@ class Strain(models.Model):
     def __str__(self):
         '''Define the string representation of this class of object.'''
         return '%s, %s' % (self.name, self.species.name)
+    
+    @property
+    def formatted_info(self):
+        strain_info = self.name
+        try:
+            if self.straincollectioninfo:
+                strain_info += ', '
+                strain_info += self.straincollectioninfo.formatted_info
+        except:
+            pass 
+        return strain_info
+    
+    def num_chromosomes(self):
+        from chromosome.models import ChromosomeBase
+        chrom_bases = ChromosomeBase.objects.filter(strain = self)
+        return len(chrom_bases)
+    
+    @property
+    def formatted_chromosomes_info(self):
+        chrom_info = ''
+        num = self.num_chromosomes()
+        chrom_info += ' (' + str(num) + ' chromosome'
+        if (num != 1):
+            chrom_info += 's'
+        chrom_info += ')'  
+        return chrom_info    
+  
+        
 
 class StrainCollectionInfo(models.Model):
     strain = models.OneToOneField(
@@ -55,6 +83,19 @@ class StrainCollectionInfo(models.Model):
     
     def __str__(self):
         return '%s' % (self.strain.name)
+    
+    @property    
+    def formatted_info(self):
+        strain_info = ''
+
+        if (self.year is not None):
+           strain_info += 'collected: ' + str(self.year)
+        if (len(self.info) > 0):
+           if (len(strain_info) > 0):
+               strain_info += ', '
+           strain_info += self.info
+           
+        return strain_info    
 
 class StrainSymbol(models.Model):
     '''Short symbols identifying a strain, used for importing mainly. Can be many symbols mapping to one strain.'''
