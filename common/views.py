@@ -135,51 +135,18 @@ def index(request):
             return _render_gene_search(request)
     return _render_search_forms(request)
 
-
-
-def format_strain_collection_info(strain,include_chromosome_info = False):
-
-    strain_info = ''
-
-    try:
-        if (strain.straincollectioninfo.year is not None):
-            strain_info += ', collected: ' + str(strain.straincollectioninfo.year)
-        if (len(strain.straincollectioninfo.info) > 0):
-           strain_info += ', ' + strain.straincollectioninfo.info
-    except:
-        pass
-    
-    if (include_chromosome_info):
-        chrom_bases = ChromosomeBase.objects.filter(strain = strain)
-        strain_info += ' (' + str(len(chrom_bases)) + ' chromosome'
-        if (len(chrom_bases) != 1):
-            strain_info += 's'
-        strain_info += ')'    
-        
-    
-    return strain.name + strain_info
-    
-
 def info(request):
     custom_data = {}
     custom_data['tab'] = 'More Info'
     
     all_species = Species.objects.all()
-    print ('all species',all_species)
     species_tab = []
     for species in all_species:
         lines = Strain.objects.filter(species = species)
-        lines_tab = []  
-        for line in lines:
-            line_info = format_strain_collection_info(line)
-            lines_tab.append(line_info)
-        species_tab.append({'name':species.name,'num_lines':len(lines),'lines':lines_tab})
+        species_tab.append({'name':species.name,'num_lines':len(lines),'lines':lines})
         
     custom_data['species_tab'] = species_tab
-    print ('species_tab: ',species_tab)
-        
-        
-    
+
     return render_to_response('info.html', custom_data,
       context_instance=RequestContext(request))
 
