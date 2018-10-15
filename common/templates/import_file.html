@@ -1,0 +1,49 @@
+<html><title>Pseudobase information</title>
+{% extends "base.html" %}
+
+{% block page_title %}Import File{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>Pending Import File</h1>
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div>
+    {% endblock header %}
+    
+    
+    {% block content %}
+<div class = "col-md-1">
+</div>   
+<div class="col-md-10 border border-primary" style="background-color:white;">
+    {% if file_info.error %}
+        <p> File name: {{ fname }} import failed </p>
+        <p> Reason: {{ file_info.error }} </p>
+    {% else %}    
+        <ul>
+          <li> File name: {{ fname }} </li>
+          <li> Chromosome: {{ file_info.chromosome_name }} </li>
+          <li> Strain: {{ file_info.strain_name }} </li>
+          <li> Start position: {{ file_info.position }} </li>
+          <li> Number of positions: {{ file_info.rec_count }} </li>
+          <li> File format: {{ file_info.format }} </li>
+          <li> Import successful! </li>
+        </ul>  
+    {% endif %}    
+      
+
+
+</div>
+<div class = "col-md-1">
+</div>   
+
+{% endblock content %}

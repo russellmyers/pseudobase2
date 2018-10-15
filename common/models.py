@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import csv
 
 import django.utils.timezone
 from django.conf import settings
@@ -210,3 +211,104 @@ class BatchProcess(models.Model):
     class Meta:
         '''Define Django-specific metadata.'''
         abstract = True
+
+__metaclass__ = type
+class ImportFileReader():
+# Not a database table
+      
+      def __init__(self,fPath,target_field_names=None):
+          self.fPath = fPath
+
+          self.field_names = target_field_names 
+           
+          self.inFile = open(self.fPath)
+          self.format_parser = self._determine_format_parser()
+          
+          #Ensure file is at beginning
+          self.inFile.seek(0) 
+          self.reader = csv.reader(self.inFile, delimiter='\t')
+
+      def get_num_records(self):
+ 
+          #Ensure file is at beginning
+          self.inFile.seek(0)     
+          count_reader = csv.reader(self.inFile, delimiter='\t')
+          row_count = sum(1 for row in count_reader)
+          
+          self.inFile.seek(0)   
+          
+          return row_count
+     
+      def parse_line(self,line):
+          
+          if line is None:
+             return None 
+          
+          data = dict(zip(self.field_names, self.format_parser(line)))
+          
+          return data
+      
+      def get_next_line(self,reset=False):
+         
+          if (reset):
+              self.inFile.seek(0) 
+              self.reader = csv.reader(self.inFile, delimiter='\t')
+         
+          try:  
+              line = self.reader.next()
+              return line
+              
+          except:
+              return None 
+        
+      def get_and_parse_next_line(self,reset=False):
+          
+          line = self.get_next_line(reset)
+          
+          return self.parse_line(line)
+
+          
+      def _get_first_line(self):
+          self.inFile.seek(0) 
+          reader = csv.reader(self.inFile, delimiter='\t')
+         
+          try:  
+              line = reader.next()
+              return line
+          except:
+              return None
+          
+    
+      def  dummy_format_parser(self,line):
+         return line                            
+        
+     
+          
+      def _determine_format_parser_from_example_line(self,example_line):
+          if example_line is None:
+              return None
+          
+          if (self.field_names is None):
+              self.field_names = []
+              for i in range (len(example_line)):
+                  self.field_names.append('f' + str(i))
+                  
+        
+          return self.dummy_format_parser
+          
+         
+          
+      def _determine_format_parser(self):
+#          pdb.set_trace()
+          example_line = self._get_first_line()
+          
+          format_parser = self._determine_format_parser_from_example_line(example_line)
+ 
+          return format_parser
+              
+          
+      def is_valid(self):
+          return self.format_parser is not None
+      
+      def finalise(self):
+          self.inFile.close()

@@ -1,0 +1,174 @@
+<html><title>Pseudobase information</title>
+{% extends "base.html" %}
+
+{% block page_title %}Import{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>Pending Imports - <i>Chromosome Sequences</i></h1>
+    <!--h6 class = "text-muted">Select a file to import</h6-->
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div>
+  
+ 
+{% endblock header %}
+    
+    
+{% block content %}
+
+{{ form.non_field_errors }}
+  <form action="" method="post">
+     {% csrf_token %}
+      <div class = "row">
+        <div class = "col-md-1">
+        </div> 
+    
+        
+     
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col" </th>
+                                         <th scope = "col">Action</th>
+                                         <th scope = "col">File name</th>
+                                         <th scope = "col">Chromosome</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Start position</th>
+                                         <th scope = "col">File size</th>
+                                         <th scope = "col">File format</th>
+                                     </tr>
+                                
+                                </thead>
+                            
+                                <tbody>
+                                    
+                                         {% for file_info in pending_files %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                     <td>
+                                                       
+                                                        <input type="checkbox"  value="{{ file_info.file_name }}" name="import_files">
+                                                     </td> 
+                                                     <td class = "small">
+                                                          {% if file_info.format == 'unknown' %}
+                                                          {% else %}
+                                                              <a href = "{% url 'importfile' file_info.file_name %}"
+                                                              {% if file_info.exists_in_db %}
+                                                                   onclick = "return confirm('Data exists already in Pseudobase for\n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n This will update/overwrite existing data in Pseudobase. Are you sure?')">
+                                                                  <span>&#9851;</span>
+                                                              {% else %}
+                                                                   onclick = "return confirm('Importing new data into Pseudobase for \n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n Are you sure?')">
+                                                                  <span>&#10133;</span>
+                                                              {% endif %}  
+                                                              </a>
+                                                          {% endif %}    
+                                                     </td>  
+                                                     {% if file_info.format == 'unknown' %}
+                                                         <td class = "text-muted">{{ file_info.file_name }}</td>
+                                                         
+                                                     {% else %}    
+                                                         <td class = "small">{{ file_info.file_name }}</td>
+                                                     {% endif %}  
+                                                     
+                   
+                                                         <!--/th-->
+                                                     <td class = "small"> {{ file_info.chromosome_name }}</td>
+                                                     <td class = "small"> {{ file_info.strain_name }} </td>
+                                                     <td class = "small"> {{ file_info.position }} </td>
+                                                     <td class = "small"> {{ file_info.file_size_MB }}</td> 
+                                                     <td class = "small"> {{ file_info.format }} </td>
+                 
+                                                 
+                                                        
+                
+                                             </tr>
+                                         {% empty %}
+                                            <tr>
+                                              <td class = "text-success">No files currently pending import!</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->        
+                                            </tr>
+                                        {% endfor %}
+                                           
+                                       
+                                
+                                </tbody>
+                      
+                           </table>
+                           
+                       
+               
+        </div>
+        <div class = "col-md-1">
+        </div>  
+     </div>
+ 
+               {% for file_info in pending_files %}
+               {% empty %}
+                 <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
+               {% endfor %}
+
+     <button type="submit" name="importfiles" class = "btn btn-primary mt-2">Import selected file(s)</button>     
+  </form>    
+  <h4 class="mt-4">Files successfully imported into Pseudobase</h4>        
+
+  <div class = "row mt-2"> 
+
+    <div class = "col-md-1">
+    </div> 
+
+    <div class="col-md-10 border border-primary" style="background-color:white;">
+            
+                 <table class = "table table-sm">
+                    <thead>
+                        <tr>
+                             <th scope = "col">File name</th>
+                             <th scope = "col">Started Import</th>
+                             <th scope = "col">Ended Import</th>
+                             <th scope = "col">Base count</th>
+                             <th scope = "col">Clip count</th>
+                         </tr>
+                    
+                    </thead>
+                
+                    <tbody>
+                         {% for recent_import in recent_imports %}
+                             <tr>
+                                     <th scope = "row" class = "small"> {{ recent_import.file_path }}</th>
+                                     <td class = "small"> {{ recent_import.start }} </td>
+                                     <td class = "small"> {{ recent_import.end }} </td>
+                                     <td class = "small"> {{ recent_import.base_count }}</td> 
+                                     <td class = "small"> {{ recent_import.clip_count }} </td>
+ 
+                                 
+                                        
+
+                             </tr>
+                         {% empty %}
+                            <td> NONE</td>
+                            <td> <small>No files imported into Pseudobase yet</small></td>        
+                           
+                        {% endfor %}
+                    
+                    </tbody>
+          
+               </table>     
+    </div>
+
+    <div class = "col-md-1">
+    </div> 
+       
+</div>
+
+
+{% endblock content %}

@@ -23,16 +23,22 @@
 {% endblock %}
 <!--hr /-->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #5f788a;"> <!--style= "background-color: #e3f2fd;-->
-      <a href="#" class="navbar-left"><img src="{{ STATIC_URL }}img/pseudobase_header_a_rounded.gif" alt="Pseudobase" width="250px"></a>
+      <a href="#" class="navbar-brand"><img src="{{ STATIC_URL }}img/pseudobase_header_a_rounded.gif" alt="Pseudobase" width="250px"></a>
       <!--a class="navbar-brand" href="#"> Pseudobase</a-->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-item nav-link {%if tab == 'Home' %}active{% endif %}" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
-          <!--a class="nav-item nav-link" href="#">Search</a-->
-          <a class="nav-item nav-link {%if tab == 'More Info' %}active{% endif %}" href="{% url 'info' %}">Sequences/Strains Info</a>
+        
+        <ul class="navbar-nav mr-auto">
+        
+          <li class = "nav-item {%if tab == 'Home' %}active{% endif %}">
+            <a class="nav-link " href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
+          </li> 
+           <li class = "nav-item {%if tab == 'More Info' %}active{% endif %}"> 
+             <a class="nav-link" href="{% url 'info' %}">Sequences/Strains Info</a>
+          </li> 
+          
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Links
@@ -44,19 +50,42 @@
               <a class="dropdown-item" href="https://www.ncbi.nlm.nih.gov/sra/?term=SRP007802">NIH NCBI Short Read Archive</a>
 
             </div>
-          </li>            
-       </div>
+          </li>  
+                 
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+           <li class = "nav-item"> 
+             <a class="nav-link" href="{% url 'import' %}">Import</a>
+          </li> 
+       </ul>
+    
+    
         <!--
         <div class="navbar-nav ml-auto">  
           <a class="nav-item nav-link" href="#">Links</a>
         </div> 
         -->
        </div>
-      </div>
+    
 </nav>
 <br>
+
+
+
 {% block header %}<h2>Search by gene or by region in the reference <i>D. pseudoobscura</i> genome sequence</h2>{% endblock %}
 <br />
+
+<div>
+ {% if messages %}
+      <ul  class="messages list-unstyled">
+        {% for message in messages %}
+          <li class="{{ message.tags }}" role = "alert">{{ message }} </li>
+        {% endfor %}
+      </ul>
+  {% endif %}
+</div>
+  
 <div>
 {% block content %}
 

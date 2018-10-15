@@ -8,11 +8,16 @@ import re
 import string
 import struct
 import textwrap
+import sys
+from os.path import join
 
 from django.conf import settings
 from django.db import models
+import django.utils.timezone
+from django.db import connection, transaction
 
-from common.models import Strain, Chromosome, ImportLog
+
+from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader
 
 
 class ChromosomeBase(models.Model):
@@ -481,3 +486,375 @@ class ChromosomeImportLog(ImportLog):
     
     base_count = models.PositiveIntegerField()
     clip_count = models.PositiveIntegerField()
+
+
+    
+class ChromosomeImportFileReader(ImportFileReader):
+    # Not a database table
+    def __init__(self,fPath,target_field_names=None):
+           if target_field_names is None:
+              target_field_names = ['chromosome_name', 'strain_name', 'position', 
+                                     'coverage', 'base'] 
+           super(ChromosomeImportFileReader, self).__init__(fPath,target_field_names)
+    
+
+    def _reference_format(self, line):
+        '''Parse a line in "reference" format and return a list of the data.
+      
+        The "reference" format is 4 tab-delimited fields, each field containing
+        a single value.
+      
+        NOTE: The coverage value here defaults to 1, as the reference data has
+        no coverage information.
+      
+        '''
+        
+        return [line[0], line[1], int(line[2]), 1, line[3].upper()]
+
+    def _standard_format(self, line):
+        '''Parse a line in "standard" format and return a list of the data.
+      
+        The "standard" format is 4 tab-delimited fields.  The third field
+        contains three space-delimited values.  The first column is empty.
+      
+        '''
+        #pdb.set_trace()
+        replace_whitespace = re.compile(r'\s').sub
+        base_info = line[3].split(' ', 2)
+        return [str(line[1]), str(line[2]), int(base_info[0]), 
+          base_info[1].upper(), replace_whitespace('', base_info[2]).upper()]
+    
+    def _determine_format_parser_from_example_line(self,example_line):
+          if example_line is None:
+              return None
+    
+          if len(example_line) == 4:
+            if example_line[0]:
+                # Reference data format
+                return self._reference_format
+            else:
+                # Standard data format
+                return self._standard_format
+          else:
+            # Invalid data format
+               return None
+           
+            
+    def is_reference_format(self):
+          return self.format_parser == self._reference_format         
+        
+class ChromosomeImporter():
+#Not a database table
+
+    def __init__(self,chromosome_data):
+            self.chromosome_data = chromosome_data
+            self.chromosome_data_fpath,self.chromosome_data_fname = os.path.split(self.chromosome_data)
+            
+            self.char_search = re.compile(r'[^ACTGKYSRWMND]').search
+            self.replace_whitespace = re.compile(r'\s').sub
+            self.replace_no_data = re.compile (r'D').sub
+    
+
+ 
+    def _lookup_strain(self, strain):
+        '''Load a Strain object for association by its "short name".
+    
+        First, translate the "short name" of the strain into the appropriate
+        "full name".  Then, look up the "full name" to get the related object
+        which we can then use for associations.
+       ''' 
+        
+#        OLD NOTE: We could (should) do this programmatically if we added a table
+#        that mapped common strain notation to the appropriate Strain object.
+#        It isn't necessary during the time crunch (a.k.a. now), but it should
+#        probably be done if the translation table ends up changing often.
+#    
+#        
+#        NEW NOTE: DONE! Below hard coded strain_translation is now replaced with StrainSymbol table:        
+        
+#    
+#        STRAIN_TRANSLATION = {
+#          'AFC12':     'American Fork Canyon, UT 12',
+#          'FLG14':     'Flagstaff, AZ 14',
+#          'FLG16':     'Flagstaff, AZ 16',
+#          'FLG18':     'Flagstaff, AZ 18',
+#          'MATHER32':  'Mather, CA 32',
+#          'MATHERTL':  'Mather, CA TL',
+#          'MV2-25':    'Mesa Verde, CO 2-25 reference line',
+#          'MSH9':      'Mount St. Helena, CA 9',
+#          'MSH24':     'Mount St. Helena, CA 24',
+#          'PP1134':    'San Antonio, NM, Pikes Peak 1134',
+#          'BDAPP1134': 'San Antonio, NM, Pikes Peak 1134',
+#          'PP1137':    'San Antonio, NM, Pikes Peak 1137',
+#          'BDAPP1137': 'San Antonio, NM, Pikes Peak 1137',
+#          'BOGNUZ':    'El Recreo white mutant line',
+#          'BOGERW':    'El Recreo white mutant line',
+#          'ERW':       'El Recreo white mutant line',
+#          'BOGTORO':   'Torobarroso',
+#          'TORO':      'Torobarroso',
+#          'MSH1993':   'Mount St. Helena, CA 1993',
+#          'MSH39':     'Mount St. Helena, CA 39',
+#          'SCI_SR':    'Santa Cruz Island',
+#          'SCI':       'Santa Cruz Island',
+#          'MSH22':     'Mount St. Helena, CA 22',
+#          'SP138':     'SP138',
+#          'MAO':       'MAO',
+#          'ARIZ':      'Lowei',
+#        }
+#    
+#        if strain.upper() in STRAIN_TRANSLATION:
+#            lookup_strain = STRAIN_TRANSLATION[strain.upper()]
+    
+        try:
+            s = StrainSymbol.objects.get(symbol=strain.upper()).strain
+            return (s, False)
+        except Strain.DoesNotExist:
+            raise
+  
+    def _lookup_chromosome(self, chromosome):
+        '''Load a Chromosome object for association by its name.'''
+        return (Chromosome.objects.get(name=chromosome), False)
+  
+    def _coverage_index(self, n):
+        '''Pack n into a byte for use in the coverage index.'''
+        return struct.pack('B', n)
+  
+    def _index(self, n):
+        '''Pack n into an integer for use in the base index.'''
+        return struct.pack('I', n)
+
+
+    def get_info(self,incl_rec_count = False):
+
+            try:
+   
+                chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
+     
+                if not chromosome_reader.format_parser:
+                   return {'file_name':self.chromosome_data_fname,'format':'unknown'} 
+                   #raise Exception('Unknown data format!')
+                else:
+                   # Get the data we only want to think about once.
+                    first_data = chromosome_reader.get_and_parse_next_line(reset=True)
+                    
+                    if incl_rec_count:
+                        
+                        rec_count = chromosome_reader.get_num_records()
+                        first_data['rec_count'] = rec_count
+                        
+                    file_size = os.path.getsize(self.chromosome_data) 
+                    first_data['file_size'] = file_size / 1000000.0
+                    
+                    if (chromosome_reader.is_reference_format()):
+                        first_data['format'] = 'Reference'
+                    else:
+                        first_data['format'] = 'Non-ref'
+                        
+                    first_data['file_name'] = self.chromosome_data_fname
+                    
+                    first_data['exists_in_db'] = self.already_exists(first_data['strain_name'],first_data['chromosome_name'])
+                    
+                    
+                    return  first_data
+             
+            except:
+                raise
+                
+            finally:
+                chromosome_reader.finalise()
+               
+        
+    def already_exists(self,strain_name,chromosome_name):
+        try:
+            strain = self._lookup_strain(strain_name)[0]
+            chromosome = self._lookup_chromosome(chromosome_name)[0]
+        except:
+            return False
+
+        #Check if chromosome/strain already exists
+        if ChromosomeBase.objects.filter(chromosome = chromosome, strain = strain).exists():
+            return True
+        else:
+           return False  
+
+    def import_data(self):
+        
+            # Create a new ImportLog object to store metadata about the import.
+            self.import_log = ChromosomeImportLog(start=django.utils.timezone.now(),
+              file_path=os.path.abspath(self.chromosome_data), base_count=0, 
+              clip_count=0)
+    
+            # Start transaction management.
+            transaction.commit_unless_managed()
+            transaction.enter_transaction_management()
+            transaction.managed(True)
+        
+            # Make a new ChromosomeBase.
+            self.cb = ChromosomeBase()
+            self.cb.file_tag = ChromosomeBase.generate_file_tag()
+            self.cb.start_position = self.cb.end_position = 0
+        
+            # Open our data files.
+            self.data_file = open(self.cb.data_file_path, 'w')
+            self.index_file = open(self.cb.index_file_path, 'wb')
+            self.coverage_file = open(self.cb.coverage_file_path, 'w')        
+        
+            try:
+                print "Constructing ChromosomeBase object from file:\n%s" % \
+                  self.chromosome_data
+                print "  ",
+    
+                chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
+     
+                if not chromosome_reader.format_parser:
+                    # Unknown data format
+                    # If the file isn't in the reference or standard data format,
+                    # we can't do anything with it.
+                    raise Exception('Unknown data format!')
+                else:
+                   # Get the data we only want to think about once.
+                    first_data = chromosome_reader.get_and_parse_next_line(reset=True)
+          
+                    if self.already_exists(first_data['strain_name'],first_data['chromosome_name']):
+                       raise Exception('Chromosome Data for chromosome: %s and strain: %s exists already!' % (first_data['chromosome_name'],first_data['strain_name'])) 
+                    
+                   
+                    self.cb.start_position = first_data['position']
+                    self.cb.strain = self._lookup_strain(first_data['strain_name'])[0]
+                    self.cb.chromosome = self._lookup_chromosome(
+                      first_data['chromosome_name'])[0]
+         
+        
+                # Save ChromosomeBase.
+                self.cb.save()
+            
+                max_position = bases_total = 0
+          
+                # Now process all the lines in the file (reset to get back to start)
+                data = chromosome_reader.get_and_parse_next_line(reset=True)
+                n = 0
+     
+                while data is not None:
+                    # Skip empty lines.
+                    if not data: continue
+          
+                    # A simple progress indicator, since processing can take a 
+                    # while. Shows progress after every million records processed.
+                    if not n % (1000 * 1000):
+                        sys.stdout.write('.')
+                        sys.stdout.flush()
+            
+         
+                    ## Custom processing to handle data cleanup.
+          
+                    # Change "N" characters in the coverage column to 0.
+                    # Additionally change the value to be an integer instead of a 
+                    # string.
+                    if data['coverage'] == 'N':
+                        data['coverage'] = 0
+    
+                    # Coverages that are above 255 should be clipped to 255, so
+                    # that we don't need to store 2 bytes of data per coverage.
+                    data['coverage'] = int(data['coverage'])
+                    if data['coverage'] > 255:
+                        self.import_log.clip_count += 1
+                        data['coverage'] = 255
+          
+                    # Check that the base string contains no invalid characters.
+                    if self.char_search(data['base']):
+                        print \
+                          'Invalid character detected in base - line %s: %s' % \
+                            (n, data['base'])
+                        break
+                    else:
+                        # Change "D" characters in the base column to "-".
+                        data['base'] = self.replace_no_data(r'-', data['base'])
+                        pass
+          
+                    max_position = int(data['position'])
+          
+                    ## Append the base and coverage data to the appropriate files.
+            
+                    # Base data.
+                    base_string = ''.join(data['base'])
+                    base_bytes = len(base_string)
+                    self.data_file.write(base_string)
+          
+                    # Base data index.
+                    self.index_file.write(self._index(bases_total))
+                    bases_total += base_bytes
+            
+                    # Coverage data.
+                    self.coverage_file.write(self._coverage_index(data['coverage'])) 
+                    
+                    data = chromosome_reader.get_and_parse_next_line()
+                    n += 1
+                    
+            
+                # Base and coverage sequences should now be fully constructed, so 
+                # we can save the object.
+                self.cb.end_position = max_position
+                self.cb.save()
+                  
+                # Finish populating the import metadata.
+                self.import_log.base_count = self.cb.total_bases
+                self.import_log.end = django.utils.timezone.now()
+                self.import_log.calculate_run_time()
+          
+                # Only save the import metadata if we actually did anything.
+                if self.import_log.base_count > 0:    
+                    self.import_log.save()
+                    
+                head, tail = os.path.split(self.chromosome_data) 
+                chromosome_reader.finalise()
+                destpath = './raw_data/chromosome'
+                print ('renaming: ',os.path.abspath(self.chromosome_data))
+                print (' ..to: ',os.path.join(destpath,tail))
+                os.rename(os.path.abspath(self.chromosome_data), os.path.join(destpath,tail)) 
+                print ('just done it!')
+            
+            except:
+                self.data_file.close()
+                self.index_file.close()
+                self.coverage_file.close()
+                os.remove(self.cb.data_file_path)
+                os.remove(self.cb.index_file_path)
+                os.remove(self.cb.coverage_file_path)
+                
+                chromosome_reader.finalise()
+    
+                transaction.rollback()
+                transaction.leave_transaction_management()
+    
+                raise
+    
+            self.data_file.close()
+            self.index_file.close()
+            self.coverage_file.close()
+            
+            chromosome_reader.finalise()
+        
+            # Finalize the transaction and close the db connection.
+            transaction.commit()
+            transaction.leave_transaction_management()
+            connection.close()
+        
+#            # All lines of chromosome data have been processed, so we can print a 
+#            # short summary of what we did.
+#            td = self.import_log.end - self.import_log.start
+#            print '\nProcessing complete in %s days, %s.%s seconds.' % \
+#              (td.days, td.seconds, td.microseconds)
+#            print '  ChromosomeBase objects constructed: 1'
+#            print '  Total bases: %s' % self.import_log.base_count
+#            print '  Total coverages clipped: %s' % self.import_log.clip_count            
+            
+    def print_summary(self):
+#        # All lines of chromosome data have been processed, so we can print a 
+#        # short summary of what we did.
+         td = self.import_log.end - self.import_log.start
+         print '\nProcessing complete in %s days, %s.%s seconds.' % \
+           (td.days, td.seconds, td.microseconds)
+         print '  ChromosomeBase objects constructed: 1'
+         print '  Total bases: %s' % self.import_log.base_count
+         print '  Total coverages clipped: %s' % self.import_log.clip_count
+                    

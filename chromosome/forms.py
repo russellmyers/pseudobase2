@@ -94,3 +94,9 @@ class SearchForm(forms.Form):
         attrs={'class': 'form-control form-control-sm col-9','placeholder':'eg 1..1000'}),                                  
                                   help_text=\
       '<div class="help_text">Format: &lt;start&gt;..&lt;end&gt;</div>')
+
+class ImportForm(forms.Form):
+      import_files = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+    )
+    
