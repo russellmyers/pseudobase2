@@ -17,12 +17,6 @@ urlpatterns = patterns('',
    
    (r'^chromosome/', include('chromosome.urls')),
    
-#   url(r'^import/$','common.views.import_files',name='import'),
-   
-#   url(r'^import/delchr/$','common.views._delete_latest',name='dellatest'),
-   
-#   url(r'^import/(?P<fname>.+)/$','common.views.import_file',name='importfile'),
-  
   # The page handling file deliveries
   (r'^delivery/(.+)$', 'common.views.delivery'),
   
