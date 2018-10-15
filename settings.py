@@ -118,7 +118,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
   # Always use forward slashes, even on Windows.
   # Don't forget to use absolute paths, not relative paths.
-  'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase/templates',
+  'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/templates',
 )
 
 INSTALLED_APPS = (
