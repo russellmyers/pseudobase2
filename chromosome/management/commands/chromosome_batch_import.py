@@ -37,30 +37,14 @@ class Command(BaseCommand):
             #for pending_import_file in request.chromosomebatchimportlog_set.filter(status = 'P'):
             for batch_file in batch_file_list:
 
-                print ('pending: ',batch_file)
                 try:
-                    #pending_import_file.status = 'A'
-                    #pending_import_file.start = django.utils.timezone.now()
-                    #pending_import_file.save()
-                    
+                   
                     chr_importer = ChromosomeImporter(batch_file)
                     chr_importer.import_data(request)
                     chr_importer.print_summary()
                     
-                    #pending_import_file.chromebase = chr_importer.cb
-                    #pending_import_file.clip_count = chr_importer.import_log.clip_count
-                    #pending_import_file.base_count = chr_importer.cb.total_bases
-                    #pending_import_file.status = 'C'
-                    #pending_import_file.end = django.utils.timezone.now()
-                    #pending_import_file.run_microseconds = pending_import_file.calculate_run_time()
-
-                    #pending_import_file.save()
-                    
                 except:
                     print ('chromosome importer failed: ',batch_file)
-                    #pending_import_file.status = 'F'
-                    #pending_import_file.end = django.utils.timezone.now()
-                    #pending_import_file.save()
                     pass
             
   
@@ -69,8 +53,6 @@ class Command(BaseCommand):
  
         except Exception:
             request.stop(batch_status='F')
-            #request.batch_start = None
-            #request.batch_end = None
             request.save()
             raise
            

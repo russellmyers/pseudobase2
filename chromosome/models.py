@@ -511,9 +511,28 @@ class ChromosomeBatchImportProcess(BatchProcess):
         batchimports = self.chromosomebatchimportlog_set.all()  #ChromosomeBatchImportLog.objects.filter(batch=self.id)
         return len(batchimports)
     
+    def set_orig_request_from_filenames(self,filenames):
+        pending_import_rel_path = './raw_data/chromosome/pending_import'
+        rel_paths = [os.path.join(pending_import_rel_path,filename) for filename in filenames]
+        self.set_orig_request_from_relpaths(rel_paths)
+    
+    def set_orig_request_from_relpaths(self,rel_paths):
+        orig_req = ''
+        for i,rel_path in enumerate(rel_paths):
+            file_path = os.path.abspath(rel_path)
+            orig_req += file_path
+            if i == len(rel_paths) - 1:
+                pass
+            else:
+                orig_req += '\n'
+        self.original_request = orig_req   
+        
+    
     @staticmethod
     def create_batch_and_import_file(chromosome_data):
         #helper static method to create a batch and import single file within it
+        #chromosome_data contains relative path eg ./raw_data/chromosome/pending_import/file.txt
+        
         transaction.commit_unless_managed()
         transaction.enter_transaction_management()
         transaction.managed(True)
@@ -525,11 +544,13 @@ class ChromosomeBatchImportProcess(BatchProcess):
             
             bp = ChromosomeBatchImportProcess(submitted_at = django.utils.timezone.now(),batch_status = 'P')
             
-            orig_req = ''
-            abs_path = os.path.abspath(chromosome_data)
-            orig_req += abs_path
-
-            bp.original_request = orig_req  
+#            orig_req = ''
+#            abs_path = os.path.abspath(chromosome_data)
+#            orig_req += abs_path
+#
+#            bp.original_request = orig_req  
+            bp.set_orig_request_from_relpaths([chromosome_data])
+            
             bp.save()
            
             

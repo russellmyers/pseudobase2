@@ -37,15 +37,17 @@ def import_files(request):
             
             bp = ChromosomeBatchImportProcess(submitted_at = django.utils.timezone.now(),batch_status = 'P')
             
-            orig_req = ''
-            for i,sel_file in enumerate(selected_values):
-               file_path = os.path.join(abspath,sel_file)
-               orig_req += file_path
-               if i == len(selected_values) - 1:
-                   pass
-               else:
-                   orig_req += '\n'
-            bp.original_request = orig_req   
+#            orig_req = ''
+#            for i,sel_file in enumerate(selected_values):
+#               file_path = os.path.join(abspath,sel_file)
+#               orig_req += file_path
+#               if i == len(selected_values) - 1:
+#                   pass
+#               else:
+#                   orig_req += '\n'
+#            bp.original_request = orig_req   
+            bp.set_orig_request_from_filenames(selected_values)
+            
             bp.save()
             
            
@@ -197,14 +199,14 @@ def import_file(request,fname=''):
     
     mypath = './raw_data/chromosome/pending_import'
     from os.path import join
-    fullfile = join(mypath, fname)
+    rel_path = join(mypath, fname)
     
     try:
-        c_importer = ChromosomeImporter(fullfile)
+        c_importer = ChromosomeImporter(rel_path)
         file_info = c_importer.get_info(incl_rec_count = True)
         custom_data['file_info'] = file_info
 
-        ChromosomeBatchImportProcess.create_batch_and_import_file(os.path.abspath(fullfile))
+        ChromosomeBatchImportProcess.create_batch_and_import_file(rel_path)
         messages.success(request, 'File imported successfully!',extra_tags='html_safe alert alert-success')
         return redirect(import_files)
 

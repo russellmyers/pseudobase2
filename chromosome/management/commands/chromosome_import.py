@@ -43,7 +43,7 @@ class Command(BaseCommand):
         #Perform this legacy command by creating a batch of one file and  calling the new batch import process
        
         try:
-            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(os.path.abspath(chromosome_data))
+            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(chromosome_data)
             print('bp: ',bp)
         except:
             raise
