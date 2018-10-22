@@ -5,6 +5,7 @@ environment.  Settings appropriate for usage in a local development
 environment can be found in settings.py.
 
 '''
+import os 
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -190,3 +191,7 @@ PSEUDOBASE_CHROMOSOME_DATA_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Informati
 PSEUDOBASE_RESULTS_FILENAME = 'pseudobase_results.zip'
 PSEUDOBASE_RESULTS_PREFIX = '/delivery/'
 PSEUDOBASE_DELIVERY_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/delivery/'
+
+PSEUDOBASE_RAW_DATA_PREFIX = 'raw_data/'
+PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX = os.path.join(PSEUDOBASE_RAW_DATA_PREFIX,'chromosome/')
+PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX = os.path.join(PSEUDOBASE_RAW_DATA_PREFIX,'chromosome/pending_import/')
