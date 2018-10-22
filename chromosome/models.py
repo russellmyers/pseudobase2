@@ -512,8 +512,8 @@ class ChromosomeBatchImportProcess(BatchProcess):
         return len(batchimports)
     
     def set_orig_request_from_filenames(self,filenames):
-        pending_import_rel_path = './raw_data/chromosome/pending_import'
-        rel_paths = [os.path.join(pending_import_rel_path,filename) for filename in filenames]
+        #pending_import_rel_path = 'raw_data/chromosome/pending_import/'
+        rel_paths = [os.path.join(settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX,filename) for filename in filenames]
         self.set_orig_request_from_relpaths(rel_paths)
     
     def set_orig_request_from_relpaths(self,rel_paths):
@@ -942,7 +942,8 @@ class ChromosomeImporter():
                     
                 head, tail = os.path.split(self.chromosome_data) 
                 chromosome_reader.finalise()
-                destpath = './raw_data/chromosome'
+                destpath =  settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX #'raw_data/chromosome/'
+                
                 print ('renaming: ',os.path.abspath(self.chromosome_data))
                 print (' ..to: ',os.path.join(destpath,tail))
                 os.rename(os.path.abspath(self.chromosome_data), os.path.join(destpath,tail)) 

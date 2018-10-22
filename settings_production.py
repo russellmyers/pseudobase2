@@ -5,7 +5,7 @@ environment.  Settings appropriate for usage in a local development
 environment can be found in settings.py.
 
 '''
-
+import os
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -189,3 +189,8 @@ PSEUDOBASE_CHROMOSOME_DATA_ROOT = '/srv/project_data/pseudobase/chromosome/'
 PSEUDOBASE_RESULTS_FILENAME = 'pseudobase_results.zip'
 PSEUDOBASE_RESULTS_PREFIX = '/delivery/'
 PSEUDOBASE_DELIVERY_ROOT = '/srv/project_data/pseudobase/delivery/'
+
+PSEUDOBASE_RAW_DATA_PREFIX = 'raw_data/'
+PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX = os.path.join(PSEUDOBASE_RAW_DATA_PREFIX,'chromosome/')
+PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX = os.path.join(PSEUDOBASE_RAW_DATA_PREFIX,'chromosome/pending_import/')
+

@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 import django.utils.timezone
 from django.db import connection, transaction
+from django.conf import settings
 
 import chromosome.forms
 from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatchImportProcess, ChromosomeBatchImportLog
@@ -15,7 +16,8 @@ from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatc
     
 def import_files(request):
     
-    mypath = './raw_data/chromosome/pending_import'
+    
+    mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX  #'raw_data/chromosome/pending_import/'
     abspath = os.path.abspath(mypath)
 
     if request.method == 'POST':
@@ -114,7 +116,7 @@ def import_files(request):
  
 def import_progress(request):
     
-    mypath = './raw_data/chromosome/pending_import'
+    mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX #'raw_data/chromosome/pending_import/'
     abspath = os.path.abspath(mypath)
     
     progress_texts = {'P':'Pending','A':'Running','C':'Completed','F':'Err - Failed','M':'Err - Duplicate','X':'Err - Exception'}
@@ -197,7 +199,7 @@ def import_file(request,fname=''):
     custom_data['fname'] = fname
     print ('fname: ',fname)
     
-    mypath = './raw_data/chromosome/pending_import'
+    mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX #'raw_data/chromosome/pending_import/'
     from os.path import join
     rel_path = join(mypath, fname)
     
@@ -232,8 +234,8 @@ def _delete_latest(request):
         fpath = latestBatchLog.file_path
         print ('latest log: ',fpath)
         
-        sourcepath = './raw_data/chromosome'
-        destpath = './raw_data/chromosome/pending_import'
+        sourcepath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX #'raw_data/chromosome/'
+        destpath =  settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX #'raw_data/chromosome/pending_import/'
         head, tail = os.path.split(fpath) 
   
         print ('moving: ',  os.path.join(sourcepath,tail))
