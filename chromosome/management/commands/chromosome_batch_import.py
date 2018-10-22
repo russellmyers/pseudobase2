@@ -13,8 +13,6 @@ distributed, efficient and sane method of batch processing.
 
 from django.core.management.base import BaseCommand
 from chromosome.models import ChromosomeBatchImportProcess, ChromosomeImporter
-import django.utils.timezone
-
 
 class Command(BaseCommand):
     '''A custom command to process "chromososome batch import" requests.

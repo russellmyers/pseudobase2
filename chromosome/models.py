@@ -511,6 +511,46 @@ class ChromosomeBatchImportProcess(BatchProcess):
         batchimports = self.chromosomebatchimportlog_set.all()  #ChromosomeBatchImportLog.objects.filter(batch=self.id)
         return len(batchimports)
     
+    @staticmethod
+    def create_batch_and_import_file(chromosome_data):
+        #helper static method to create a batch and import single file within it
+        transaction.commit_unless_managed()
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        try:
+               
+            current_batches = ChromosomeBatchImportProcess.objects.current_batches() #ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))   
+            if (len(current_batches) > 0):
+               raise Exception('Batch import already in process. Please wait ')
+            
+            bp = ChromosomeBatchImportProcess(submitted_at = django.utils.timezone.now(),batch_status = 'P')
+            
+            orig_req = ''
+            abs_path = os.path.abspath(chromosome_data)
+            orig_req += abs_path
+
+            bp.original_request = orig_req  
+            bp.save()
+           
+            
+            bp.start()
+            bp.save()
+            chr_importer = ChromosomeImporter(chromosome_data)
+            chr_importer.import_data(bp)
+            chr_importer.print_summary()
+            bp.stop()
+            bp.save()
+
+            transaction.commit()
+            transaction.leave_transaction_management()
+            connection.close()
+            return bp
+ 
+        except Exception as e:
+            transaction.rollback()
+            transaction.leave_transaction_management()
+            raise Exception('Import failed: ' + str(e))   
+            return None
     
 
 # Import log for files imported via batch process
@@ -661,8 +701,9 @@ class ChromosomeImporter():
 
     def get_info(self,incl_rec_count = False):
 
+            chromosome_reader = None
+            
             try:
-                print ('chrom data: ',self.chromosome_data)
                 chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
      
                 if not chromosome_reader.format_parser:
@@ -697,8 +738,8 @@ class ChromosomeImporter():
                 raise
                 
             finally:
-                print ('finally')
-                chromosome_reader.finalise()
+                if (chromosome_reader):
+                   chromosome_reader.finalise()
                
         
     def already_exists(self,strain_name,chromosome_name):
@@ -716,7 +757,6 @@ class ChromosomeImporter():
 
     def import_data(self,batch=None):
         
-            print ('importing data')
             #import pdb
             
             #pdb.set_trace()
@@ -750,15 +790,17 @@ class ChromosomeImporter():
             # Open our data files.
             self.data_file = open(self.cb.data_file_path, 'w')
             self.index_file = open(self.cb.index_file_path, 'wb')
-            self.coverage_file = open(self.cb.coverage_file_path, 'w')        
+            self.coverage_file = open(self.cb.coverage_file_path, 'w')  
+            
+            chromosome_reader = None
         
             try:
                 print "Constructing ChromosomeBase object from file:\n%s" % \
                   self.chromosome_data
-                print "  ",
+                print "  "
     
                 chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
-     
+                
                 if not chromosome_reader.format_parser:
                     # Unknown data format
                     # If the file isn't in the reference or standard data format,
@@ -791,7 +833,6 @@ class ChromosomeImporter():
                         self.import_log.chromebase = self.cb
                         self.import_log.save()
                 except:
-                    print ('saving import log failed')
                     raise
    
             
@@ -884,7 +925,7 @@ class ChromosomeImporter():
                 print ('renaming: ',os.path.abspath(self.chromosome_data))
                 print (' ..to: ',os.path.join(destpath,tail))
                 os.rename(os.path.abspath(self.chromosome_data), os.path.join(destpath,tail)) 
-                print ('just done it!')
+                print ('Rename complete!')
             
             except:
                 self.data_file.close()
@@ -894,7 +935,8 @@ class ChromosomeImporter():
                 os.remove(self.cb.index_file_path)
                 os.remove(self.cb.coverage_file_path)
                 
-                chromosome_reader.finalise()
+                if chromosome_reader:
+                   chromosome_reader.finalise()
     
                 transaction.rollback()
                 transaction.leave_transaction_management()

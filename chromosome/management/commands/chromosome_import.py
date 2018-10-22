@@ -39,44 +39,16 @@ class Command(BaseCommand):
         script can take a while to complete.  Don't panic.
         
         '''
-        
-        #Perform this legacy command by creating a batch of one file and  calling the new batch import process
-        transaction.commit_unless_managed()
-        transaction.enter_transaction_management()
-        transaction.managed(True)
-        try:
-               
-            current_batches = ChromosomeBatchImportProcess.objects.current_batches() #ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))   
-            if (len(current_batches) > 0):
-               raise Exception('Batch import already in process. Please wait ')
-            
-            bp = ChromosomeBatchImportProcess(submitted_at = django.utils.timezone.now(),batch_status = 'P')
-            
-            orig_req = ''
-            abs_path = os.path.abspath(chromosome_data)
-            orig_req += abs_path
-
-            bp.original_request = orig_req  
-            bp.save()
-           
-            
-            bp.start()
-            bp.save()
-            chr_importer = ChromosomeImporter(chromosome_data)
-            chr_importer.import_data(bp)
-            chr_importer.print_summary()
-            bp.stop()
-            bp.save()
-
-            transaction.commit()
-            transaction.leave_transaction_management()
-            connection.close()
-            print ('Imported successfully: ',chromosome_data)
  
-        except Exception as e:
-            transaction.rollback()
-            transaction.leave_transaction_management()
-            raise Exception('Import failed: ' + str(e))
+        #Perform this legacy command by creating a batch of one file and  calling the new batch import process
+       
+        try:
+            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(os.path.abspath(chromosome_data))
+            print('bp: ',bp)
+        except:
+            raise
+            
+
 
  
             

@@ -8,10 +8,9 @@ from django.contrib import messages
 from django.http import HttpResponse
 import django.utils.timezone
 from django.db import connection, transaction
-from django.db.models import Q
 
 import chromosome.forms
-from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeImportLog, ChromosomeBatchImportProcess, ChromosomeBatchImportProcessManager, ChromosomeBatchImportLog
+from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatchImportProcess, ChromosomeBatchImportLog
 
     
 def import_files(request):
@@ -22,9 +21,7 @@ def import_files(request):
     if request.method == 'POST':
         print ('posttt')    
         form = chromosome.forms.ImportForm(request.POST)
-        print('instantiated form'   )
         selected_values = request.POST.getlist('import_files')
-        print ('sel vals: ',selected_values)
         
         # Start transaction management.
         transaction.commit_unless_managed()
@@ -52,11 +49,6 @@ def import_files(request):
             bp.save()
             
            
-            #for sel_file in selected_values:
-                
-            #    bl = ChromosomeBatchImportLog(start=django.utils.timezone.now(),end=django.utils.timezone.now(),run_microseconds=0,file_path = os.path.join(abspath,sel_file),batch=bp,status='P',base_count=0,clip_count=0)
-            #    bl.save()
-            
             # Finalize the transaction and close the db connection.
             transaction.commit()
             transaction.leave_transaction_management()
@@ -69,11 +61,6 @@ def import_files(request):
 
             messages.error(request, 'Batch import process failed: ' + str(e),extra_tags='html_safe alert alert-danger')
             return redirect(import_files)
-            
-            
- 
-        
-        # return HttpResponse("Importing..." + str(selected_values))
         
 #        if form.is_valid():
 #           print ('form is valid')   
@@ -139,7 +126,6 @@ def import_progress(request):
     
         #for rb in current_batch_import_file_logs:
         for batch_file in batch_file_list:
-            print ('batch file: ',batch_file)
             try:
                file_log = ChromosomeBatchImportLog.objects.get(batch=current_batch,file_path = batch_file)
                file_progress_dict[os.path.split(batch_file)[1]] = file_log.status  
@@ -151,7 +137,6 @@ def import_progress(request):
                 file_progress_dict[os.path.split(batch_file)[1]] = 'X'
             
               
-        print ('running: ',file_progress_dict)
     else:
         messages.success(request, 'Import(s) completed!',extra_tags='html_safe alert alert-success')
         return redirect(import_files)
@@ -160,15 +145,9 @@ def import_progress(request):
     custom_data = {}
     custom_data['tab'] = 'Import Progress'
     
-    from os import listdir
-    from os.path import isfile, join
     custom_data['pending_import_path'] = abspath
 
-    #files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-   
-    
     files_info = []
-    #for f in files:
     
     status = ''
     for fl in batch_file_list:
@@ -223,19 +202,14 @@ def import_file(request,fname=''):
     try:
         c_importer = ChromosomeImporter(fullfile)
         file_info = c_importer.get_info(incl_rec_count = True)
-        
         custom_data['file_info'] = file_info
-    
-        c_importer.import_data()
-        
-        print ('info: ',file_info)
+
+        ChromosomeBatchImportProcess.create_batch_and_import_file(os.path.abspath(fullfile))
         messages.success(request, 'File imported successfully!',extra_tags='html_safe alert alert-success')
         return redirect(import_files)
-        
-    except Exception as e: 
-        print ('Import failed: ',e)
+
+    except Exception as e:
         custom_data['file_info'] = {'error':e}
-        
     
     return render_to_response('import_file.html', custom_data,
       context_instance=RequestContext(request))   
