@@ -57,30 +57,36 @@
                                          {% for file_info in pending_files %}
                                              <tr>
                                                  <!--th scope = "row"-->
-                                                     <td>
-                                                       
-                                                        <input type="checkbox"  value="{{ file_info.file_name }}" name="import_files">
-                                                     </td> 
-                                                     <td class = "small">
-                                                          {% if file_info.format == 'unknown' %}
-                                                          {% else %}
-                                                              <a href = "{% url 'importfile' file_info.file_name %}"
-                                                              {% if file_info.exists_in_db %}
-                                                                   onclick = "return confirm('Data exists already in Pseudobase for\n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n This will update/overwrite existing data in Pseudobase. Are you sure?')">
-                                                                  <span>&#9851;</span>
-                                                              {% else %}
-                                                                   onclick = "return confirm('Importing new data into Pseudobase for \n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n Are you sure?')">
-                                                                  <span>&#10133;</span>
-                                                              {% endif %}  
-                                                              </a>
-                                                          {% endif %}    
-                                                     </td>  
                                                      {% if file_info.format == 'unknown' %}
+                                                         <td></td>
+                                                         <td class = "small"></td>
                                                          <td class = "text-muted">{{ file_info.file_name }}</td>
-                                                         
-                                                     {% else %}    
+                                                     
+                                                     {% else %}
+                                                         {% if file_info.import_status %}
+                                                            <td></td>
+                                                            <td class = "small">
+                                                               {{ file_info.import_status }}
+                                                            </td>
+                                                         {% else %}     
+           
+                                                             <td>
+                                                                <input type="checkbox"  value="{{ file_info.file_name }}" name="import_files">
+                                                             </td> 
+                                                             <td class = "small">
+                                                                 <a href = "{% url 'importfile' file_info.file_name %}"
+                                                                  {% if file_info.exists_in_db %}
+                                                                       onclick = "return confirm('Data exists already in Pseudobase for\n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n This will update/overwrite existing data in Pseudobase. Are you sure?')">
+                                                                      <span class = "text-warning">&#9851; Update</span>
+                                                                  {% else %}
+                                                                       onclick = "return confirm('Importing new data into Pseudobase for \n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n Are you sure?')">
+                                                                      <span>&#10133; New</span>
+                                                                  {% endif %}  
+                                                                  </a>
+                                                         </td>  
+                                                         {% endif %}    
                                                          <td class = "small">{{ file_info.file_name }}</td>
-                                                     {% endif %}  
+                                                    {% endif %}  
                                                      
                    
                                                          <!--/th-->

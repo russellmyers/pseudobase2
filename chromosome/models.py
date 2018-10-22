@@ -15,9 +15,10 @@ from django.conf import settings
 from django.db import models
 import django.utils.timezone
 from django.db import connection, transaction
+from django.db.models import Q
 
 
-from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader
+from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader, BatchProcess
 
 
 class ChromosomeBase(models.Model):
@@ -481,11 +482,45 @@ class ChromosomeBase(models.Model):
         ordering = ('strain__species__pk', 'chromosome__name', 'strain__name')
 
 
+# Deprecated - now uses ChromosomeBatchImportLog
 class ChromosomeImportLog(ImportLog):
     '''Metadata about the import of a particular ChromosomeBase object.'''
     
     base_count = models.PositiveIntegerField()
     clip_count = models.PositiveIntegerField()
+
+class ChromosomeBatchImportProcessManager(models.Manager):
+    def current_batches(self):
+        #Pending or Active
+        return self.filter(Q(batch_status='P') | Q(batch_status='A'))  
+    
+    def pending_batches(self):
+        #Pending
+        return self.filter(Q(batch_status='P'))
+ 
+    def running_batches(self):
+        #Active
+        return self.filter(Q(batch_status='A'))
+    
+
+class ChromosomeBatchImportProcess(BatchProcess):
+    original_request = models.TextField()
+    
+    objects = ChromosomeBatchImportProcessManager()
+    def num_files_in_batch(self):
+        batchimports = self.chromosomebatchimportlog_set.all()  #ChromosomeBatchImportLog.objects.filter(batch=self.id)
+        return len(batchimports)
+    
+    
+
+# Import log for files imported via batch process
+class ChromosomeBatchImportLog(ImportLog):
+
+    base_count = models.PositiveIntegerField(null=True,blank=True)
+    clip_count = models.PositiveIntegerField(null=True,blank=True)
+    batch = models.ForeignKey(ChromosomeBatchImportProcess)
+    status = models.CharField(max_length=1, db_index=True, default='P')
+    chromebase = models.ForeignKey(ChromosomeBase,null=True,blank=True)
 
 
     
@@ -627,7 +662,7 @@ class ChromosomeImporter():
     def get_info(self,incl_rec_count = False):
 
             try:
-   
+                print ('chrom data: ',self.chromosome_data)
                 chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
      
                 if not chromosome_reader.format_parser:
@@ -658,9 +693,11 @@ class ChromosomeImporter():
                     return  first_data
              
             except:
+                print ('whoops exc')
                 raise
                 
             finally:
+                print ('finally')
                 chromosome_reader.finalise()
                
         
@@ -677,12 +714,28 @@ class ChromosomeImporter():
         else:
            return False  
 
-    def import_data(self):
+    def import_data(self,batch=None):
         
+            print ('importing data')
+            #import pdb
+            
+            #pdb.set_trace()
             # Create a new ImportLog object to store metadata about the import.
-            self.import_log = ChromosomeImportLog(start=django.utils.timezone.now(),
-              file_path=os.path.abspath(self.chromosome_data), base_count=0, 
-              clip_count=0)
+            if (batch is None):
+                self.import_log = ChromosomeImportLog(start=django.utils.timezone.now(),
+                  file_path=os.path.abspath(self.chromosome_data), base_count=0, 
+                  clip_count=0)
+            else:
+               self.import_log = ChromosomeBatchImportLog(start=django.utils.timezone.now(),
+                  file_path=os.path.abspath(self.chromosome_data), base_count=0, 
+                  clip_count=0)  
+               self.import_log.batch = batch
+               self.import_log.status = 'A'
+               self.import_log.end = django.utils.timezone.now()
+               self.import_log.calculate_run_time()
+               self.import_log.chromebase = None
+               self.import_log.save()
+    
     
             # Start transaction management.
             transaction.commit_unless_managed()
@@ -727,6 +780,20 @@ class ChromosomeImporter():
         
                 # Save ChromosomeBase.
                 self.cb.save()
+                
+                try:
+                    if batch is None:
+                        pass
+                    else:
+                        self.import_log.status = 'A'
+                        self.import_log.end = django.utils.timezone.now()
+                        self.import_log.calculate_run_time()
+                        self.import_log.chromebase = self.cb
+                        self.import_log.save()
+                except:
+                    print ('saving import log failed')
+                    raise
+   
             
                 max_position = bases_total = 0
           
@@ -800,6 +867,12 @@ class ChromosomeImporter():
                 self.import_log.base_count = self.cb.total_bases
                 self.import_log.end = django.utils.timezone.now()
                 self.import_log.calculate_run_time()
+                
+                if (batch is None):
+                    pass
+                else:
+                    self.import_log.chromebase = self.cb
+                    self.import_log.status = 'C'
           
                 # Only save the import metadata if we actually did anything.
                 if self.import_log.base_count > 0:    

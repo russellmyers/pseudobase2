@@ -1,0 +1,76 @@
+<html><title>Pseudobase information</title>
+{% extends "base.html" %}
+
+{% block page_title %}Import{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+ 
+{% endblock header %}
+    
+    
+{% block content %}
+
+
+{% block pending %}
+
+{% endblock pending %}
+
+{% block completed %}
+
+  <h4 class="mt-4">Files successfully imported into Pseudobase</h4>        
+
+  <div class = "row mt-2"> 
+
+    <div class = "col-md-1">
+    </div> 
+
+    <div class="col-md-10 border border-primary"><!--style="background-color:white;"-->
+            
+                 <table class = "table table-sm">
+                    <thead>
+                        <tr>
+                             <th scope = "col">File name</th>
+                             <th scope = "col">Started Import</th>
+                             <th scope = "col">Ended Import</th>
+                             <th scope = "col">Base count</th>
+                             <th scope = "col">Clip count</th>
+                         </tr>
+                    
+                    </thead>
+                
+                    <tbody>
+                         {% for recent_import in recent_imports %}
+                             <tr>
+                                     <th scope = "row" class = "small"> {{ recent_import.file_path }}</th>
+                                     <td class = "small"> {{ recent_import.start }} </td>
+                                     <td class = "small"> {{ recent_import.end }} </td>
+                                     <td class = "small"> {{ recent_import.base_count }}</td> 
+                                     <td class = "small"> {{ recent_import.clip_count }} </td>
+ 
+                                 
+                                        
+
+                             </tr>
+                         {% empty %}
+                            <td> NONE</td>
+                            <td> <small>No files imported into Pseudobase yet</small></td>        
+                           
+                        {% endfor %}
+                    
+                    </tbody>
+          
+               </table>     
+    </div>
+
+    <div class = "col-md-1">
+    </div> 
+       
+</div>
+{% endblock completed %}
+
+
+{% endblock content %}

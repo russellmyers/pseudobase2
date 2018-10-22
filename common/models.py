@@ -155,6 +155,7 @@ class BatchProcess(models.Model):
     submitted_at = models.DateTimeField()
     # Available status codes for batch_status:
     # P = Pending (has yet to be processed)
+    # A = Active (processing)
     # F = Failed (processing was attempted, but an unknown failure occurred)
     # C = Completed (has been processed, but not yet included in a report)
     # R = Reported (has been processed and included in a report)

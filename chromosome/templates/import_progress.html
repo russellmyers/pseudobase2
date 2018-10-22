@@ -1,0 +1,130 @@
+<html><title>Pseudobase information</title>
+{% extends "import_base.html" %}
+
+{% block page_title %}Import{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>Imports In progress - <i>Chromosome Sequences</i></h1>
+    <h4>Files currently importing into Pseudobase</h4>
+    <!--h6 class = "text-muted">Select a file to import</h6-->
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div>
+  
+ 
+{% endblock header %}
+    
+    
+{% block pending %}
+      <div class = "row">
+        <div class = "col-md-1">
+        </div> 
+    
+        
+     
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col" </th>
+                                         <th scope = "col">Status</th>
+                                         <th scope = "col">File name</th>
+                                         <th scope = "col">Chromosome</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Start position</th>
+                                         <th scope = "col">File size</th>
+                                         <th scope = "col">File format</th>
+                                     </tr>
+                                
+                                </thead>
+                            
+                                <tbody>
+                                    
+                                         {% for file_info in pending_files %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                     {% if file_info.format == 'unknown' %}
+                                                         <td></td>
+                                                         <td class = "small"></td>
+                                                         <td class = "text-muted">{{ file_info.file_name }}</td>
+                                                     
+                                                     {% else %}
+                                                         {% if file_info.import_status %}
+                                                            <td></td>
+                                                            <td class = "small">
+                                                               {%if file_info.import_status == 'Pending' %} 
+                                                                   <span><b> {{ file_info.import_status }} </b></span>
+                                                               {% elif file_info.import_status == 'Running'  %}
+                                                                   <span class = "text-success"> {{ file_info.import_status }} </span>
+                                                               {% elif file_info.import_status == 'Completed'  %}
+                                                                   <span class = "text-primary"> {{ file_info.import_status }} </span>
+                                                               
+                                                               {% else %}
+                                                                   <span class = "text-danger"> {{ file_info.import_status }} </span>
+                                                               {% endif %}    
+                                                            </td>
+                                                         {% else %}     
+           
+                                                             <td>
+                                                                 <input type="checkbox"  value="{{ file_info.file_name }}" name="import_files">
+                                                             </td> 
+                                                             <td class = "small">
+                                                                 <a href = "{% url 'importfile' file_info.file_name %}"
+                                                                  {% if file_info.exists_in_db %}
+                                                                       onclick = "return confirm('Data exists already in Pseudobase for\n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n This will update/overwrite existing data in Pseudobase. Are you sure?')">
+                                                                      <span class = "text-warning">&#9851; Update</span>
+                                                                   {% else %}
+                                                                       onclick = "return confirm('Importing new data into Pseudobase for \n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n Are you sure?')">
+                                                                      <span>&#10133; New</span>
+                                                                  {% endif %}  
+                                                                  </a>
+                                                         </td>  
+                                                         {% endif %}    
+                                                         <td class = "small">{{ file_info.file_name }}</td>
+                                                    {% endif %}  
+                                                     
+                   
+                                                         <!--/th-->
+                                                     <td class = "small"> {{ file_info.chromosome_name }}</td>
+                                                     <td class = "small"> {{ file_info.strain_name }} </td>
+                                                     <td class = "small"> {{ file_info.position }} </td>
+                                                     <td class = "small"> {{ file_info.file_size_MB }}</td> 
+                                                     <td class = "small"> {{ file_info.format }} </td>
+                 
+                                                 
+                                                        
+                
+                                             </tr>
+                                         {% empty %}
+                                            <tr>
+                                              <td class = "text-success">No files currently pending import!</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->        
+                                            </tr>
+                                        {% endfor %}
+                                           
+                                       
+                                
+                                </tbody>
+                      
+                           </table>
+                           
+                       
+               
+        </div>
+        <div class = "col-md-1">
+        </div>  
+     </div>
+
+
+
+{% endblock pending %}
