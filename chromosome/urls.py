@@ -10,6 +10,8 @@ urlpatterns = patterns('',
    
   url(r'^import/delchr/$','chromosome.views._delete_latest',name='dellatest'),
   
+   url(r'^import/(?P<fname>.+)/info/$','chromosome.views._get_file_info',name='importfileinfo'),
+  
   url(r'^import/progress/$','chromosome.views.import_progress',name='importprogress'),
    
   url(r'^import/(?P<fname>.+)/$','chromosome.views.import_file',name='importfile'),

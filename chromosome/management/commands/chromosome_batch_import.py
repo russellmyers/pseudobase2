@@ -36,15 +36,13 @@ class Command(BaseCommand):
             
             #for pending_import_file in request.chromosomebatchimportlog_set.filter(status = 'P'):
             for batch_file in batch_file_list:
-
                 try:
-                   
                     chr_importer = ChromosomeImporter(batch_file)
                     chr_importer.import_data(request)
                     chr_importer.print_summary()
                     
-                except:
-                    print ('chromosome importer failed: ',batch_file)
+                except Exception as e:
+                    print ('chromosome importer failed: ',batch_file, ' Reason: ',e)
                     pass
             
   

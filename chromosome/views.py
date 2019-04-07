@@ -9,6 +9,7 @@ from django.http import HttpResponse
 import django.utils.timezone
 from django.db import connection, transaction
 from django.conf import settings
+import json
 
 import chromosome.forms
 from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatchImportProcess, ChromosomeBatchImportLog
@@ -119,7 +120,7 @@ def import_progress(request):
     mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX #'raw_data/chromosome/pending_import/'
     abspath = os.path.abspath(mypath)
     
-    progress_texts = {'P':'Pending','A':'Running','C':'Completed','F':'Err - Failed','M':'Err - Duplicate','X':'Err - Exception'}
+    progress_texts = {'P':'Pending','A':'Importing','C':'Completed','F':'Err - Failed','M':'Err - Duplicate','X':'Err - Exception'}
     
     current_batches = ChromosomeBatchImportProcess.objects.current_batches() #ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))   
     if (len(current_batches) > 0):
@@ -132,7 +133,12 @@ def import_progress(request):
         for batch_file in batch_file_list:
             try:
                file_log = ChromosomeBatchImportLog.objects.get(batch=current_batch,file_path = batch_file)
-               file_progress_dict[os.path.split(batch_file)[1]] = file_log.status  
+               if (file_log.status == 'A'):
+                   print ('recs read: ',file_log.records_read, ' base count: ',file_log.base_count, 'res: ',file_log.records_read * 1.0 / file_log.base_count * 100.0)
+                   perc_complete = 0.0 if file_log.base_count == 0 else file_log.records_read * 1.0 / file_log.base_count * 100.0
+                   file_progress_dict[os.path.split(batch_file)[1]] = file_log.status + "%.1f %%" % perc_complete  #str(perc_complete) #(file_log.records_read)
+               else:    
+                   file_progress_dict[os.path.split(batch_file)[1]] = file_log.status  
             except ChromosomeBatchImportLog.DoesNotExist:
                 file_progress_dict[os.path.split(batch_file)[1]] = 'P' 
             except ChromosomeBatchImportLog.MultipleObjectsReturned:
@@ -142,7 +148,25 @@ def import_progress(request):
             
               
     else:
-        messages.success(request, 'Import(s) completed!',extra_tags='html_safe alert alert-success')
+        latest_batch = ChromosomeBatchImportProcess.objects.latest_finished_batch()
+        if latest_batch is None:
+            messages.info(request,'No pending, running or completed imports',extra_tags='html_safe alert alert-info')
+        else: 
+            if (latest_batch.batch_status == 'C'):
+                successful_files = 0
+                files_in_batch = latest_batch.chromosomebatchimportlog_set.all()
+                if (files_in_batch is None):
+                    messages.info(request,'No files in batch to import',extra_tags='html_safe alert alert-info')
+                else:
+                    for f in files_in_batch:
+                        if f.status == 'C':
+                            successful_files +=1
+                if (successful_files == len(files_in_batch)):       
+                    messages.success(request, 'Import(s) completed! ' + str(successful_files) + ' files succesfully imported',extra_tags='html_safe alert alert-success')
+                else:
+                    messages.warning(request, 'Import(s) completed. ' + str(successful_files) + ' / ' + str(len(files_in_batch)) + '  files successfully imported. ' + str(len(files_in_batch) - successful_files) + ' failed',extra_tags='html_safe alert alert-warning')
+            else:    
+                messages.error(request, 'Import(s) failed',extra_tags='html_safe alert alert-danger')
         return redirect(import_files)
         
     
@@ -159,12 +183,17 @@ def import_progress(request):
         if f in file_progress_dict:
            status = file_progress_dict[f] 
            
-        if ((status == 'A') or (status == 'C')):
+        if ((status[:1] == 'A') or (status == 'C')):
             # don't attempt to read, already open or alreast removed from pending imports folder
             file_info = {}
             print ('status: ',status)
-            print ('prog text: ',progress_texts[status])
-            file_info['import_status'] = progress_texts[status]
+            if (status[:1] == 'A'):
+                print ('prog text: ',progress_texts[status[:1]])
+                file_info['import_status'] = progress_texts[status[:1]] 
+                file_info['import_perc_complete'] = status[1:]
+            else:    
+                print ('prog text: ',progress_texts[status])
+                file_info['import_status'] = progress_texts[status]
             file_info['file_name'] = f
             file_info['format'] = '*'
             print('fie info: ',file_info)
@@ -230,7 +259,13 @@ def _delete_latest(request):
         
         #latestLog = ChromosomeImportLog.objects.all().order_by('-id')[0]
         latestBatchLog = ChromosomeBatchImportLog.objects.all().order_by('-id')[0]
-        
+        if (latestBatchLog.status == 'C'):
+            pass
+        else:
+            while not (latestBatchLog.status == 'C'): 
+               latestBatchLog.delete()
+               latestBatchLog = ChromosomeBatchImportLog.objects.all().order_by('-id')[0]
+            
         fpath = latestBatchLog.file_path
         print ('latest log: ',fpath)
         
@@ -267,3 +302,38 @@ def _delete_latest(request):
     return redirect(import_files)
  
 
+def _get_file_info(request,fname = ''):
+    
+    
+    mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX  #'raw_data/chromosome/pending_import/'
+    
+    response_data = {}
+    error = ''
+
+#    current_batches = ChromosomeBatchImportProcess.objects.current_batches() #ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))   
+#    if (len(current_batches) > 0):
+#       response_data = {'error':'Batch in progress','files_info':[]}
+#       return HttpResponse(json.dumps(response_data), content_type="application/json") 
+#    
+#    
+#    from os import listdir
+#    from os.path import isfile, join
+#    files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+#   
+#    
+#    files_info = []
+#    for f in files:
+    from os.path import join
+
+    
+    try:
+        c_importer = ChromosomeImporter(join(mypath, fname))
+        file_info = c_importer.get_info(incl_rec_count = True)
+    except Exception as e:   
+        file_info = {}
+        error = str(e)
+        return HttpResponse(status=404)
+           
+    response_data = {'error':error,'file_info':file_info}
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+    

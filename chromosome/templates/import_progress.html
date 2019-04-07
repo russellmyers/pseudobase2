@@ -3,6 +3,10 @@
 
 {% block page_title %}Import{% endblock %}
 
+{% block extra_meta %}
+<meta http-equiv="refresh" content="5" />
+{% endblock %}
+
 {% block links %}{% endblock %}
 
 
@@ -64,8 +68,8 @@
                                                             <td class = "small">
                                                                {%if file_info.import_status == 'Pending' %} 
                                                                    <span><b> {{ file_info.import_status }} </b></span>
-                                                               {% elif file_info.import_status == 'Running'  %}
-                                                                   <span class = "text-success"> {{ file_info.import_status }} </span>
+                                                               {% elif file_info.import_status == 'Importing'  %}
+                                                                   <span class = "text-success"> {{ file_info.import_status }} {{ file_info.import_perc_complete }} </span>
                                                                {% elif file_info.import_status == 'Completed'  %}
                                                                    <span class = "text-primary"> {{ file_info.import_status }} </span>
                                                                

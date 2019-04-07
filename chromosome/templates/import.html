@@ -36,7 +36,7 @@
         
      
         <div class="col-md-10 border border-primary" style="background-color:white;">
-                            <table class = "table table-sm">
+                            <table id="pending_tab" class = "table table-sm">
                                 <thead>
                                     <tr>
                                          <th scope = "col" </th>
@@ -59,7 +59,7 @@
                                                      {% if file_info.format == 'unknown' %}
                                                          <td></td>
                                                          <td class = "small"></td>
-                                                         <td class = "text-muted">{{ file_info.file_name }}</td>
+                                                         <td class = "small text-muted"><i>{{ file_info.file_name }}</i></td>
                                                      
                                                      {% else %}
                                                          {% if file_info.import_status %}
@@ -141,3 +141,54 @@
 
 
 {% endblock pending %}
+
+{% block script %}
+{%load static %}
+<script>
+
+
+    {% for file_info in pending_files %}
+       
+        ajaxGet("{% url 'importfileinfo' fname=file_info.file_name %}", updateBaseCount);
+
+    {% endfor %}
+ 
+function ajaxGet(url, callbackFunction) {
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      callbackFunction(this);
+    }
+    
+ };
+  xhttp.open("GET", url, true);
+  xhttp.send();
+}
+
+function updateBaseCount(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     recCount = info['file_info']['rec_count'];
+     if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("pending_tab");
+     tr = table.getElementsByTagName("tr");
+    
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[2];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[6];
+                //alert ('size: ' + tdSize.innerHTML)
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount + ' bases)'
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }    
+      }  
+     
+}
+</script>
+{% endblock %}

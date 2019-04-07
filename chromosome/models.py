@@ -16,9 +16,19 @@ from django.db import models
 import django.utils.timezone
 from django.db import connection, transaction
 from django.db.models import Q
-
+    
 
 from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader, BatchProcess
+
+@transaction.autocommit
+def update_import_log_outside_transaction(importlogrec):
+    importlogrec.save()    
+    
+
+def my_custom_sql(import_id):
+    from django.db import connection, transaction
+    with connection.cursor() as cursor:
+        cursor.execute("UPDATE chromosome_chromosomebatchimportlog SET records_read = 42 WHERE id = %s", [import_id])
 
 
 class ChromosomeBase(models.Model):
@@ -502,6 +512,11 @@ class ChromosomeBatchImportProcessManager(models.Manager):
         #Active
         return self.filter(Q(batch_status='A'))
     
+    def latest_finished_batch(self):
+        #Last batch to finish (whether it completed successfully or failed)
+        return self.latest('id')
+        
+    
 
 class ChromosomeBatchImportProcess(BatchProcess):
     original_request = models.TextField()
@@ -581,6 +596,7 @@ class ChromosomeBatchImportLog(ImportLog):
     clip_count = models.PositiveIntegerField(null=True,blank=True)
     batch = models.ForeignKey(ChromosomeBatchImportProcess)
     status = models.CharField(max_length=1, db_index=True, default='P')
+    records_read = models.PositiveIntegerField(blank=True,default=0)
     chromebase = models.ForeignKey(ChromosomeBase,null=True,blank=True)
 
 
@@ -794,6 +810,7 @@ class ChromosomeImporter():
                self.import_log.status = 'A'
                self.import_log.end = django.utils.timezone.now()
                self.import_log.calculate_run_time()
+               self.import_log.base_count = self.get_info(incl_rec_count=True)['rec_count']
                self.import_log.chromebase = None
                self.import_log.save()
     
@@ -873,7 +890,12 @@ class ChromosomeImporter():
                         sys.stdout.write('.')
                         sys.stdout.flush()
             
-         
+                    if (n % (1000 * 100) == 0):
+                        print ('progres write: ',n)
+                        #log progress
+                        self.import_log.records_read = n
+                        #self.import_log.save()
+                        update_import_log_outside_transaction(self.import_log)
                     ## Custom processing to handle data cleanup.
           
                     # Change "N" characters in the coverage column to 0.
@@ -925,6 +947,15 @@ class ChromosomeImporter():
                 self.cb.end_position = max_position
                 self.cb.save()
                   
+                head, tail = os.path.split(self.chromosome_data) 
+                chromosome_reader.finalise()
+                destpath =  settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX #'raw_data/chromosome/'
+                
+                print ('renaming: ',os.path.abspath(self.chromosome_data))
+                print (' ..to: ',os.path.join(destpath,tail))
+                os.rename(os.path.abspath(self.chromosome_data), os.path.join(destpath,tail)) 
+                print ('Rename complete!')
+                
                 # Finish populating the import metadata.
                 self.import_log.base_count = self.cb.total_bases
                 self.import_log.end = django.utils.timezone.now()
@@ -939,17 +970,9 @@ class ChromosomeImporter():
                 # Only save the import metadata if we actually did anything.
                 if self.import_log.base_count > 0:    
                     self.import_log.save()
-                    
-                head, tail = os.path.split(self.chromosome_data) 
-                chromosome_reader.finalise()
-                destpath =  settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX #'raw_data/chromosome/'
-                
-                print ('renaming: ',os.path.abspath(self.chromosome_data))
-                print (' ..to: ',os.path.join(destpath,tail))
-                os.rename(os.path.abspath(self.chromosome_data), os.path.join(destpath,tail)) 
-                print ('Rename complete!')
             
             except:
+                print ('in exception chromosome importer')
                 self.data_file.close()
                 self.index_file.close()
                 self.coverage_file.close()
@@ -962,6 +985,12 @@ class ChromosomeImporter():
     
                 transaction.rollback()
                 transaction.leave_transaction_management()
+                
+                #rolled back everything else, but still put out import log entry showing fail
+                self.import_log.status = 'F'
+                self.import_log.end = django.utils.timezone.now()
+                self.import_log.calculate_run_time()
+                self.import_log.save()
     
                 raise
     
