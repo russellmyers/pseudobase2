@@ -67,7 +67,7 @@ class ChromosomeBase(models.Model):
             
         
         #pdb.set_trace()
-        f = open(self.data_file_path)
+        #f = open(self.data_file_path) rbm 9/4/19 doesn't seem to be needed
     
         try:
             start_offset = self._get_byte_offset_from_index(start)
@@ -86,7 +86,8 @@ class ChromosomeBase(models.Model):
             
   
         finally:
-            f.close()
+            #f.close()  rbm 9/4/19
+            pass
     
         return False
 
