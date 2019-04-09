@@ -500,6 +500,12 @@ class ChromosomeImportLog(ImportLog):
     base_count = models.PositiveIntegerField()
     clip_count = models.PositiveIntegerField()
 
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return 'Imported: %s File Path: %s'  % (str(self.end), self.file_path)
+
+
+
 class ChromosomeBatchImportProcessManager(models.Manager):
     def current_batches(self):
         #Pending or Active
@@ -523,9 +529,16 @@ class ChromosomeBatchImportProcess(BatchProcess):
     original_request = models.TextField()
     
     objects = ChromosomeBatchImportProcessManager()
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return 'Submitted: %s Status: %s Request: %s' % (self.submitted_at, self.batch_status, self.original_request)
+
     def num_files_in_batch(self):
         batchimports = self.chromosomebatchimportlog_set.all()  #ChromosomeBatchImportLog.objects.filter(batch=self.id)
         return len(batchimports)
+
+
     
     def set_orig_request_from_filenames(self,filenames):
         #pending_import_rel_path = 'raw_data/chromosome/pending_import/'
@@ -600,6 +613,9 @@ class ChromosomeBatchImportLog(ImportLog):
     records_read = models.PositiveIntegerField(blank=True,default=0)
     chromebase = models.ForeignKey(ChromosomeBase,null=True,blank=True)
 
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return 'Status: %s Base Count: %s Imported: %s file path: %s' % (self.status, self.base_count, str(self.end), self.file_path)
 
     
 class ChromosomeImportFileReader(ImportFileReader):
