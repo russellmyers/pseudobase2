@@ -36,9 +36,15 @@
         
           <li class = "nav-item {%if tab == 'Home' %}active{% endif %}">
             <a class="nav-link " href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
-          </li> 
+          </li>
+         <li class = "nav-item {%if tab == 'Quick Search' %}active{% endif %}">
+            <a class="nav-link " href="{% url 'index' %}">Quick Search</a>
+          </li>
+         <li class = "nav-item {%if tab == 'Browse' %}active{% endif %}">
+            <a class="nav-link " href="{% url 'index' %}">Browse</a>
+          </li>
            <li class = "nav-item {%if tab == 'More Info' %}active{% endif %}"> 
-             <a class="nav-link" href="{% url 'info' %}">Sequences/Strains Info</a>
+             <a class="nav-link" href="{% url 'info' %}">Info</a>
           </li> 
           
           <li class="nav-item dropdown">

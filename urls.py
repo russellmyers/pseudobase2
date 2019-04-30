@@ -16,6 +16,10 @@ urlpatterns = patterns('',
    url(r'^info/$','common.views.info',name='info'),
    
    (r'^chromosome/', include('chromosome.urls')),
+
+   url(r'^jb/stats/global$','common.views.jb_stats_global',name='jb_stats_global'),
+
+   url(r'^jb/features/(?P<ref_name>.+)$', 'common.views.jb_get_features', name='jb_get_features'),
    
   # The page handling file deliveries
   (r'^delivery/(.+)$', 'common.views.delivery'),

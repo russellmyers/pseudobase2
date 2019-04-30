@@ -40,3 +40,5 @@ media/pseudobase_update_toolkit.xlsx
 *.bat
 *.pyc
 *.pptx
+
+*.idea/

@@ -9,6 +9,10 @@ from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from django.http import Http404
 
+# for jbrowse rest api
+from django.http import HttpResponse
+import json
+
 import gene.forms
 import chromosome.forms
 from chromosome.models import ChromosomeBase
@@ -52,6 +56,26 @@ def _render_chromosome_search(request):
         return render_to_response('chromosome_fasta.html', custom_data,
           context_instance=RequestContext(request))
     return _render_search_forms(request, chromosome_form=form)
+
+def assemble_jbrowse_chromosome_query_data(request):
+
+    custom_data = {}
+    form = chromosome.forms.SearchForm(request.POST)
+    if form.is_valid():
+        custom_data['chr'] = form.cleaned_data['chromosome'].name
+        custom_data['species'] = []
+        for species in form.cleaned_data['species']:
+            for strain in species.strain_set.all():
+                for strain_symbol in strain.strainsymbol_set.all():
+                    custom_data['species'].append(strain_symbol.symbol)
+            #custom_data['species'].extend([x.strainsymbol_set.all()[0].symbol for x in species.strain_set.all()])
+        #custom_data['species'] = [x.symbol for x in form.cleaned_data['species']]
+        custom_data['pos_from'] = form.cleaned_data['position'][0]
+        custom_data['pos_to'] = form.cleaned_data['position'][1]
+        custom_data['tracks_query'] = 'tracks=Reference sequence lab,genes,' + ','.join(custom_data['species'])
+
+    return custom_data
+
 
 
 def _submit_new_gene_batch(request, form):
@@ -120,6 +144,7 @@ def _convert_bytes(n):
         return '%dB' % n
 
 
+
 def index(request):
     '''Handle requests for the main "search" page and validate submissions.'''
     search_tab = request.GET.get('search_tab','')
@@ -129,10 +154,15 @@ def index(request):
     print ('in index')  
     if request.method == 'POST':
         print ('Posting')
-        if request.POST['search_type'] == 'Search by chromosome':
-            return _render_chromosome_search(request)
-        elif request.POST['search_type'] == 'Search by gene':
-            return _render_gene_search(request)
+        if 'browse_type' in request.POST:
+            custom_data = assemble_jbrowse_chromosome_query_data(request)
+            return render_to_response('test_jb.html', custom_data,
+                                      context_instance=RequestContext(request))
+        else:
+            if request.POST['search_type'] ==  'Show search results': #'Search by chromosome':
+                return _render_chromosome_search(request)
+            elif request.POST['search_type'] == 'Search by gene':
+                return _render_gene_search(request)
     return _render_search_forms(request)
 
 def info(request):
@@ -175,3 +205,69 @@ def delivery(request, code):
     else:
         return render_to_response('gene_delivery_not_ready.html', {}, 
           context_instance=RequestContext(request))
+
+
+def jb_stats_global(request):
+
+    response_data = {"featureDensity": 0.02,"featureCount": 234235,"scoreMin": 87,"scoreMax": 87,"scoreMean": 42,"scoreStdDev": 2.1}
+
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+def jb_get_features(request,ref_name=''):
+    start = int(request.GET.get('start', '0'))
+    end = int(request.GET.get('end', '0'))
+    strain = request.GET.get('strain', None)
+
+
+    if strain is None:
+        pass
+    elif strain == 'Flg14':
+
+    #tst_seq = "AAAACCCGATTGGC"
+    #cig = "14M"
+    #md = "8T5"
+
+        ref_seq = "AAAACCCGTTTGGC"
+        tst_start = 23
+
+        tst_seq = "AAACCCGATTGAAGC"
+
+        cig = "1M1D10M2I2M"
+        md = "1^A6T5"
+
+    elif strain == 'ARIZ':
+        ref_seq = "AAAACCCGTTTGGC"
+        tst_start = 23
+
+        tst_seq = "AAAATCCGTTTGGC"
+
+        cig = "14M"
+        md = "4C9"
+
+    elif strain == 'Flg16':
+        ref_seq = "TAGCCCCCCCCCCCCCCCCCCCCCCCCCCCCCA"
+        tst_seq = "TAGCCCCCCCACCCCCCCCCCCCCCCCCCCCCA"
+        tst_start = 45
+        cig = "33M"
+        md = "10C22"
+
+
+    tst_end = tst_start + len(ref_seq)
+
+
+
+    if start < tst_end and  end > tst_start:
+        response_data = {
+          "features": [
+            {"type":"match","name":"test","id":"test1","seq": tst_seq, "seq_length":len(tst_seq),"length_on_ref":len(ref_seq),"unmapped":False,"qc_failed":False,"duplicate":False,"secondary_alignment":False,"supplementary_alignment":False,"score":0,"template_length":0,"MQ":0,"start": tst_start, "end":tst_end , "strand":1,"tags":["seq","CIGAR","MD","length_on_ref","seq_length","unmapped","qc_failed","duplicate","secondary_alignment","supplementary_alignment","template_length","MQ"],"cigar":cig, "md":md}
+          ]
+        }
+    else:
+        response_data = {
+            "features": [
+
+            ]
+        }
+
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+

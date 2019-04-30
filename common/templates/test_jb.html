@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block page_title %}JB{% endblock %}
+
+{% block links %}{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<!--div class="container"-->
+
+    <div class = "frame" style="width: 97%; margin: 5px auto 10px;">
+      <iframe
+        id="jbrowse_iframe"
+        src="http://pseudotest.a2hosted.com/jb/index.html?data=ps_data&menu=0&loc={{ chr }}:{{ pos_from }}.. {{ pos_to }}&{{ tracks_query }}"
+        style="border: 1px solid black"
+        width="100%"
+        height="1000px"
+        >
+      </iframe>
+    </div>
+
+<!--/div==>
+
+
+{% endblock %}
+
+{% block script %}
+{% if display_counter %}{% include "stat_counter.html" %}{% endif %}
+{% endblock %}
+
