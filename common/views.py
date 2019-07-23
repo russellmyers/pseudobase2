@@ -20,7 +20,8 @@ from gene.models import Gene, GeneSymbol, GeneBatchProcess
 from common.models import Species, Strain
 
 import logging
-logging.basicConfig(filename='test_logging_rbm.log',level=logging.DEBUG)
+#logging.basicConfig(filename='test_logging_rbm.log',level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 
 def _render_search_forms(request,
@@ -48,11 +49,11 @@ def _render_search_forms(request,
 def _render_chromosome_search(request):
     '''Render the results of a chromosome search.'''
 
-    logging.info('In _render_chrom_search.')
+    log.info('In _render_chrom_search.')
     custom_data = {}
     form = chromosome.forms.SearchForm(request.POST)
     if form.is_valid():
-        logging.info('In _render_chrom_search. Valid form.. %s' % form.cleaned_data['chromosome'])
+        log.info('In _render_chrom_search. Valid form.. %s' % form.cleaned_data['chromosome'])
         custom_data['fasta_objects'] = ChromosomeBase.multi_strain_fasta(
           form.cleaned_data['chromosome'],
           form.cleaned_data['species'],
@@ -60,7 +61,7 @@ def _render_chromosome_search(request):
           form.cleaned_data['position'][1])
         return render_to_response('chromosome_fasta.html', custom_data,
           context_instance=RequestContext(request))
-    logging.warning('In _render_chrom_search. Not valid form')
+    log.warning('In _render_chrom_search. Not valid form')
     return _render_search_forms(request, chromosome_form=form)
 
 def assemble_jbrowse_chromosome_query_data(request):
@@ -158,18 +159,18 @@ def index(request):
        request.session['session_search_tab'] = search_tab 
  
     print ('in index')
-    logging.info('In  index')
+    log.info('In  index')
 
     if request.method == 'POST':
         print ('Posting')
-        logging.info('Posting')
+        log.info('Posting')
 
         if 'browse_type' in request.POST:
             custom_data = assemble_jbrowse_chromosome_query_data(request)
             return render_to_response('test_jb.html', custom_data,
                                       context_instance=RequestContext(request))
         else:
-            logging.info('In index. Showing results. search type: %s' % request.POST['search_type'])
+            log.info('In index. Showing results. search type: %s' % request.POST['search_type'])
 
             if request.POST['search_type'] ==  'Show search results': #'Search by chromosome':
                 return _render_chromosome_search(request)
