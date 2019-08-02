@@ -79,7 +79,8 @@ def assemble_jbrowse_chromosome_query_data(request):
         #custom_data['species'] = [x.symbol for x in form.cleaned_data['species']]
         custom_data['pos_from'] = form.cleaned_data['position'][0]
         custom_data['pos_to'] = form.cleaned_data['position'][1]
-        custom_data['tracks_query'] = 'tracks=Reference sequence lab,genes,' + ','.join(custom_data['species'])
+        vcf_tracks = [x + '_VCF_r304_sample_only' for x in custom_data['species']]
+        custom_data['tracks_query'] = 'tracks=Ref sequence flybase lab,genes flybase,' + ','.join(vcf_tracks)
 
     return custom_data
 
