@@ -10,6 +10,7 @@ command interface, e.g.:
 '''
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from optparse import make_option
 import gzip
 from common.models import Chromosome
@@ -27,7 +28,7 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('-f','--output_folder',
                     dest='output_folder',
-                    default='raw_data/chromosome/pending_import/',
+                    default=settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX,
                     help='output file folder'),
     )
 
