@@ -116,13 +116,8 @@ class Command(BaseCommand):
 
     def get_ref_strain_symbol(self):
         try:
-            #print('trying')
             strain_symbols = StrainSymbol.objects.filter(strain__is_reference=True)
-            #print(str(strain_symbols))
-            #print(str(strain_symbols[0]))
-            #print(type(strain_symbols[0]))
             return str(strain_symbols[0].symbol)
-
         except:
             return 'Unknown'
 

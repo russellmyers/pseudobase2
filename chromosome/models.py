@@ -31,6 +31,17 @@ def my_custom_sql(import_id):
         cursor.execute("UPDATE chromosome_chromosomebatchimportlog SET records_read = 42 WHERE id = %s", [import_id])
 
 
+
+class ChromosomeBaseManager(models.Manager):
+    def get_all_ref_bases(self,chrom_name):
+        try:
+            strain_name = StrainSymbol.objects.filter(strain__is_reference=True)[0].strain.name
+            chrom = self.filter(strain__name=strain_name,chromosome__name=chrom_name)[0]
+            return chrom.get_all_bases()
+        except:
+            return None
+
+
 class ChromosomeBase(models.Model):
     '''Sequence Data and metadata about a particular chromosome.'''
     
@@ -43,7 +54,8 @@ class ChromosomeBase(models.Model):
     pad_char = 'N' #For unknown bases outside bounds of self.start_position, self.end_position
     realign_char = '-'  # where insertions occur in a strain, re-align other strains padded with this char
 
-  
+    objects = ChromosomeBaseManager()
+
     def __str__(self):
         '''Define the string representation of this class of object.'''
         return '%s %s' % (self.strain.name, self.chromosome)
@@ -269,7 +281,11 @@ class ChromosomeBase(models.Model):
         return r'>%s' % delimiter.join((self.strain.species.name,
           self.strain.name, self.chromosome.name,
           '%s..%s' % (start_position, end_position)))
-        
+
+    def get_all_bases(self):
+        bases = self._base_data(self.start_position-1, self.end_position)
+        return bases
+
   
     def fasta_bases(self, start_position, end_position, wrapped=True):
         '''Return the sequence data for the specified range.
