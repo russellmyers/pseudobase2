@@ -175,13 +175,25 @@ LOGGING = {
             # Add filter to list of filters
             'filters': ['require_debug_false', 'skip_suspicious_operations'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'logfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': "C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2" + "/rbm_logfile.log",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            #'formatter': 'simple',
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        '': {
+            'handlers': ['logfile'],
+            'level': 'INFO',
         },
     }
 }
