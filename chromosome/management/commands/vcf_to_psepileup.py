@@ -1,243 +1,127 @@
-'''A custom Django administrative command for importing chromosome data.
+'''A custom Django administrative command for analysing a VCF (and relevant reference sequence)
+ and converting to psepileup format
 
 This command is intended to be used through Django's standard "management"
 command interface, e.g.:
 
-  # ./manage.py vcf_to_psepileup <file_to_convert>
+  # ./manage.py vcf_to_psepileup <chrom strain>
 
-<file_to_convert> should be a standard VCF file
 
 '''
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from optparse import make_option
-import pandas as pd
-import sys
-#from chromosome.models import ChromosomeImporter, ChromosomeBatchImportProcess
-#from django.db import connection, transaction
-#import os
-#import django.utils.timezone
+import os
+
+from chromosome import utils
 
 
 class Command(BaseCommand):
     '''A custom command to convert VCF to psepileup format'''
 
     help = 'Converts vcf file to custom Noor lab psepileup format ready for import into Pseudobase.'
-    args = '<path to VCF file>'
+    args = '<chrom strain>'
 
     option_list = BaseCommand.option_list + (
         make_option('-f','--output_folder',
                     dest='output_folder',
                     default=settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX,
-                    help='output file folder'),
+                    help='output file folder for psepileup'),
     )  + (
-        make_option('-s', '--strain',
-                    dest='strain',
-                    help='strain'),
+        make_option('-i', '--input_file',
+                    dest='input_file',
+                    help='Optional - input VCF file name. Derived if not input'),
+
+    )  + (
+        make_option('-n', '--num_recs',
+                    dest='num_recs',
+                    help='Optional - restricts to this number of records for testing'),
 
     )
 
 
+    def assemble_default_input_file(self,chrom,strain,type):
+        file_name =  'genotyped_filtered'
+        file_name  +=  type
+        file_name += '_' + strain + '_chr' +   chrom + '.vcf.gz'
+        file_path_and_name = os.path.join(settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX,file_name)
+        return file_path_and_name
 
-    def find_depth(self,info):
+    def assemble_default_output_pse_file(self, chrom, strain,output_folder):
+        file_name = chrom + '_' + strain + '.psepileup'
+        file_path_and_name = os.path.join(output_folder, file_name)
+        return file_path_and_name
 
+    def assemble_default_output_vcf_file(self, chrom, strain,type, output_folder):
+        file_name = 'genotyped_filtered'
+        file_name += type
+        file_name += '_' + strain + '_chr' + chrom + '.vcf.gz'
+        file_path_and_name = os.path.join(output_folder, file_name)
+        return file_path_and_name
 
-        for item in info:
-            item_split = item.split('=')
-            # print ('item split 0: ',item_split[0])
-            if item_split[0] == 'DP':
-                # print ('returning item split 1: ',item_split[1])
-                return item_split[1]
-        return 'Q'
+    def process_vcf_all_steps(self,file_type_1, file_name_1, release, org, chrom, out_pse_full_name,
+                                  out_vcf_full_name, file_type_2=None, file_name_2=None, num_recs=None,
+                                  base_density=100000,
+                                  show_plots=False):
+            df, comments_1, comments_2 = utils.read_vcfs(file_type_1, file_name_1, release, file_type_2=file_type_2,
+                                                   file_name_2=file_name_2, num_recs=num_recs)
 
+            dup = utils.vcf_duplicate_positions(df)
 
-    def process_var(self,ref, alt, index, pos, debug=False):
-        if (len(ref) == 1) and (len(alt) == 1):
-            return alt, 0, 'S'  # snp
-        elif (len(ref) > len(alt)):
+            df = utils.analyse_vcf_dataframe(df, org)
 
-            if len(ref) == 2 and len(alt) == 1:
-                if debug:
-                    print ('\nsingle del', ref, alt, index, pos)
-                return 'D', 1, 'D'
-            else:
-                if debug:
-                    print('\ndel with mult chars in vcf: ', ref, alt, index, pos)
-                if (len(ref) > len(alt) + 1):
-                    print('\nMulti del more than one!!!!. Not catered for', ref, alt, index, pos)
-                return 'D', 1, 'D'
+            summ = utils.plot_vcf_summary(df, show_plots=show_plots)
 
-        elif (len(ref) == len(alt)):
-            print('\nequal length var: ', ref, alt, index, pos)
-            return '=', 0, 'E'
-        else:  # insertion
+            df_overlaps = utils.check_for_overlaps(df)
 
-            if len(ref) == 1 and len(alt) == 2:
-                if debug:
-                    print('\nsingle insert', ref, alt, index, pos)
-                return alt[0] + ' ' + alt[1], 0, 'I'
-            else:
-                if debug:
-                    print('\nmulti ins: ', ref, alt, index, pos)
-                inserted_bases = alt[1:1 + len(alt) - len(ref)]
-                return ref[0] + ' ' + inserted_bases, 0, 'I'
+            df_pse_pileup, num_snps_written, num_indels_written, overlap_positions = utils.create_pse_pileup_2(df,
+                                                                                                         chrom, org,
+                                                                                                         num_recs=num_recs)
 
+            utils.plot_var_densities(chrom, org, base_density, num_snps_written, num_indels_written, show_plots=show_plots)
 
-    def read_vcf_file(self,vcf_file_name):
+            utils.output_pse_pileup(df_pse_pileup, out_pse_full_name)
 
-        self.stdout.write('Reading VCF file: ' + vcf_file_name)
-        rec_count = 0
-        head = None
-        comment_lines = []
-        lines = []
-        with open(vcf_file_name, 'r') as vcf_file:
-            for i, line in enumerate(vcf_file):
-                line = line.rstrip()
-                rec_count += 1
+            utils.output_vcf_sample_only(df, comments_1, org, out_vcf_full_name, reduce_alts=True)
 
-                if line[:6] == '#CHROM':
-                    head = line[1:].split('\t')
-                    #print('head line: ', line)
-                    comment_lines.append(line)
-                    continue
+            print(' ')
+            print('All steps complete!')
 
-                if line[:2] == '##':
-                    comment_lines.append(line)
-                    continue
-
-                lines.append(line.split('\t'))
-
-        self.stdout.write('Records read: ' + str(rec_count))
-
-        df = pd.DataFrame(lines, columns=head)
-        return df
-
-
-    def process_vcf(self,df,options):
-
-        sys.stdout.write('Converting VCF file ')
-        ignore_next = False
-
-        pse_pileup_list = []
-
-        num_recs = df.shape[0]
-        progress = num_recs // 20
-
-        for index, row in df.iterrows():
-
-            type = ''
-
-            #if index % 50000 == 0:
-            if index % progress == 0:
-                sys.stdout.write('.')
-                sys.stdout.flush()
-                #print('\r', 'Processing VCF record: ', index, ' / ', df.shape[0], end='')
-                #print('Processing VCF record: ' +  str(index) +  ' / ' + str(df.shape[0]))
-
-            if ignore_next:
-                ignore_next = False
-                continue
-
-            pse_pileup_line = ['']
-            pse_pileup_line.append(row['CHROM'])
-            pse_pileup_line.append(options['strain'])
-            pos = str(row['POS'])
-            vcf_info = row['INFO'].split(';')
-            depth = self.find_depth(vcf_info)
-
-            alts = row['ALT'].split(',')
-
-            offset = 0
-
-            if len(alts) == 1:
-                if alts[0] == '<*>':
-                    bases = row['REF']
-                else:
-                    bases, offset, type = self.process_var(row['REF'], alts[0], index, pos, debug=False)
-
-
-            elif len(alts) == 2:
-                if alts[1] == '<*>':
-                    bases, offset, type = self.process_var(row['REF'], alts[0], index, pos, debug=False)
-
-                else:
-                    print('\nunexpected second alt. Terminating ', alts, ' index: ', index)
-                    break
-
-            elif len(alts) > 2:
-                print('\nunexpected number of alts. Terminating. ', alts, ' index: ', index)
-                break
-
-            if type == 'E':
-                print('\nUnexpected vcf var encountered - terminating')
-                break
-
-            pos = str(int(pos) + offset)
-            if bases[0] == 'N':
-                depth = 'N'
-            bases_info = pos + ' ' + depth + ' ' + bases
-            pse_pileup_line.append(bases_info)
-
-            ignore_next = False
-
-            if type == 'I':
-                pse_pileup_list.pop()
-            elif type == 'D':
-                ignore_next = True
-
-            pse_pileup_list.append(pse_pileup_line)
-
-        df_pse_pileup = pd.DataFrame(pse_pileup_list, columns=['Blank', 'Chrom', 'Org', 'Base info'])
-
-        #print('\npse pileup shape: ', df_pse_pileup.shape)
-
-        sys.stdout.write('\n')
-        sys.stdout.flush()
-
-        return df_pse_pileup
-
-
-    def get_chrom(self,df_pse_pileup):
-        return df_pse_pileup.iloc[0]['Chrom']
-
-    def output_psepileup(self,df_pse_pileup,options):
-        out_ext = '.psepileup'
-
-        full_output_name = options['output_folder'] + self.get_chrom(df_pse_pileup) + '_' + options['strain']  + out_ext
-
-        self.stdout.write('Outputting:  ' + full_output_name)
-        df_pse_pileup.to_csv(full_output_name, index=False, header=False, sep='\t')
-
-
-    def convert_vcf_file(self,vcf_file_name,options):
-        df = self.read_vcf_file(vcf_file_name)
-        df_pse_pileup = self.process_vcf(df,options)
-        self.output_psepileup(df_pse_pileup,options)
-
-
-
-
-    def handle(self, vcf_file_name, **options):
+    def handle(self, chrom, strain, **options):
         '''The main entry point for the Django management command.
 
         '''
 
-        if options['strain'] is None:
-            raise Exception('strain option missing (-s)')
+        if options['input_file'] is None:
+            input_file = self.assemble_default_input_file(chrom,strain,'ALL')
+            self.stdout.write('No input file specified. Using default: ' + input_file)
         else:
-            strain = options['strain']
-
-        try:
-            self.convert_vcf_file(vcf_file_name,options)
-            self.stdout.write(self.style.SUCCESS('VCF conversion complete. In: ' + vcf_file_name + ' out folder: ' + options['output_folder']))
-        except:
-            raise
+            input_file = options['input_file']
 
 
+        input_vcf_folder = os.path.dirname(input_file)
 
+        output_pse_file = self.assemble_default_output_pse_file(chrom,strain,options['output_folder'] )
+        output_vcf_file = self.assemble_default_output_vcf_file(chrom,strain,'ALL_trimmed',input_vcf_folder) # output trimmed vcf  in same  folder as input vcf
 
+        self.stdout.write(' ')
+        self.stdout.write(self.style.SUCCESS('Input VCF file: ' + input_file))
+        self.stdout.write(self.style.SUCCESS('Output trimmed VCF file ' + output_vcf_file))
+        self.stdout.write(self.style.SUCCESS('Output PSE file ' + output_pse_file))
 
+        self.stdout.write(' num_recs: ' + 'None' if options['num_recs'] is None else options['num_recs'])
 
+        # self.process_vcf_all_steps('ALL', input_file, None,strain,chrom, output_pse_file,
+        #                       output_vcf_file, file_type_2=None, file_name_2=None, num_recs=int(options['num_recs']),
+        #                       base_density=100000,
+        #                       show_plots=True)
 
+        num_recs = None if options['num_recs'] is None else int(options['num_recs'])
+        utils.process_vcf_quick('ALL', input_file, None,strain,chrom, output_pse_file,
+                              output_vcf_file, num_recs=num_recs,
+                              base_density=100000,
+                              show_plots=True)
+
+        self.stdout.write(self.style.SUCCESS('VCF conversion complete. Chrom: ' +  chrom + ' Strain: ' + strain))
 

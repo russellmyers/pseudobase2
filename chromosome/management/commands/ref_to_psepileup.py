@@ -32,7 +32,7 @@ class Command(BaseCommand):
                     help='output file folder'),
     )
 
-    def create_ref_pse_pileup(self,fa, chrom, org, num_recs=None):
+    def create_ref_pse_pileup(self, fa, chrom, org, num_recs=None):
         pse_pileup_lines = []
         fa_str = ''.join(fa[1:])
         print('fa str len: ', len(fa_str))
@@ -48,10 +48,10 @@ class Command(BaseCommand):
 
         return pse_pileup_lines
 
-    def output_psepileup(self,pse_pileup_lines,chrom,strain,options):
+    def output_psepileup(self, pse_pileup_lines, chrom, strain, options):
         out_ext = '.psepileup'
 
-        full_output_name = options['output_folder'] + chrom + '_' + strain  + out_ext
+        full_output_name = options['output_folder'] + chrom + '_' + strain + out_ext
 
         self.stdout.write('  Outputting:  ' + full_output_name)
 
@@ -60,13 +60,13 @@ class Command(BaseCommand):
         out_file.write(pse_pileup_str)
         out_file.close()
 
-    def create_ref_pse_pileup(self,fa, chrom, org,debug=False, num_recs=None):
+    def create_ref_pse_pileup(self, fa, chrom, org, debug=False, num_recs=None):
         pse_pileup_lines = []
         fa_str = ''.join(fa[1:])
-        #print('fa str len: ', len(fa_str))
+        # print('fa str len: ', len(fa_str))
 
         for i, base in enumerate(fa_str):
-            if  debug and (i % 1000000 == 0):
+            if debug and (i % 1000000 == 0):
                 self.stdout.write('  Creating base position: ' + str(i))
             if num_recs is None:
                 pass
@@ -78,9 +78,9 @@ class Command(BaseCommand):
 
         return pse_pileup_lines
 
-    def get_seq(self,ref_file_name,chrom, debug=False):
+    def get_seq(self, ref_file_name, chrom, debug=False):
 
-        self.stdout.write('Converting Chromosome: '  + chrom)
+        self.stdout.write('Converting Chromosome: ' + chrom)
 
         in_fasta = False
 
@@ -88,8 +88,8 @@ class Command(BaseCommand):
 
         fasta_seq = []
 
-        fin = gzip.open(ref_file_name,'r')
-        #with gzip.open(ref_file_name, 'r') as fin:
+        fin = gzip.open(ref_file_name, 'r')
+        # with gzip.open(ref_file_name, 'r') as fin:
         for i, line in enumerate(fin):
             if i % 100000 == 0:
                 if debug:
@@ -111,7 +111,6 @@ class Command(BaseCommand):
                     fasta_line = line_str.rstrip()
                     fasta_seq.append(fasta_line)
                     chrom_len += len(fasta_line)
-
 
         return fasta_seq, chrom_len
 

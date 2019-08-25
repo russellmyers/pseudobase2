@@ -10,13 +10,14 @@ import struct
 import textwrap
 import sys
 from os.path import join
+import gzip
 
 from django.conf import settings
 from django.db import models
 import django.utils.timezone
 from django.db import connection, transaction
 from django.db.models import Q
-    
+
 
 from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader, BatchProcess
 
@@ -56,9 +57,11 @@ class ChromosomeBase(models.Model):
 
     objects = ChromosomeBaseManager()
 
+    ordering = ('chromosome','strain',)
+
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s %s' % (self.strain.name, self.chromosome)
+        return '%s %s' % (self.chromosome,self.strain.name)
   
     def has_insertions(self,stAbs,endAbs):
         #check if selected region has inserts, ie at least one position with > 1 base
@@ -548,7 +551,7 @@ class ChromosomeBatchImportProcess(BatchProcess):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return 'Submitted: %s Status: %s Request: %s' % (self.submitted_at, self.batch_status, self.original_request)
+        return 'Submitted: %s Status: %s' % (self.submitted_at, self.batch_status)
 
     def num_files_in_batch(self):
         batchimports = self.chromosomebatchimportlog_set.all()  #ChromosomeBatchImportLog.objects.filter(batch=self.id)
@@ -574,7 +577,7 @@ class ChromosomeBatchImportProcess(BatchProcess):
         
     
     @staticmethod
-    def create_batch_and_import_file(chromosome_data):
+    def create_batch_and_import_file(chromosome_data,ref_chrom=None):
         #helper static method to create a batch and import single file within it
         #chromosome_data contains relative path eg ./raw_data/chromosome/pending_import/file.txt
         
@@ -601,7 +604,7 @@ class ChromosomeBatchImportProcess(BatchProcess):
             
             bp.start()
             bp.save()
-            chr_importer = ChromosomeImporter(chromosome_data)
+            chr_importer = ChromosomeImporter(chromosome_data,ref_chrom = ref_chrom)
             chr_importer.import_data(bp)
             chr_importer.print_summary()
             bp.stop()
@@ -631,7 +634,7 @@ class ChromosomeBatchImportLog(ImportLog):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return 'Status: %s Base Count: %s Imported: %s file path: %s' % (self.status, self.base_count, str(self.end), self.file_path)
+        return 'Status: %s Base Count: %s Imported: %s' % (self.status, self.base_count, str(self.end))
 
     
 class ChromosomeImportFileReader(ImportFileReader):
@@ -687,12 +690,53 @@ class ChromosomeImportFileReader(ImportFileReader):
             
     def is_reference_format(self):
           return self.format_parser == self._reference_format         
-        
+
+class ChromosomeVCFImportFileReader():
+    # Not a database table
+    # Assumes gzip format, so can't use .next() functionality as per ImportFileReader (therefore not subclassed from ImportFileReader)
+    def __init__(self,fPath):
+        self.fPath = fPath
+
+    def  get_chrom_and_strain(self):
+        vcf_file = gzip.open(self.fPath, 'r')
+        chrom = None
+        strain = None
+        for i, line in enumerate(vcf_file):
+
+            if i > 10000:
+                break # Give up. May not actually be a VCF file
+
+            line = line.decode('utf-8').rstrip()
+            if line[:1] == '#':
+               if line[:6] == '#CHROM':
+                head = line[1:].split('\t')
+                strain = head[-1]
+            else:
+               chrom = line.split('\t')[0]
+               break  #assume comment head line is before first record
+
+        vcf_file.close()
+        return chrom,strain
+
+    def get_num_records(self):
+
+        i = 0
+
+        vcf_file = gzip.open(self.fPath, 'r')
+        for i, line in enumerate(vcf_file):
+            i+=1
+
+        vcf_file.close()
+
+        return i
+
 class ChromosomeImporter():
 #Not a database table
 
-    def __init__(self,chromosome_data):
+    def __init__(self,chromosome_data,ref_chrom=None):
             self.chromosome_data = chromosome_data
+            self.ref_chrom = ref_chrom
+
             self.chromosome_data_fpath,self.chromosome_data_fname = os.path.split(self.chromosome_data)
             
             self.char_search = re.compile(r'[^ACTGKYSRWMND]').search
@@ -772,12 +816,34 @@ class ChromosomeImporter():
     def get_info(self,incl_rec_count = False):
 
             chromosome_reader = None
-            
+
+            if self.chromosome_data.split('.')[-1] == 'gz':
+                file_size = os.path.getsize(self.chromosome_data)
+                if len(self.chromosome_data.split('.')) > 1 and (self.chromosome_data.split('.')[-2] == 'fasta'):
+                    return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
+                            'format': 'VCF gzipped', 'chromosome_name': 'Unknown', 'strain_name': 'Unknown','rec_count':0}
+                else:
+                    vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
+                    chrom,strain = vcf_reader.get_chrom_and_strain()
+                    rec_count = 0
+                    if incl_rec_count:
+                        rec_count = vcf_reader.get_num_records()
+                    if chrom is None or strain is None:
+                        return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
+                            'format': 'Unknown','rec_count':rec_count}
+                    else:
+                        return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
+                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain,'rec_count':rec_count}
+
+
+
+
             try:
                 chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
      
                 if not chromosome_reader.format_parser:
-                   return {'file_name':self.chromosome_data_fname,'format':'unknown'} 
+                   file_size = os.path.getsize(self.chromosome_data)
+                   return {'file_name':self.chromosome_data_fname,'file_size':file_size /1000000.0,'format':'unknown'}
                    #raise Exception('Unknown data format!')
                 else:
                    # Get the data we only want to think about once.
@@ -825,6 +891,179 @@ class ChromosomeImporter():
         else:
            return False  
 
+
+    def process_import_lines_vcf(self):
+
+        return 0
+
+
+    def get_ref_seq_from_fasta(self, debug=False):
+
+        in_fasta = False
+
+        chrom_len = 0
+
+        fasta_seq = []
+
+        header = ''
+
+        fin = gzip.open(self.chromosome_data, 'r')
+        for i, line in enumerate(fin):
+            if i % 100000 == 0:
+                if debug:
+                    print('i: ' + str(i) + ' line: ' + line.decode('utf-8')[:150])
+
+            line_str = line.decode('utf-8')
+            if line_str[0] == '>':
+
+                if debug:
+                    print ('header: ' + str(i) + ' ' + line_str)
+
+                if in_fasta:
+                    return ''.join(fasta_seq), chrom_len,header
+
+                if line_str[1:1 + len(self.ref_chrom)] == self.ref_chrom:
+                    #fasta_seq.append(line_str.rstrip())
+                    in_fasta = True
+                    header = line_str.rstrip()
+            else:
+                if in_fasta:
+                    fasta_line = line_str.rstrip()
+                    fasta_seq.append(fasta_line)
+                    chrom_len += len(fasta_line)
+
+        return ''.join(fasta_seq), chrom_len,header
+
+
+    def process_import_lines_ref(self):
+
+        max_position = bases_total = 0
+
+        # Now process all the lines in the file (reset to get back to start)
+        #data = chromosome_reader.get_and_parse_next_line(reset=True)
+
+        ref_bases,chrom_len,header = self.get_ref_seq_from_fasta(debug=True)
+
+        n = 0
+
+        #while data is not None:
+        for i,base in enumerate(ref_bases):
+
+
+            # A simple progress indicator, since processing can take a
+            # while. Shows progress after every million records processed.
+            if not i % (1000 * 1000):
+                sys.stdout.write('.')
+                sys.stdout.flush()
+
+            if (i % (1000 * 100) == 0):
+                print ('progres write: ', i)
+                # log progress
+                self.import_log.records_read = i
+                # self.import_log.save()
+                update_import_log_outside_transaction(self.import_log)
+            ## Custom processing to handle data cleanup.
+
+            coverage = 0
+
+            # Check that the base string contains no invalid characters.
+            if self.char_search(base):
+                print \
+                    'Invalid character detected in base - line %s: %s' % \
+                    (i, base)
+                break
+
+            max_position = i + 1
+
+            ## Append the base and coverage data to the appropriate files.
+
+            # Base data.
+            base_string = base
+            base_bytes = len(base_string)
+            self.data_file.write(base_string)
+
+            # Base data index.
+            self.index_file.write(self._index(bases_total))
+            bases_total += base_bytes
+
+            # Coverage data.
+            self.coverage_file.write(self._coverage_index(coverage))
+
+
+        return max_position
+
+
+    def process_import_lines_psepileup(self,chromosome_reader):
+
+        max_position = bases_total = 0
+
+        # Now process all the lines in the file (reset to get back to start)
+        data = chromosome_reader.get_and_parse_next_line(reset=True)
+        n = 0
+
+        while data is not None:
+            # Skip empty lines.
+            if not data: continue
+
+            # A simple progress indicator, since processing can take a
+            # while. Shows progress after every million records processed.
+            if not n % (1000 * 1000):
+                sys.stdout.write('.')
+                sys.stdout.flush()
+
+            if (n % (1000 * 100) == 0):
+                print ('progres write: ', n)
+                # log progress
+                self.import_log.records_read = n
+                # self.import_log.save()
+                update_import_log_outside_transaction(self.import_log)
+            ## Custom processing to handle data cleanup.
+
+            # Change "N" characters in the coverage column to 0.
+            # Additionally change the value to be an integer instead of a
+            # string.
+            if data['coverage'] == 'N':
+                data['coverage'] = 0
+
+            # Coverages that are above 255 should be clipped to 255, so
+            # that we don't need to store 2 bytes of data per coverage.
+            data['coverage'] = int(data['coverage'])
+            if data['coverage'] > 255:
+                self.import_log.clip_count += 1
+                data['coverage'] = 255
+
+            # Check that the base string contains no invalid characters.
+            if self.char_search(data['base']):
+                print \
+                    'Invalid character detected in base - line %s: %s' % \
+                    (n, data['base'])
+                break
+            else:
+                # Change "D" characters in the base column to "-".
+                data['base'] = self.replace_no_data(r'-', data['base'])
+                pass
+
+            max_position = int(data['position'])
+
+            ## Append the base and coverage data to the appropriate files.
+
+            # Base data.
+            base_string = ''.join(data['base'])
+            base_bytes = len(base_string)
+            self.data_file.write(base_string)
+
+            # Base data index.
+            self.index_file.write(self._index(bases_total))
+            bases_total += base_bytes
+
+            # Coverage data.
+            self.coverage_file.write(self._coverage_index(data['coverage']))
+
+            data = chromosome_reader.get_and_parse_next_line()
+            n += 1
+
+        return max_position
+
     def import_data(self,batch=None):
         
             #import pdb
@@ -864,32 +1103,44 @@ class ChromosomeImporter():
             self.coverage_file = open(self.cb.coverage_file_path, 'w')  
             
             chromosome_reader = None
-        
-            try:
-                print "Constructing ChromosomeBase object from file:\n%s" % \
+
+            print "Constructing ChromosomeBase object from file:\n%s" % \
                   self.chromosome_data
-                print "  "
-    
-                chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
-                
-                if not chromosome_reader.format_parser:
-                    # Unknown data format
-                    # If the file isn't in the reference or standard data format,
-                    # we can't do anything with it.
-                    raise Exception('Unknown data format!')
+            print "  "
+
+            try:
+
+                if self.ref_chrom is not None:
+                    self.cb.start_position = 1
+                    try:
+                        strains = Strain.objects.filter(is_reference=True)
+                        self.cb.strain = strains[0]
+                    except:
+                        self.cb.strain = self._lookup_strain('Mesa Verde, CO 2-25 reference line')[0]
+
+                    self.cb.chromosome = self._lookup_chromosome(self.ref_chrom)[0]
+
                 else:
-                   # Get the data we only want to think about once.
-                    first_data = chromosome_reader.get_and_parse_next_line(reset=True)
-          
-                    if self.already_exists(first_data['strain_name'],first_data['chromosome_name']):
-                       raise Exception('Chromosome Data for chromosome: %s and strain: %s exists already!' % (first_data['chromosome_name'],first_data['strain_name'])) 
-                    
-                   
-                    self.cb.start_position = first_data['position']
-                    self.cb.strain = self._lookup_strain(first_data['strain_name'])[0]
-                    self.cb.chromosome = self._lookup_chromosome(
-                      first_data['chromosome_name'])[0]
-         
+                    chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
+
+                    if not chromosome_reader.format_parser:
+                        # Unknown data format
+                        # If the file isn't in the reference or standard data format,
+                        # we can't do anything with it.
+                        raise Exception('Unknown data format!')
+                    else:
+                       # Get the data we only want to think about once.
+                        first_data = chromosome_reader.get_and_parse_next_line(reset=True)
+
+                        if self.already_exists(first_data['strain_name'],first_data['chromosome_name']):
+                           raise Exception('Chromosome Data for chromosome: %s and strain: %s exists already!' % (first_data['chromosome_name'],first_data['strain_name']))
+
+
+                        self.cb.start_position = first_data['position']
+                        self.cb.strain = self._lookup_strain(first_data['strain_name'])[0]
+                        self.cb.chromosome = self._lookup_chromosome(
+                          first_data['chromosome_name'])[0]
+
         
                 # Save ChromosomeBase.
                 self.cb.save()
@@ -905,83 +1156,22 @@ class ChromosomeImporter():
                         self.import_log.save()
                 except:
                     raise
-   
-            
-                max_position = bases_total = 0
-          
-                # Now process all the lines in the file (reset to get back to start)
-                data = chromosome_reader.get_and_parse_next_line(reset=True)
-                n = 0
-     
-                while data is not None:
-                    # Skip empty lines.
-                    if not data: continue
-          
-                    # A simple progress indicator, since processing can take a 
-                    # while. Shows progress after every million records processed.
-                    if not n % (1000 * 1000):
-                        sys.stdout.write('.')
-                        sys.stdout.flush()
-            
-                    if (n % (1000 * 100) == 0):
-                        print ('progres write: ',n)
-                        #log progress
-                        self.import_log.records_read = n
-                        #self.import_log.save()
-                        update_import_log_outside_transaction(self.import_log)
-                    ## Custom processing to handle data cleanup.
-          
-                    # Change "N" characters in the coverage column to 0.
-                    # Additionally change the value to be an integer instead of a 
-                    # string.
-                    if data['coverage'] == 'N':
-                        data['coverage'] = 0
-    
-                    # Coverages that are above 255 should be clipped to 255, so
-                    # that we don't need to store 2 bytes of data per coverage.
-                    data['coverage'] = int(data['coverage'])
-                    if data['coverage'] > 255:
-                        self.import_log.clip_count += 1
-                        data['coverage'] = 255
-          
-                    # Check that the base string contains no invalid characters.
-                    if self.char_search(data['base']):
-                        print \
-                          'Invalid character detected in base - line %s: %s' % \
-                            (n, data['base'])
-                        break
-                    else:
-                        # Change "D" characters in the base column to "-".
-                        data['base'] = self.replace_no_data(r'-', data['base'])
-                        pass
-          
-                    max_position = int(data['position'])
-          
-                    ## Append the base and coverage data to the appropriate files.
-            
-                    # Base data.
-                    base_string = ''.join(data['base'])
-                    base_bytes = len(base_string)
-                    self.data_file.write(base_string)
-          
-                    # Base data index.
-                    self.index_file.write(self._index(bases_total))
-                    bases_total += base_bytes
-            
-                    # Coverage data.
-                    self.coverage_file.write(self._coverage_index(data['coverage'])) 
-                    
-                    data = chromosome_reader.get_and_parse_next_line()
-                    n += 1
-                    
-            
+
+                if self.ref_chrom is not None:
+                    max_position = self.process_import_lines_ref()
+                else:
+                    max_position = self.process_import_lines_psepileup(chromosome_reader)
+
                 # Base and coverage sequences should now be fully constructed, so 
                 # we can save the object.
                 self.cb.end_position = max_position
                 self.cb.save()
                   
-                head, tail = os.path.split(self.chromosome_data) 
-                chromosome_reader.finalise()
+                head, tail = os.path.split(self.chromosome_data)
+                if chromosome_reader is None:
+                    pass
+                else:
+                    chromosome_reader.finalise()
                 destpath =  settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX #'raw_data/chromosome/'
                 
                 print ('renaming: ',os.path.abspath(self.chromosome_data))
@@ -1030,8 +1220,11 @@ class ChromosomeImporter():
             self.data_file.close()
             self.index_file.close()
             self.coverage_file.close()
-            
-            chromosome_reader.finalise()
+
+            if chromosome_reader is None:
+                pass
+            else:
+                chromosome_reader.finalise()
         
             # Finalize the transaction and close the db connection.
             transaction.commit()

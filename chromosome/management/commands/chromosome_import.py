@@ -12,6 +12,7 @@ by the Noor lab.
 
 from django.core.management.base import BaseCommand
 from chromosome.models import ChromosomeImporter,ChromosomeBatchImportProcess
+from optparse import make_option
 from django.db import connection, transaction
 import os
 import django.utils.timezone
@@ -23,9 +24,14 @@ class Command(BaseCommand):
 
     help = 'Imports the data from the named file into the database.'
     args = '<path to CSV-like file>'
-  
 
-           
+    option_list = BaseCommand.option_list + (
+        make_option('-r', '--refchrom',
+                    dest='ref_chrom',
+                    help='import reference chromosome name'),
+    )
+
+
     def handle(self, chromosome_data, **options):
         '''The main entry point for the Django management command.
         
@@ -41,9 +47,12 @@ class Command(BaseCommand):
         '''
  
         #Perform this legacy command by creating a batch of one file and  calling the new batch import process
-       
+
+        print('chromosome_data: ',chromosome_data)
+        print('Ref chrom: ',options['ref_chrom'])
+
         try:
-            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(chromosome_data)
+            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(chromosome_data,ref_chrom=options['ref_chrom'])
             print('bp: ',bp)
         except:
             raise

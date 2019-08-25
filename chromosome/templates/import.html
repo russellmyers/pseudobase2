@@ -39,7 +39,7 @@
                             <table id="pending_tab" class = "table table-sm">
                                 <thead>
                                     <tr>
-                                         <th scope = "col" </th>
+                                         <th scope = "col"> </th>
                                          <th scope = "col">Action</th>
                                          <th scope = "col">File name</th>
                                          <th scope = "col">Chromosome</th>
@@ -176,14 +176,19 @@ function updateBaseCount(xhttp) {
 
      table = document.getElementById("pending_tab");
      tr = table.getElementsByTagName("tr");
-    
+     var lineType = 'bases';
       for (i = 1; i < tr.length; i++) {
         td = tr[i].getElementsByTagName("td")[2];
         if (td) {
             if (td.innerHTML == fname) {
                 tdSize = tr[i].getElementsByTagName("td")[6];
+                tdFormat = tr[i].getElementsByTagName("td")[7];
                 //alert ('size: ' + tdSize.innerHTML)
-                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount + ' bases)'
+                if (tdFormat ==  'VCF gzipped') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
                 //alert ('fname: ' + fname +  ' i: ' + i.toString())
             }
         }    
