@@ -1198,8 +1198,7 @@ class ChromosomeImporter():
                self.import_log.status = 'A'
                self.import_log.end = django.utils.timezone.now()
                self.import_log.calculate_run_time()
-               #TODO write base count to import_log once complete
-               self.import_log.base_count =  0 #self.get_info(incl_rec_count=True)['rec_count']
+               self.import_log.base_count =  self.get_info(incl_rec_count=True)['rec_count']
                self.import_log.chromebase = None
                self.import_log.save()
     
