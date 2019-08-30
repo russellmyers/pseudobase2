@@ -18,6 +18,8 @@ import django.utils.timezone
 from django.db import connection, transaction
 from django.db.models import Q
 
+from chromosome.utils import VCFRecord
+
 
 from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader, BatchProcess
 
@@ -48,6 +50,7 @@ class ChromosomeBase(models.Model):
     
     strain = models.ForeignKey(Strain)
     chromosome = models.ForeignKey(Chromosome)
+    release = models.CharField(max_length=20,default=' ') #Flybase ref alignment release
     start_position = models.PositiveIntegerField()
     end_position = models.PositiveIntegerField()
     file_tag = models.CharField(max_length=32)
@@ -61,7 +64,7 @@ class ChromosomeBase(models.Model):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s %s' % (self.chromosome,self.strain.name)
+        return '%s %s %s' % (self.chromosome,self.strain.name,self.release)
   
     def has_insertions(self,stAbs,endAbs):
         #check if selected region has inserts, ie at least one position with > 1 base
@@ -282,7 +285,7 @@ class ChromosomeBase(models.Model):
         '''
         
         return r'>%s' % delimiter.join((self.strain.species.name,
-          self.strain.name, self.chromosome.name,
+          self.strain.name, self.chromosome.name,self.release,
           '%s..%s' % (start_position, end_position)))
 
     def get_all_bases(self):
@@ -577,7 +580,7 @@ class ChromosomeBatchImportProcess(BatchProcess):
         
     
     @staticmethod
-    def create_batch_and_import_file(chromosome_data,ref_chrom=None):
+    def create_batch_and_import_file(chromosome_data,flybase_release  = ' ',ref_chrom=None):
         #helper static method to create a batch and import single file within it
         #chromosome_data contains relative path eg ./raw_data/chromosome/pending_import/file.txt
         
@@ -604,7 +607,7 @@ class ChromosomeBatchImportProcess(BatchProcess):
             
             bp.start()
             bp.save()
-            chr_importer = ChromosomeImporter(chromosome_data,ref_chrom = ref_chrom)
+            chr_importer = ChromosomeImporter(chromosome_data,flybase_release=flybase_release, ref_chrom = ref_chrom)
             chr_importer.import_data(bp)
             chr_importer.print_summary()
             bp.stop()
@@ -696,12 +699,22 @@ class ChromosomeVCFImportFileReader():
     # Assumes gzip format, so can't use .next() functionality as per ImportFileReader (therefore not subclassed from ImportFileReader)
     def __init__(self,fPath):
         self.fPath = fPath
+        self.vcf_file = None
+        self.chrom = None
+        self.strain = None
+
+
+    def open(self):
+       self.vcf_file = gzip.open(self.fPath, 'r')
+
+    def close(self):
+        self.vcf_file.close()
 
     def  get_chrom_and_strain(self):
-        vcf_file = gzip.open(self.fPath, 'r')
-        chrom = None
-        strain = None
-        for i, line in enumerate(vcf_file):
+
+        self.open()
+
+        for i, line in enumerate(self.vcf_file):
 
             if i > 10000:
                 break # Give up. May not actually be a VCF file
@@ -710,13 +723,14 @@ class ChromosomeVCFImportFileReader():
             if line[:1] == '#':
                if line[:6] == '#CHROM':
                 head = line[1:].split('\t')
-                strain = head[-1]
+                self.strain = head[-1]
             else:
-               chrom = line.split('\t')[0]
+               self.chrom = line.split('\t')[0]
                break  #assume comment head line is before first record
 
-        vcf_file.close()
-        return chrom,strain
+        self.close()
+
+        return self.chrom,self.strain
 
     def get_num_records(self):
 
@@ -733,9 +747,10 @@ class ChromosomeVCFImportFileReader():
 class ChromosomeImporter():
 #Not a database table
 
-    def __init__(self,chromosome_data,ref_chrom=None):
+    def __init__(self,chromosome_data,flybase_release = ' ',ref_chrom=None):
             self.chromosome_data = chromosome_data
             self.ref_chrom = ref_chrom
+            self.flybase_release = flybase_release
 
             self.chromosome_data_fpath,self.chromosome_data_fname = os.path.split(self.chromosome_data)
             
@@ -892,12 +907,98 @@ class ChromosomeImporter():
            return False  
 
 
-    def process_import_lines_vcf(self):
+    def process_import_lines_vcf(self,chrom,strain):
 
-        return 0
+        max_position = bases_total = 0
+
+        new_bases_total = new_max_position = 0
+
+        del_inds = {}
+
+        poss_del_overlaps = []
+
+        # Now process all the lines in the file (reset to get back to start)
+        # data = chromosome_reader.get_and_parse_next_line(reset=True)
+
+        #ref_bases, chrom_len, header = self.get_ref_seq_from_fasta(chrom,debug=True)
+        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom)
+
+        vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
+        vcf_reader.open()
+
+        for i,line in enumerate(vcf_reader.vcf_file):
+            line = line.decode('utf-8').rstrip()
+            if line[:1] == '#':
+                continue
+            else:
+                v = VCFRecord(line)
+                start_max_position = new_max_position
+                start_bases_total = new_bases_total
+                for n,base in enumerate(ref_bases[start_max_position:int(v.POS)-1]):
+                   if (start_max_position + n) in del_inds:
+                       new_bases_total, new_max_position = self.process_base_position('D', new_bases_total,
+                                                                                      new_max_position, coverage=del_inds[start_max_position + n])
+                       del del_inds[start_max_position + n]
+                   else:
+                        new_bases_total,new_max_position = self.process_base_position(base, new_bases_total, new_max_position)
+                # Now - write current vcf line if called base (or write N if uncalled)
+                if int(v.POS) - 1 in del_inds:
+                    poss_del_overlaps.append([v.POS,del_inds])
+                    #print('Pos delete overlap: ',v.POS,del_inds)
+                    continue
+                var_type,called_bases,read_depth = v.var_type()
+                if  not v.passed_filter() or (var_type == 'U'):
+                    new_bases_total,new_max_position = self.process_base_position('N', new_bases_total, new_max_position,coverage=0)
+                else:
+                    if var_type == '*':
+                        pass
+                    elif var_type == 'R': #Homo ref, or het called ref
+                        new_bases_total, new_max_position = self.process_base_position(called_bases, new_bases_total,
+                                                                                       new_max_position, coverage=read_depth)
+                    else:
+                         if var_type == 'S':
+                             new_bases_total, new_max_position = self.process_base_position(called_bases,
+                                                                                            new_bases_total,
+                                                                                            new_max_position,
+                                                                                            coverage=read_depth)
+                         elif var_type == 'I':
+                             new_bases_total, new_max_position = self.process_base_position(called_bases,
+                                                                                            new_bases_total,
+                                                                                            new_max_position,
+                                                                                            coverage=read_depth)
+                         elif var_type == 'D':
+                             start_del_ind = new_max_position + 1
+                             for i, base in enumerate(called_bases):
+                                 ind_to_apply = start_del_ind + i
+                                 del_inds[ind_to_apply] = read_depth
 
 
-    def get_ref_seq_from_fasta(self, debug=False):
+        print('Finished vcf. Now rest of ref. pos: ',new_max_position)
+        start_max_position = new_max_position
+        for n,base in enumerate(ref_bases[start_max_position:]):
+            if (start_max_position + n) in del_inds:
+                new_bases_total, new_max_position = self.process_base_position('D', new_bases_total,
+                                                                               new_max_position, coverage=del_inds[start_max_position + n])
+                del del_inds[start_max_position + n]
+            else:
+                new_bases_total,new_max_position = self.process_base_position(base, new_bases_total, new_max_position)
+
+
+          #Now write any remaining bases to end of ref bases
+
+        vcf_reader.close()
+
+        print('Num poss del overlaps ',len(poss_del_overlaps))
+        print('Sample of overlaps: ')
+        if len(poss_del_overlaps) >= 5:
+            print(poss_del_overlaps[:5])
+        else:
+            print(poss_del_overlaps[:len(poss_del_overlaps)])
+
+        return new_max_position
+
+
+    def get_ref_seq_from_fasta(self,chrom,debug=False):
 
         in_fasta = False
 
@@ -922,7 +1023,7 @@ class ChromosomeImporter():
                 if in_fasta:
                     return ''.join(fasta_seq), chrom_len,header
 
-                if line_str[1:1 + len(self.ref_chrom)] == self.ref_chrom:
+                if line_str[1:1 + len(chrom)] == chrom:
                     #fasta_seq.append(line_str.rstrip())
                     in_fasta = True
                     header = line_str.rstrip()
@@ -935,6 +1036,60 @@ class ChromosomeImporter():
         return ''.join(fasta_seq), chrom_len,header
 
 
+    def process_base_position(self, base, bases_total, max_position,coverage=0):
+
+        i = max_position
+
+        # A simple progress indicator, since processing can take a
+        # while. Shows progress after every million records processed.
+        if not i % (1000 * 1000):
+            sys.stdout.write('.')
+            sys.stdout.flush()
+
+        if (i % (1000 * 100) == 0):
+            print ('progres write: ', i)
+            # log progress
+            self.import_log.records_read = i
+            # self.import_log.save()
+            update_import_log_outside_transaction(self.import_log)
+        ## Custom processing to handle data cleanup.
+
+
+        # Check that the base string contains no invalid characters.
+        if self.char_search(base):
+            print \
+                'Invalid character detected in base - line %s: %s' % \
+                (i, base)
+            return max_position + 1,bases_total+1
+        else:
+
+            # Change "D" characters in the base column to "-".
+            base = self.replace_no_data(r'-', base)
+            pass
+
+        new_max_position = i + 1
+
+        if coverage > 255:
+           self.import_log.clip_count += 1
+           coverage = 255
+
+
+        ## Append the base and coverage data to the appropriate files.
+
+        # Base data.
+        base_string = base
+        base_bytes = len(base_string)
+        self.data_file.write(base_string)
+
+        # Base data index.
+        self.index_file.write(self._index(bases_total))
+        new_bases_total = bases_total+base_bytes
+
+        # Coverage data.
+        self.coverage_file.write(self._coverage_index(coverage))
+
+        return new_bases_total,new_max_position
+
     def process_import_lines_ref(self):
 
         max_position = bases_total = 0
@@ -942,53 +1097,14 @@ class ChromosomeImporter():
         # Now process all the lines in the file (reset to get back to start)
         #data = chromosome_reader.get_and_parse_next_line(reset=True)
 
-        ref_bases,chrom_len,header = self.get_ref_seq_from_fasta(debug=True)
+        ref_bases,chrom_len,header = self.get_ref_seq_from_fasta(self.ref_chrom,debug=True)
 
         n = 0
 
         #while data is not None:
         for i,base in enumerate(ref_bases):
 
-
-            # A simple progress indicator, since processing can take a
-            # while. Shows progress after every million records processed.
-            if not i % (1000 * 1000):
-                sys.stdout.write('.')
-                sys.stdout.flush()
-
-            if (i % (1000 * 100) == 0):
-                print ('progres write: ', i)
-                # log progress
-                self.import_log.records_read = i
-                # self.import_log.save()
-                update_import_log_outside_transaction(self.import_log)
-            ## Custom processing to handle data cleanup.
-
-            coverage = 0
-
-            # Check that the base string contains no invalid characters.
-            if self.char_search(base):
-                print \
-                    'Invalid character detected in base - line %s: %s' % \
-                    (i, base)
-                break
-
-            max_position = i + 1
-
-            ## Append the base and coverage data to the appropriate files.
-
-            # Base data.
-            base_string = base
-            base_bytes = len(base_string)
-            self.data_file.write(base_string)
-
-            # Base data index.
-            self.index_file.write(self._index(bases_total))
-            bases_total += base_bytes
-
-            # Coverage data.
-            self.coverage_file.write(self._coverage_index(coverage))
-
+            bases_total,max_position = self.process_base_position(base, bases_total, max_position)
 
         return max_position
 
@@ -1082,7 +1198,8 @@ class ChromosomeImporter():
                self.import_log.status = 'A'
                self.import_log.end = django.utils.timezone.now()
                self.import_log.calculate_run_time()
-               self.import_log.base_count = self.get_info(incl_rec_count=True)['rec_count']
+               #TODO write base count to import_log once complete
+               self.import_log.base_count =  0 #self.get_info(incl_rec_count=True)['rec_count']
                self.import_log.chromebase = None
                self.import_log.save()
     
@@ -1096,6 +1213,7 @@ class ChromosomeImporter():
             self.cb = ChromosomeBase()
             self.cb.file_tag = ChromosomeBase.generate_file_tag()
             self.cb.start_position = self.cb.end_position = 0
+            self.cb.release = self.flybase_release
         
             # Open our data files.
             self.data_file = open(self.cb.data_file_path, 'w')
@@ -1120,6 +1238,12 @@ class ChromosomeImporter():
 
                     self.cb.chromosome = self._lookup_chromosome(self.ref_chrom)[0]
 
+                elif self.chromosome_data.split('.')[-1] == 'gz':
+                    vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
+                    chrom,strain = vcf_reader.get_chrom_and_strain()
+                    self.cb.start_position = 1
+                    self.cb.strain = StrainSymbol.objects.get(symbol=strain).strain
+                    self.cb.chromosome = self._lookup_chromosome(chrom)[0]
                 else:
                     chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
 
@@ -1159,6 +1283,8 @@ class ChromosomeImporter():
 
                 if self.ref_chrom is not None:
                     max_position = self.process_import_lines_ref()
+                elif self.chromosome_data.split('.')[-1] == 'gz':
+                    max_position = self.process_import_lines_vcf(chrom,strain)
                 else:
                     max_position = self.process_import_lines_psepileup(chromosome_reader)
 

@@ -654,3 +654,165 @@ In  index
 In  index
 In  index
 In  index
+In  index
+In  index
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\core\handlers\base.py", line 113, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "C:\NewOneDrive\OneDrive - Northgate Information Solutions Limited\Documents\GitLab\pseudobase2\common\views.py", line 177, in index
+    return _render_chromosome_search(request)
+  File "C:\NewOneDrive\OneDrive - Northgate Information Solutions Limited\Documents\GitLab\pseudobase2\common\views.py", line 63, in _render_chromosome_search
+    context_instance=RequestContext(request))
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\shortcuts\__init__.py", line 29, in render_to_response
+    return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\loader.py", line 177, in render_to_string
+    return t.render(context_instance)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\base.py", line 140, in render
+    return self._render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\base.py", line 134, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\base.py", line 830, in render
+    bit = self.render_node(node, context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\debug.py", line 74, in render_node
+    return node.render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\loader_tags.py", line 124, in render
+    return compiled_parent._render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\base.py", line 134, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\base.py", line 830, in render
+    bit = self.render_node(node, context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\debug.py", line 74, in render_node
+    return node.render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\base.py", line 830, in render
+    bit = self.render_node(node, context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\debug.py", line 74, in render_node
+    return node.render(context)
+  File "C:\Users\RussellM\AppData\Local\conda\conda\envs\py26django15\lib\site-packages\django\template\defaulttags.py", line 148, in render
+    values = list(values)
+  File "C:\NewOneDrive\OneDrive - Northgate Information Solutions Limited\Documents\GitLab\pseudobase2\chromosome\models.py", line 470, in multi_strain_fasta
+    bases_per_position.append(c.get_bases_per_position(start,end))
+  File "C:\NewOneDrive\OneDrive - Northgate Information Solutions Limited\Documents\GitLab\pseudobase2\chromosome\models.py", line 392, in get_bases_per_position
+    if  (self.has_insertions(start_position,end_position)):
+  File "C:\NewOneDrive\OneDrive - Northgate Information Solutions Limited\Documents\GitLab\pseudobase2\chromosome\models.py", line 90, in has_insertions
+    start_offset = self._get_byte_offset_from_index(start)
+  File "C:\NewOneDrive\OneDrive - Northgate Information Solutions Limited\Documents\GitLab\pseudobase2\chromosome\models.py", line 176, in _get_byte_offset_from_index
+    f = open(self.index_file_path,'rb')
+IOError: [Errno 2] No such file or directory: u'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/chromosome/Faxp5yOxvi4Xo4MnmTnMXpZjYNaTzsk6.index'
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In _render_chrom_search. Valid form.. 2
+In  index
+In  index
+Posting
+In index. Showing results. search type: Show search results
+In _render_chrom_search.
+In  index
+In  index

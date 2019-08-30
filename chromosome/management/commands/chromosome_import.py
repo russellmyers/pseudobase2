@@ -26,9 +26,14 @@ class Command(BaseCommand):
     args = '<path to CSV-like file>'
 
     option_list = BaseCommand.option_list + (
+        make_option('-f', '--flybasereleaseversion',
+                    dest='flybase_release',
+                    default='pse1',
+                    help='Flybase release version aligned against (eg r3.04)'),
         make_option('-r', '--refchrom',
                     dest='ref_chrom',
                     help='import reference chromosome name'),
+
     )
 
 
@@ -49,10 +54,12 @@ class Command(BaseCommand):
         #Perform this legacy command by creating a batch of one file and  calling the new batch import process
 
         print('chromosome_data: ',chromosome_data)
-        print('Ref chrom: ',options['ref_chrom'])
+        print('Flybase release version: ', options['flybase_release'])
+        print('Ref chrom import: ',options['ref_chrom'])
+
 
         try:
-            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(chromosome_data,ref_chrom=options['ref_chrom'])
+            bp = ChromosomeBatchImportProcess.create_batch_and_import_file(chromosome_data,flybase_release=options['flybase_release'],ref_chrom=options['ref_chrom'])
             print('bp: ',bp)
         except:
             raise

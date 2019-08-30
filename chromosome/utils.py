@@ -979,7 +979,7 @@ class VCFRecord:
             indel_bases = self.REF[1:len(self.REF) - len(called_bases) + 1]
         else:
             indel_type = 'I'
-            indel_bases = called_bases[1:len(called_bases) - len(self.REF) + 1]
+            indel_bases = called_bases[0] + called_bases[1:len(called_bases) - len(self.REF) + 1]
 
         return indel_type,indel_bases
 
@@ -992,14 +992,14 @@ class VCFRecord:
                 return 'U',None,None
             elif self.is_homo_ref():
                 called_bases, read_depth = self.called_bases()
-                return 'R',self.REF,read_depth
+                return 'R',self.REF[0],read_depth
             elif self.is_homo_alt() or self.is_het():
                 called_bases,read_depth = self.called_bases()
                 if called_bases == '*':
                     return '*',called_bases,read_depth
                 elif called_bases == 'R':
                     # Het but most abundant is ref
-                    return 'R',self.REF,read_depth
+                    return 'R',self.REF[0],read_depth
                 elif len(self.REF) == 1 and len(called_bases) == 1:
                     return 'S',called_bases,read_depth
                 else:
@@ -1031,7 +1031,7 @@ class VCFRecord:
         max_gen = self.gen_2 if reads_2 > reads_1 else self.gen_1
 
         if max_gen == 0:
-            return 'R',None
+            return 'R',self.ads[0]
         else:
             return self.alts[max_gen - 1],self.ads[max_gen]
 
@@ -1083,7 +1083,57 @@ class VCFRecord:
         bases_info[1] = str(read_depth)
         line[-1] = ' '.join(bases_info)
 
-    def apply_to_pse_pileup_line(self,pse_ind,pse_pileup_list):
+    def apply_chromosomebase_format(self,del_inds):
+
+        var_type, var_bases, read_depth = self.var_type()
+
+        if not self.passed_filter() or (var_type == 'U'):
+            # write N
+            # print('F or U: ',self)
+            self.apply_not_passed_or_uncalled(line, var_type, var_bases, read_depth)
+            if len(del_inds) > 0:
+                print('deletion overlap with filter fail or uncalled: ', pse_ind, del_inds)
+        else:
+            if var_type == '*':
+                # Ignore
+                # print('*: ', self)
+                pass
+            elif var_type == 'R':  # Homo ref or het called as reference
+                # write read depth
+                if self.is_het():
+                    # print('RH: ', self)
+                    pass
+
+                self.apply_homo_ref(line, var_type, var_bases, read_depth)
+                if len(del_inds) > 0:
+                    print('deletion overlap with homo ref or het called as homo ref: ', pse_ind, del_inds)
+            else:
+                if self.is_homo_alt():
+                    # print('HA S,L: ',self)
+                    pass
+                else:
+                    # print('HE S,L: ', self)
+                    pass
+                # write base(s) and read depth
+                if var_type == 'S':
+                    self.apply_snp(line, var_type, var_bases, read_depth)
+                    if len(del_inds) > 0:
+                        print('deletion overlap with SNP: ', pse_ind, del_inds)
+                elif var_type == 'I':
+                    self.apply_insertion(line, var_type, var_bases, read_depth)
+                    if len(del_inds) > 0:
+                        print('deletion overlap with INSERT: ', pse_ind, del_inds)
+                elif var_type == 'D':
+                    if len(del_inds) > 0:
+                        print('Overlapping deletion: ', pse_ind, del_inds)
+                    del_inds = []
+                    for i, base in enumerate(var_bases):
+                        ind_to_apply = pse_ind + 1 + i
+                        del_inds.append(ind_to_apply)
+                        self.apply_deletion(pse_pileup_list[ind_to_apply], var_type, base, read_depth)
+
+    def apply_to_pse_pileup_line(self,pse_ind,pse_pileup_list,del_inds):
+
 
         var_type, var_bases, read_depth = self.var_type()
 
@@ -1093,6 +1143,8 @@ class VCFRecord:
             # write N
             # print('F or U: ',self)
             self.apply_not_passed_or_uncalled(line,var_type,var_bases,read_depth)
+            if len(del_inds) > 0:
+                print('deletion overlap with filter fail or uncalled: ',pse_ind,del_inds)
         else:
             if var_type == '*':
                 # Ignore
@@ -1105,6 +1157,8 @@ class VCFRecord:
                     pass
 
                 self.apply_homo_ref(line,var_type,var_bases,read_depth)
+                if len(del_inds) > 0:
+                    print('deletion overlap with homo ref or het called as homo ref: ', pse_ind, del_inds)
             else:
                 if self.is_homo_alt():
                     #print('HA S,L: ',self)
@@ -1115,11 +1169,20 @@ class VCFRecord:
                 # write base(s) and read depth
                 if var_type == 'S':
                     self.apply_snp(line,var_type,var_bases,read_depth)
+                    if len(del_inds) > 0:
+                         print('deletion overlap with SNP: ', pse_ind, del_inds)
                 elif var_type == 'I':
                     self.apply_insertion(line,var_type,var_bases,read_depth)
+                    if len(del_inds) > 0:
+                        print('deletion overlap with INSERT: ', pse_ind, del_inds)
                 elif var_type == 'D':
+                    if len(del_inds) > 0:
+                        print('Overlapping deletion: ',pse_ind, del_inds)
+                    del_inds = []
                     for i,base in enumerate(var_bases):
-                        self.apply_deletion(pse_pileup_list[pse_ind + 1 + i],var_type,base,read_depth)
+                        ind_to_apply =  pse_ind + 1 + i
+                        del_inds.append(ind_to_apply)
+                        self.apply_deletion(pse_pileup_list[ind_to_apply],var_type,base,read_depth)
 
 
 
@@ -1137,6 +1200,8 @@ def read_vcf_quick(full_name, org,chrom,pse_pileup_list,release=None,num_recs=No
     head = None
     comment_lines = []
     lines = []
+
+    del_inds = [] #deletions applied to future positions
 
     tot_summary_flags = [0 for i in range(11)]
     print('  Reading: ', full_name)
@@ -1187,7 +1252,7 @@ def read_vcf_quick(full_name, org,chrom,pse_pileup_list,release=None,num_recs=No
             if pse_index  >= num_recs:
                 break
 
-        v.apply_to_pse_pileup_line(pse_index,pse_pileup_list)
+        v.apply_to_pse_pileup_line(pse_index,pse_pileup_list,del_inds)
 
 
 
