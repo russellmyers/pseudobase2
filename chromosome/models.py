@@ -63,7 +63,8 @@ class ChromosomeBase(models.Model):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s %s %s' % (self.chromosome,self.strain.name, self.strain.release.name)
+        rel = 'Norel' if self.strain.release is None else self.strain.release.name
+        return '%s %s %s' % (self.chromosome,self.strain.name, rel)
   
     def has_insertions(self,stAbs,endAbs):
         #check if selected region has inserts, ie at least one position with > 1 base
@@ -282,9 +283,9 @@ class ChromosomeBase(models.Model):
         If delimiter is specified, it is used instead of the default.
         
         '''
-        
+        rel = 'Norel' if self.strain.release is None else self.strain.release.name
         return r'>%s' % delimiter.join((self.strain.species.name,
-          self.strain.name, self.chromosome.name,self.strain.release.name,
+          self.strain.name, self.chromosome.name,rel,
           '%s..%s' % (start_position, end_position)))
 
     def get_all_bases(self):

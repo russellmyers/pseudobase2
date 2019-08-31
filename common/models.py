@@ -47,7 +47,8 @@ class Strain(models.Model):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s, %s, %s' % (self.name, self.release.name, self.species.name)
+        rel = 'Norel' if self.release is None else self.release.name
+        return '%s, %s, %s' % (self.name, rel, self.species.name)
     
     @property
     def formatted_info(self):
@@ -117,7 +118,8 @@ class StrainSymbol(models.Model):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s [%s, %s, %s]' % (self.symbol, self.strain.name, self.strain.release.name, self.strain.species.symbol)
+        rel = 'Norel' if self.strain.release is None else self.strain.release.name
+        return '%s [%s, %s, %s]' % (self.symbol, self.strain.name, rel, self.strain.species.symbol)
 
 
 
