@@ -660,7 +660,7 @@ class ChromosomeImportFileReader(ImportFileReader):
       
         '''
         
-        return [line[0], line[1], int(line[2]), 1, line[3].upper()]
+        return [line[0], line[1]+'_pse1', int(line[2]), 1, line[3].upper()]
 
     def _standard_format(self, line):
         '''Parse a line in "standard" format and return a list of the data.
@@ -672,7 +672,7 @@ class ChromosomeImportFileReader(ImportFileReader):
         #pdb.set_trace()
         replace_whitespace = re.compile(r'\s').sub
         base_info = line[3].split(' ', 2)
-        return [str(line[1]), str(line[2]), int(base_info[0]), 
+        return [str(line[1]), str(line[2]) + '_pse1', int(base_info[0]),
           base_info[1].upper(), replace_whitespace('', base_info[2]).upper()]
     
     def _determine_format_parser_from_example_line(self,example_line):
@@ -863,7 +863,7 @@ class ChromosomeImporter():
                 else:
                    # Get the data we only want to think about once.
                     first_data = chromosome_reader.get_and_parse_next_line(reset=True)
-                    
+
                     if incl_rec_count:
                         
                         rec_count = chromosome_reader.get_num_records()
@@ -1230,7 +1230,7 @@ class ChromosomeImporter():
                 if self.ref_chrom is not None:
                     self.cb.start_position = 1
                     try:
-                        strains = Strain.objects.filter(is_reference=True)
+                        strains = Strain.objects.filter(is_reference=True,release__name=self.flybase_release)
                         self.cb.strain = strains[0]
                     except:
                         self.cb.strain = self._lookup_strain('Mesa Verde, CO 2-25 reference line')[0]
