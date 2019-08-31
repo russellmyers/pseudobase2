@@ -26,16 +26,28 @@ class Species(models.Model):
         verbose_name_plural = 'species'
 
 
+class Release(models.Model):
+    '''Flybase releases which strains are aligned against.'''
+
+    name = models.CharField(max_length=20)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return '%s, %s' % (self.name, self.description)
+
+
 class Strain(models.Model):
     '''Data about a particular strain.'''
 
     name = models.CharField(max_length=255)
     species = models.ForeignKey(Species)
+    release = models.ForeignKey(Release,null=True)
     is_reference = models.BooleanField()
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s, %s' % (self.name, self.species.name)
+        return '%s, %s, %s' % (self.name, self.release.name, self.species.name)
     
     @property
     def formatted_info(self):
@@ -105,7 +117,9 @@ class StrainSymbol(models.Model):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s [%s, %s]' % (self.symbol, self.strain.name, self.strain.species.symbol)
+        return '%s [%s, %s, %s]' % (self.symbol, self.strain.name, self.strain.release.name, self.strain.species.symbol)
+
+
 
 class Chromosome(models.Model):
     '''Data about a particular chromosome.'''

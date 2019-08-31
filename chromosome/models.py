@@ -50,7 +50,6 @@ class ChromosomeBase(models.Model):
     
     strain = models.ForeignKey(Strain)
     chromosome = models.ForeignKey(Chromosome)
-    release = models.CharField(max_length=20,default=' ') #Flybase ref alignment release
     start_position = models.PositiveIntegerField()
     end_position = models.PositiveIntegerField()
     file_tag = models.CharField(max_length=32)
@@ -64,7 +63,7 @@ class ChromosomeBase(models.Model):
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s %s %s' % (self.chromosome,self.strain.name,self.release)
+        return '%s %s %s' % (self.chromosome,self.strain.name, self.strain.release.name)
   
     def has_insertions(self,stAbs,endAbs):
         #check if selected region has inserts, ie at least one position with > 1 base
@@ -285,7 +284,7 @@ class ChromosomeBase(models.Model):
         '''
         
         return r'>%s' % delimiter.join((self.strain.species.name,
-          self.strain.name, self.chromosome.name,self.release,
+          self.strain.name, self.chromosome.name,self.strain.release.name,
           '%s..%s' % (start_position, end_position)))
 
     def get_all_bases(self):
