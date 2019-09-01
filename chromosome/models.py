@@ -819,7 +819,13 @@ class ChromosomeImporter():
   
     def _lookup_chromosome(self, chromosome):
         '''Load a Chromosome object for association by its name.'''
-        return (Chromosome.objects.get(name=chromosome), False)
+        chr_split = chromosome.split('_')
+        if len(chr_split) > 1: # chromsome group, eg XL_group3b
+           chr_split[1] = chr_split[1].lower()
+           chr = '_'.join(chr_split)
+        else:
+           chr = chromosome
+        return (Chromosome.objects.get(name=chr), False)
   
     def _coverage_index(self, n):
         '''Pack n into a byte for use in the coverage index.'''
