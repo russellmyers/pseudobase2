@@ -11,6 +11,7 @@ import textwrap
 import sys
 from os.path import join
 import gzip
+import json
 
 from django.conf import settings
 from django.db import models
@@ -634,6 +635,7 @@ class ChromosomeBatchImportLog(ImportLog):
     status = models.CharField(max_length=1, db_index=True, default='P')
     records_read = models.PositiveIntegerField(blank=True,default=0)
     chromebase = models.ForeignKey(ChromosomeBase,null=True,blank=True)
+    vcf_meta_data = models.TextField(null=True,blank=True)
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
@@ -841,14 +843,17 @@ class ChromosomeImporter():
                     vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
                     chrom,strain = vcf_reader.get_chrom_and_strain()
                     rec_count = 0
+                    bases_count = 0
                     if incl_rec_count:
                         rec_count = vcf_reader.get_num_records()
+                        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom)
+                        bases_count = len(ref_bases)
                     if chrom is None or strain is None:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'Unknown','rec_count':rec_count}
+                            'format': 'Unknown','rec_count':rec_count, 'bases_count':bases_count}
                     else:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain,'rec_count':rec_count}
+                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain,'rec_count':rec_count, 'bases_count':bases_count}
 
 
 
@@ -923,6 +928,8 @@ class ChromosomeImporter():
         #ref_bases, chrom_len, header = self.get_ref_seq_from_fasta(chrom,debug=True)
         ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom)
 
+        tot_summary_flags = [0 for i in range(len(VCFRecord.vcf_types))]
+
         vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
         vcf_reader.open()
 
@@ -934,6 +941,9 @@ class ChromosomeImporter():
                 v = VCFRecord(line)
                 start_max_position = new_max_position
                 start_bases_total = new_bases_total
+                summary_flags = v.summary_flags()
+                tot_summary_flags = [prev_tot + summary_flags[i] for i, prev_tot in enumerate(tot_summary_flags)]
+
                 for n,base in enumerate(ref_bases[start_max_position:int(v.POS)-1]):
                    if (start_max_position + n) in del_inds:
                        new_bases_total, new_max_position = self.process_base_position('D', new_bases_total,
@@ -988,6 +998,8 @@ class ChromosomeImporter():
 
         vcf_reader.close()
 
+        vcf_meta_data = VCFRecord.tot_summary_flags_to_meta_data(tot_summary_flags)
+
         print('Num poss del overlaps ',len(poss_del_overlaps))
         print('Sample of overlaps: ')
         if len(poss_del_overlaps) >= 5:
@@ -995,7 +1007,9 @@ class ChromosomeImporter():
         else:
             print(poss_del_overlaps[:len(poss_del_overlaps)])
 
-        return new_max_position
+
+
+        return new_max_position, vcf_meta_data
 
 
     def get_ref_seq_from_fasta(self,chrom,debug=False):
@@ -1198,7 +1212,10 @@ class ChromosomeImporter():
                self.import_log.status = 'A'
                self.import_log.end = django.utils.timezone.now()
                self.import_log.calculate_run_time()
-               self.import_log.base_count =  self.get_info(incl_rec_count=True)['rec_count']
+               if self.chromosome_data.split('.')[-1] == 'gz':
+                   self.import_log.base_count = self.get_info(incl_rec_count=True)['bases_count']
+               else:
+                   self.import_log.base_count =  self.get_info(incl_rec_count=True)['rec_count']
                self.import_log.chromebase = None
                self.import_log.save()
     
@@ -1280,10 +1297,12 @@ class ChromosomeImporter():
                 except:
                     raise
 
+                vcf_meta_data = ''
+
                 if self.ref_chrom is not None:
                     max_position = self.process_import_lines_ref()
                 elif self.chromosome_data.split('.')[-1] == 'gz':
-                    max_position = self.process_import_lines_vcf(chrom,strain)
+                    max_position, vcf_meta_data = self.process_import_lines_vcf(chrom,strain)
                 else:
                     max_position = self.process_import_lines_psepileup(chromosome_reader)
 
@@ -1306,6 +1325,7 @@ class ChromosomeImporter():
                 
                 # Finish populating the import metadata.
                 self.import_log.base_count = self.cb.total_bases
+                self.import_log.vcf_meta_data = json.dumps(vcf_meta_data)
                 self.import_log.end = django.utils.timezone.now()
                 self.import_log.calculate_run_time()
                 

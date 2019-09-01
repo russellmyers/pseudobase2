@@ -879,7 +879,8 @@ def get_ref_strain_symbol(self):
 
 class VCFRecord:
 
-
+    vcf_types = ['Filtered', 'Uncalled', 'Hom Ref', 'Het Ref', 'Hom Alt', 'Het Alt', '*', 'SNP', 'INDEL', 'Insertion',
+             'Deletion']
 
     def __init__(self,line):
 
@@ -924,10 +925,15 @@ class VCFRecord:
         else:
             return (self.gen_1 == self.gen_2)  and (self.gen_1 > 0)
 
+    @staticmethod
+    def tot_summary_flags_to_meta_data(tot_summary_flags):
+        meta_data = {}
+        for i,vcf_type in enumerate(VCFRecord.vcf_types):
+            meta_data[vcf_type] = tot_summary_flags[i]
+        return meta_data
 
     def summary_flags(self):
-        types = ['F','U','HR','HER','HA','HEA','*','S','L','I','D']
-        summary_flags = [0 for i in range(len(types))]
+        summary_flags = [0 for i in range(len(self.vcf_types))]
 
         var_type,var_bases,read_depth = self.var_type()
 
