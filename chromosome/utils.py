@@ -3,7 +3,7 @@ from __future__ import print_function # cater for printing on same line, ie with
 #import matplotlib.pyplot as plt
 #import numpy as np
 import gzip
-import pandas as pd
+#import pandas as pd
 
 '''
  VCF Analysis and Conversion routines 
