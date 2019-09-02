@@ -74,11 +74,11 @@ class Command(BaseCommand):
 
         output_file = self.assemble_default_output_file(chrom,strain,options['output_folder'] )
 
-        self.stdout.write(self.style.SUCCESS('Input file 1: ' + input_file_1))
-        self.stdout.write(self.style.SUCCESS('Input file 2: ' + input_file_2))
-        self.stdout.write(self.style.SUCCESS('Output file ' + output_file))
+        self.stdout.write('Input file 1: ' + input_file_1)
+        self.stdout.write('Input file 2: ' + input_file_2)
+        self.stdout.write('Output file ' + output_file)
 
         utils.merge_vcfs(input_file_1,input_file_2,output_file)
 
-        self.stdout.write(self.style.SUCCESS('VCF merge complete. Chrom: ' +  chrom + ' Strain: ' + strain))
+        self.stdout.write('VCF merge complete. Chrom: ' +  chrom + ' Strain: ' + strain)
 
