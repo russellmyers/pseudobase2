@@ -96,11 +96,27 @@ class Gene(models.Model):
         ordering = ('strain__species__pk', 'strain__name')
 
 
+class GeneSymbolManager(models.Manager):
+    def gene_symbols_no_flybase_ID(self):
+        symbols_without_flybase_ID = []
+
+        all_symbols = self.all()
+        print('Num symbols: ',len(all_symbols))
+        for i,symbol in enumerate(all_symbols):
+            if (i % 10000 == 0):
+                print('Processing: ',i)
+            flybase_id = symbol.flybase_ID()
+            if flybase_id is None:
+               symbols_without_flybase_ID.append(symbol.symbol)
+        return symbols_without_flybase_ID
+
 class GeneSymbol(models.Model):
     '''Data about a symbol representing a gene in different systems.'''
  
     symbol = models.CharField(max_length=255)
     translations = models.ManyToManyField('self')
+
+    objects = GeneSymbolManager()
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
@@ -109,6 +125,13 @@ class GeneSymbol(models.Model):
     def all_symbols(self):
         '''Return a list of all translations of this gene symbol.'''
         return([self.symbol] + [t.symbol for t in self.translations.all()])
+
+    def flybase_ID(self):
+        all_translations = self.all_symbols()
+        for trans in all_translations:
+            if trans[:4] == 'FBgn':
+                return trans
+        return None
 
     @staticmethod
     def normalize(symbol):
