@@ -130,6 +130,9 @@ class MRNA(models.Model):
         '''Define the string representation of this class of object.'''
         return '%s, %s' % (self.gene.import_code, self.name)
 
+    class Meta:
+        verbose_name_plural = 'mRNA Transcripts'
+
     def cds_total_length(self):
         cds_records = self.cds_set.all()
         tot_len = 0
@@ -178,6 +181,9 @@ class CDS(models.Model):
     def __str__(self):
         '''Define the string representation of this class of object.'''
         return '%s, %s' % (self.mRNA.name, self.num)
+
+    class Meta:
+        verbose_name_plural = 'CDS Regions'
 
     def length(self):
         return self.end_position - self.start_position + 1
