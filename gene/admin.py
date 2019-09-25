@@ -2,9 +2,12 @@
 
 from django.contrib import admin
 
-from gene.models import Gene, GeneSymbol, GeneBatchProcess
+from gene.models import Gene, GeneSymbol, GeneBatchProcess, MRNA, CDS
 
 
 admin.site.register(Gene)
 admin.site.register(GeneSymbol)
 admin.site.register(GeneBatchProcess)
+admin.site.register(MRNA)
+admin.site.register(CDS)
+

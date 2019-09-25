@@ -12,6 +12,10 @@ from django.db import models
 from common.models import Strain, Chromosome
 from common.models import BatchProcess, ImportLog
 
+from chromosome.models import ChromosomeBase
+
+
+
 
 class Gene(models.Model):
     '''Sequence Data and metadata about a particular gene sequence.'''
@@ -21,11 +25,26 @@ class Gene(models.Model):
     start_position = models.PositiveIntegerField()
     end_position = models.PositiveIntegerField()
     import_code = models.CharField(max_length=255, db_index=True)
-    bases = models.TextField(editable=False)
+    bases = models.TextField() #(editable=False)
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s, %s' % (self.chromosome.name, self.strain.name)
+        return '%s, %s, %s' % (self.chromosome.name, self.import_code, self.strain.name)
+
+
+    def largest_transcript(self):
+        mrnas = self.mrna_set.all()
+        largest = None
+        largest_size = -1
+        for mrna in mrnas:
+            len = mrna.cds_total_length()
+            if len > largest_size:
+                largest_size = len
+                largest = mrna
+        return largest
+
+    def bases_for_largest_transcript(self):
+        pass
 
     def fasta_header(self, delimiter='|'):
         '''Return a FASTA-compliant header containing sequence metadata.
@@ -33,10 +52,10 @@ class Gene(models.Model):
         If delimiter is specified, it is used instead of the default.
         
         '''
-        
+        largest_transcript = self.largest_transcript()
         return r'>%s' % delimiter.join((self.strain.species.name,
           self.strain.name,
-          '%s_%s' %(self.chromosome.name, self.start_position),
+          '%s_%s %s' %(self.chromosome.name, self.start_position if largest_transcript is None else largest_transcript.start_position(), '' if largest_transcript is None else largest_transcript.name),
           self.symbols()))
   
     def fasta_bases(self, wrapped=True):
@@ -46,6 +65,13 @@ class Gene(models.Model):
         to 75 characters for format compliance.
       
         '''
+
+        largest_transcript = self.largest_transcript()
+        if largest_transcript is None:
+            bases = self.bases
+        else:
+            #ref_strain = Strain.objects.get(name__contains='refer',release__name__contain='3')
+            bases = largest_transcript.bases_for_strain(self.strain)
     
         if wrapped:
             # We have to go through this little eval dance because the
@@ -55,9 +81,9 @@ class Gene(models.Model):
                 tw = textwrap.TextWrapper(width=75, break_on_hyphens=False)
             except TypeError:
                 tw = textwrap.TextWrapper(width=75)
-            return tw.wrap(self.bases)
+            return tw.wrap(bases)
         else:
-            return self.bases
+            return bases
 
     def symbols(self):
         '''Return all symbols that represent this gene.'''
@@ -95,6 +121,66 @@ class Gene(models.Model):
         '''Define Django-specific metadata.'''
         ordering = ('strain__species__pk', 'strain__name')
 
+
+class MRNA(models.Model):
+    name = models.CharField(max_length=255)
+    gene = models.ForeignKey(Gene)
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return '%s, %s' % (self.gene.import_code, self.name)
+
+    def cds_total_length(self):
+        cds_records = self.cds_set.all()
+        tot_len = 0
+        for rec in cds_records:
+            tot_len += rec.length()
+
+        return tot_len
+
+
+    def cds_list(self):
+        cds_list = []
+        for cds in self.cds_set.all():
+            cds_list.append([cds.start_position,cds.end_position])
+
+        return cds_list
+
+    def bases_for_strain(self,strain):
+        bases_list = []
+        cb = ChromosomeBase.objects.get(strain=strain,chromosome=self.gene.chromosome)
+        for cds_range in self.cds_list():
+            cds_bases = cb.fasta_bases(cds_range[0],cds_range[1])
+            bases_list.extend(cds_bases)
+        return ''.join(bases_list)
+
+
+    def start_position(self):
+        cds_list = self.cds_list()
+        if len(cds_list) > 0:
+            return cds_list[0][0]
+        else:
+            return -1
+
+    def end_position(self):
+        cds_list = self.cds_list()
+        if len(cds_list) > 0:
+            return cds_list[-1][-1]
+        else:
+            return -1
+
+class CDS(models.Model):
+    mRNA = models.ForeignKey(MRNA)
+    start_position = models.PositiveIntegerField()
+    end_position = models.PositiveIntegerField()
+    num = models.PositiveIntegerField()
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return '%s, %s' % (self.mRNA.name, self.num)
+
+    def length(self):
+        return self.end_position - self.start_position + 1
 
 class GeneSymbolManager(models.Manager):
     def gene_symbols_no_flybase_ID(self):
