@@ -9,11 +9,17 @@ import textwrap
 from django.conf import settings
 from django.db import models
 
-from common.models import Strain, Chromosome
+from common.models import Strain, Chromosome, StrainManager
 from common.models import BatchProcess, ImportLog
 
 from chromosome.models import ChromosomeBase
 
+
+# class GeneManager(models.Manager):
+#     def ref_strain_gene_for_chrom_and_code(self,chrom_name,import_code):
+#         ref_strain_gene = None
+#         try:
+#            rfg = self.filter(chromosome__name=chrom_name,import_code=import_code,)
 
 
 
@@ -25,11 +31,14 @@ class Gene(models.Model):
     start_position = models.PositiveIntegerField()
     end_position = models.PositiveIntegerField()
     import_code = models.CharField(max_length=255, db_index=True)
+    strand = models.CharField(max_length=1)
     bases = models.TextField() #(editable=False)
+
+    # objects = GeneManager()
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
-        return '%s, %s, %s' % (self.chromosome.name, self.import_code, self.strain.name)
+        return '%s, %s, %s, %s' % (self.chromosome.name, self.import_code, self.strain.name, self.strain.release.name)
 
 
     def largest_transcript(self):
@@ -46,32 +55,50 @@ class Gene(models.Model):
     def bases_for_largest_transcript(self):
         pass
 
-    def fasta_header(self, delimiter='|'):
+    def fasta_header(self, delimiter='|',use_strain=None):
         '''Return a FASTA-compliant header containing sequence metadata.
         
         If delimiter is specified, it is used instead of the default.
+
+        If use_strain is specified, use that strain to specify strain name etc (while using self, ie gene, to obtain
+        sequence ranges). This is used because default sequence ranges for each gene are stored against the reference strain.
+        An actual gene record is created for a non-ref strain only if the sequence range needs to be overridden for that strain.
+
         
         '''
+
+        strain = self.strain if use_strain is None else use_strain
+
         largest_transcript = self.largest_transcript()
-        return r'>%s' % delimiter.join((self.strain.species.name,
-          self.strain.name,
+        return r'>%s' % delimiter.join((strain.species.name,
+          strain.name,
           '%s_%s %s' %(self.chromosome.name, self.start_position if largest_transcript is None else largest_transcript.start_position(), '' if largest_transcript is None else largest_transcript.name),
           self.symbols()))
   
-    def fasta_bases(self, wrapped=True):
+    def fasta_bases(self, wrapped=True,use_strain=None):
         '''Return the sequence data for the specified range.
       
         This data is retrieved from the data file.  It is generally wrapped
         to 75 characters for format compliance.
-      
+
+        If use_strain is specified, use that strain to specify strain name etc (while using self, ie gene, to obtain
+        sequence ranges). This is used because default sequence ranges for each gene are stored against the reference strain.
+        An actual gene record is created for a non-ref strain only if the sequence range needs to be overridden for that strain.
+
         '''
+
+        strain = self.strain if use_strain is None else use_strain
 
         largest_transcript = self.largest_transcript()
         if largest_transcript is None:
             bases = self.bases
         else:
             #ref_strain = Strain.objects.get(name__contains='refer',release__name__contain='3')
-            bases = largest_transcript.bases_for_strain(self.strain)
+            # ref_strain = Strain.objects.ref_strain_for_release('r3.04')
+            # if ref_strain is None:
+            #     bases = self.bases
+            # else:
+            bases = largest_transcript.bases_for_strain(strain)   #(self.strain)
     
         if wrapped:
             # We have to go through this little eval dance because the
@@ -111,12 +138,34 @@ class Gene(models.Model):
     
         n_symbols = GeneSymbol.objects.get(
           symbol=GeneSymbol.normalize(symbol)).all_symbols()
-        genes = Gene.objects.filter(strain__species__pk__in=species).filter(
-          import_code__in=n_symbols).order_by('-strain__is_reference', 
-            'strain__species__id', 'strain__name')
-        for g in genes:
-            yield (g.fasta_header(), g.fasta_bases())
-    
+
+        if settings.FLYBASE_RELEASE_VERSION == 'pse1':
+            #Old Method
+            genes = Gene.objects.filter(strain__species__pk__in=species).filter(
+              import_code__in=n_symbols, strain__release__name=settings.FLYBASE_RELEASE_VERSION).order_by('-strain__is_reference',
+                'strain__species__id', 'strain__name')
+            for g in genes:
+                yield (g.fasta_header(), g.fasta_bases())
+        else:
+            #New method r3.04 onwards
+            strains = Strain.objects.strains_in_species_list(species,settings.FLYBASE_RELEASE_VERSION)
+            ref_strain = Strain.objects.ref_strain_for_release(settings.FLYBASE_RELEASE_VERSION)
+            ref_gene = Gene.objects.get(strain=ref_strain, import_code__in=n_symbols)
+
+            for strain in strains:
+                strain_gene = None
+                try:
+                  strain_gene = Gene.objects.get(strain=strain,import_code__in=n_symbols)
+                except:
+                    pass
+
+                if strain_gene is None:
+                    yield (ref_gene.fasta_header(use_strain=strain), ref_gene.fasta_bases(use_strain=strain))
+                else:
+                    yield (strain_gene.fasta_header(), strain_gene.fasta_bases())
+
+
+
     class Meta:
         '''Define Django-specific metadata.'''
         ordering = ('strain__species__pk', 'strain__name')
@@ -149,28 +198,54 @@ class MRNA(models.Model):
 
         return cds_list
 
+    def reverse_complement(self,bases):
+        compl = {'A':'T','C':'G','G':'C','T':'A'}
+        rev_bases = ''
+        for base in reversed(bases):
+            if base in compl:
+                rev_bases += compl[base]
+            else:
+                rev_bases += base
+
+        return rev_bases
+
+
     def bases_for_strain(self,strain):
         bases_list = []
         cb = ChromosomeBase.objects.get(strain=strain,chromosome=self.gene.chromosome)
         for cds_range in self.cds_list():
             cds_bases = cb.fasta_bases(cds_range[0],cds_range[1])
             bases_list.extend(cds_bases)
-        return ''.join(bases_list)
+            bases = ''.join(bases_list)
+
+        if self.gene.strand == '-':
+            return self.reverse_complement(bases)
+        else:
+            return bases
 
 
     def start_position(self):
         cds_list = self.cds_list()
-        if len(cds_list) > 0:
-            return cds_list[0][0]
-        else:
+
+        if len(cds_list) == 0:
             return -1
+
+        if self.gene.strand == '-':
+           return cds_list[-1][-1]
+        else:
+           return cds_list[0][0]
+
 
     def end_position(self):
         cds_list = self.cds_list()
-        if len(cds_list) > 0:
-            return cds_list[-1][-1]
-        else:
+
+        if len(cds_list) == 0:
             return -1
+        if self.gene.strand == '-':
+            return cds_list[0][0]
+        else:
+            return cds_list[-1][-1]
+
 
 class CDS(models.Model):
     mRNA = models.ForeignKey(MRNA)
@@ -275,6 +350,10 @@ class GeneImportLog(ImportLog):
     '''Metadata about the import of a particular Gene object.'''
     gene_count = models.PositiveIntegerField()
 
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return 'Imported: %s File Path: %s' % (str(self.end), self.file_path)
+
 
 class GeneSymbolImportLog(ImportLog):
     '''Metadata about the import of a set of GeneSymbol data.'''
@@ -282,7 +361,10 @@ class GeneSymbolImportLog(ImportLog):
     symbol_count = models.PositiveIntegerField()
     translation_count = models.PositiveIntegerField()
   
-  
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return 'Imported: %s File Path: %s'  % (str(self.end), self.file_path)
+
 class GeneBatchProcess(BatchProcess):
     '''Metadata about the processing of a "batch gene" request.'''
     original_species = models.CharField(max_length=255)

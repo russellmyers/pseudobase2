@@ -36,6 +36,28 @@ class Release(models.Model):
         '''Define the string representation of this class of object.'''
         return '%s, %s' % (self.name, self.description)
 
+class StrainManager(models.Manager):
+
+    def ref_strain_for_release(self,release_name):
+
+        ref_strain = None
+        strains = self.filter(is_reference=True,release__name=release_name)
+        if len(strains) is None:
+            pass
+        else:
+            ref_strain = strains[0]
+        return ref_strain
+
+    def strains_in_species_list(self,species_list,release_name):
+
+        strains = []
+        for species in species_list:
+            species_strains = species.strain_set.filter(release__name=release_name)
+            strains.extend(species_strains)
+
+        strains = sorted(strains,key=lambda x: x.is_reference,reverse=True)
+
+        return strains
 
 class Strain(models.Model):
     '''Data about a particular strain.'''
@@ -44,6 +66,8 @@ class Strain(models.Model):
     species = models.ForeignKey(Species)
     release = models.ForeignKey(Release,null=True)
     is_reference = models.BooleanField()
+
+    objects = StrainManager()
 
     def __str__(self):
         '''Define the string representation of this class of object.'''
