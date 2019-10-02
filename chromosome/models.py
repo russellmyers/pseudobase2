@@ -844,7 +844,7 @@ class ChromosomeImporter():
                 file_size = os.path.getsize(self.chromosome_data)
                 if len(self.chromosome_data.split('.')) > 1 and (self.chromosome_data.split('.')[-2] == 'fasta'):
                     return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'VCF gzipped', 'chromosome_name': 'Unknown', 'strain_name': 'Unknown','rec_count':0}
+                            'format': 'VCF gzipped', 'chromosome_name': 'Unknown', 'strain_name': 'Unknown','bases_count':0,'rec_count':0}
                 else:
                     vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
                     chrom,strain = vcf_reader.get_chrom_and_strain()

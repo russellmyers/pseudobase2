@@ -48,12 +48,22 @@ class StrainManager(models.Manager):
             ref_strain = strains[0]
         return ref_strain
 
-    def strains_in_species_list(self,species_list,release_name):
+    def strains_in_species_list(self,species_list,release_name=None,release_to_exclude=None):
 
         strains = []
         for species in species_list:
-            species_strains = species.strain_set.filter(release__name=release_name)
-            strains.extend(species_strains)
+            if release_name is None:
+                species_strains = species.strain_set.all()
+            else:
+               species_strains = species.strain_set.filter(release__name=release_name)
+            if release_to_exclude is None:
+               strains.extend(species_strains)
+            else:
+               for strain in species_strains:
+                   if strain.release.name == release_to_exclude:
+                       pass
+                   else:
+                       strains.append(strain)
 
         strains = sorted(strains,key=lambda x: x.is_reference,reverse=True)
 

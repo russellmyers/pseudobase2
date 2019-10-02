@@ -34,6 +34,8 @@ from django.db import connection, transaction
 from common.models import Chromosome, StrainSymbol
 from gene.models import Gene, GeneImportLog, MRNA, CDS
 
+from optparse import make_option
+
 class GFFReader():
     def __init__(self,command,fPath,excl_match=True,excl_gold_path = True,chrom_names=None,limit=None):
         self.fPath = fPath
@@ -53,7 +55,7 @@ class GFFReader():
         fin = gzip.open(self.fPath, 'r')
         for i, line in enumerate(fin):
 
-            if i % 200000 == 0:
+            if i % 1000000 == 0:
                  sys.stdout.write('.')
                  sys.stdout.flush()
 
@@ -220,7 +222,7 @@ class GFFReader():
                 return curr_parent
 
             if curr_parent in self.parent_dict:
-                curr_parent = self.mrna_dict[curr_parent]
+                curr_parent = self.parent_dict[curr_parent]
             else:
                 done = True
                 return None
@@ -539,7 +541,21 @@ class Command(BaseCommand):
     
     help = 'Imports the data from the named file into the database.'
     args = '<path to CSV-like file>'
-  
+
+    option_list = BaseCommand.option_list + (
+        make_option('-l', '--limit',
+                    dest='limit',
+                    type = int,
+                    default=None,
+                    help='Max number of records to read from gff (testing purposes only)'),
+        make_option('-c', '--chrom',
+                    dest='chrom_list',
+                    default = [],
+                    action = 'append',
+                    help='import chromosome name'),
+
+    )
+
     def _lookup_strain(self, strain):
         '''Load a Strain object for association by its "short name".
     
@@ -647,7 +663,7 @@ class Command(BaseCommand):
         name_split = gene_data.split('.')
         if len(name_split) > 2:
             if ((name_split[-2] == 'gff') or (name_split[-2] == 'gff3')) and name_split[-1] == 'gz':
-                gff_reader = GFFReader(self,gene_data,chrom_names = ['2'],limit=10000)
+                gff_reader = GFFReader(self,gene_data,chrom_names = options['chrom_list'],limit=options['limit'])
                 gff_reader.df = gff_reader.split_attributes(gff_reader.df)
                 gff_reader.pre_parse(gff_reader.df)
                 gff_reader.df = gff_reader.allocate_gene_and_mrna_per_record(gff_reader.df)
