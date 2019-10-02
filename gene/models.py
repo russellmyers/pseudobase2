@@ -71,7 +71,7 @@ class Gene(models.Model):
 
         largest_transcript = self.largest_transcript()
         return r'>%s' % delimiter.join((strain.species.name,
-          strain.name,
+          strain.name,strain.release.name,
           '%s_%s %s' %(self.chromosome.name, self.start_position if largest_transcript is None else largest_transcript.start_position(), '' if largest_transcript is None else largest_transcript.name),
           self.symbols()))
   
@@ -139,30 +139,34 @@ class Gene(models.Model):
         n_symbols = GeneSymbol.objects.get(
           symbol=GeneSymbol.normalize(symbol)).all_symbols()
 
-        if settings.FLYBASE_RELEASE_VERSION == 'pse1':
-            #Old Method
-            genes = Gene.objects.filter(strain__species__pk__in=species).filter(
-              import_code__in=n_symbols, strain__release__name=settings.FLYBASE_RELEASE_VERSION).order_by('-strain__is_reference',
-                'strain__species__id', 'strain__name')
-            for g in genes:
-                yield (g.fasta_header(), g.fasta_bases())
-        else:
-            #New method r3.04 onwards
-            strains = Strain.objects.strains_in_species_list(species,settings.FLYBASE_RELEASE_VERSION)
-            ref_strain = Strain.objects.ref_strain_for_release(settings.FLYBASE_RELEASE_VERSION)
-            ref_gene = Gene.objects.get(strain=ref_strain, import_code__in=n_symbols)
 
-            for strain in strains:
-                strain_gene = None
+        #Old Method - check for original release (pse1) formatted genes
+        genes = Gene.objects.filter(strain__species__pk__in=species).filter(
+          import_code__in=n_symbols, strain__release__name=settings.ORIGINAL_RELEASE_VERSION).order_by('-strain__is_reference',
+            'strain__species__id', 'strain__name')
+        for g in genes:
+            yield (g.fasta_header(), g.fasta_bases())
+
+
+        #New method Flybase release r3.04 onwards
+        strains = Strain.objects.strains_in_species_list(species,release_to_exclude=settings.ORIGINAL_RELEASE_VERSION)
+
+        for strain in strains:
+            strain_gene = None
+            try:
+              strain_gene = Gene.objects.get(strain=strain,import_code__in=n_symbols)
+            except:
+                pass
+
+            if strain_gene is None:
+                ref_strain = Strain.objects.ref_strain_for_release(strain.release.name)
                 try:
-                  strain_gene = Gene.objects.get(strain=strain,import_code__in=n_symbols)
+                    ref_gene = Gene.objects.get(strain=ref_strain, import_code__in=n_symbols)
+                    yield (ref_gene.fasta_header(use_strain=strain), ref_gene.fasta_bases(use_strain=strain))
                 except:
                     pass
-
-                if strain_gene is None:
-                    yield (ref_gene.fasta_header(use_strain=strain), ref_gene.fasta_bases(use_strain=strain))
-                else:
-                    yield (strain_gene.fasta_header(), strain_gene.fasta_bases())
+            else:
+                yield (strain_gene.fasta_header(), strain_gene.fasta_bases())
 
 
 
