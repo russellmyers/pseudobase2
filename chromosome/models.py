@@ -65,7 +65,9 @@ class ChromosomeBase(models.Model):
     def __str__(self):
         '''Define the string representation of this class of object.'''
         rel = 'Norel' if self.strain.release is None else self.strain.release.name
-        return '%s %s %s' % (self.chromosome,self.strain.name, rel)
+        return '%s %s %s' % (rel, self.chromosome, self.strain.name)
+
+
   
     def has_insertions(self,stAbs,endAbs):
         #check if selected region has inserts, ie at least one position with > 1 base
@@ -513,7 +515,8 @@ class ChromosomeBase(models.Model):
   
     class Meta:
         '''Define Django-specific metadata.'''
-        ordering = ('strain__species__pk', 'chromosome__name', 'strain__name')
+        #ordering = ('strain__species__pk', 'chromosome__name', 'strain__name')
+        ordering = ('strain__release__name','chromosome__name','-strain__is_reference','strain__name')
 
 
 # Deprecated - now uses ChromosomeBatchImportLog
