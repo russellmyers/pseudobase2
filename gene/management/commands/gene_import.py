@@ -37,7 +37,7 @@ from gene.models import Gene, GeneImportLog, MRNA, CDS
 from optparse import make_option
 
 class GFFReader():
-    def __init__(self,command,fPath,excl_match=True,excl_gold_path = True,chrom_names=None,limit=None):
+    def __init__(self,command,fPath,excl_match=True,excl_gold_path = True,chrom_names=None,ignore_fasta=True, limit=None):
         self.fPath = fPath
         self.command = command
         self.excl_match = excl_match
@@ -72,7 +72,10 @@ class GFFReader():
                 comments.append([i, line_parsed])
                 continue
             elif len(line_parsed) < 2:
-                fasta_stuff.append([i, line_parsed])
+                if ignore_fasta:
+                    pass
+                else:
+                    fasta_stuff.append([i, line_parsed])
                 continue
 
             if self.excl_match:

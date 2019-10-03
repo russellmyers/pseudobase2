@@ -91,22 +91,25 @@ def assemble_jbrowse_gene_query_data(request):
     form = gene.forms.SearchForm(request.POST, request.FILES)
 
     if form.is_valid():
-        symbol = GeneSymbol.objects.get(symbol=form.cleaned_data['gene'])
-        flybase_id = symbol.flybase_ID()
-        strain_genes = Gene.objects.filter(import_code=flybase_id).order_by('-strain__is_reference')
-        gene = strain_genes[0]
-        custom_data['chr'] = gene.chromosome.name
-        custom_data['species'] = []
-        for species in form.cleaned_data['species']:
-            for strain in species.strain_set.all():
-                for strain_symbol in strain.strainsymbol_set.all():
-                    custom_data['species'].append(strain_symbol.symbol)
-            #custom_data['species'].extend([x.strainsymbol_set.all()[0].symbol for x in species.strain_set.all()])
-        #custom_data['species'] = [x.symbol for x in form.cleaned_data['species']]
-        custom_data['pos_from'] = int(gene.start_position)
-        custom_data['pos_to'] = int(gene.end_position)
-        vcf_tracks = [x + '_VCF_r304_sample_only' for x in custom_data['species']]
-        custom_data['tracks_query'] = 'tracks=Ref sequence flybase lab,genes flybase,' + ','.join(vcf_tracks)
+        try:
+            symbol = GeneSymbol.objects.get(symbol=form.cleaned_data['gene'])
+            flybase_id = symbol.flybase_ID()
+            strain_genes = Gene.objects.filter(import_code=flybase_id).order_by('-strain__is_reference')
+            gene = strain_genes[0]
+            custom_data['chr'] = gene.chromosome.name
+            custom_data['species'] = []
+            for species in form.cleaned_data['species']:
+                for strain in species.strain_set.all():
+                    for strain_symbol in strain.strainsymbol_set.all():
+                        custom_data['species'].append(strain_symbol.symbol)
+                #custom_data['species'].extend([x.strainsymbol_set.all()[0].symbol for x in species.strain_set.all()])
+            #custom_data['species'] = [x.symbol for x in form.cleaned_data['species']]
+            custom_data['pos_from'] = int(gene.start_position)
+            custom_data['pos_to'] = int(gene.end_position)
+            vcf_tracks = [x + '_VCF_r304_sample_only' for x in custom_data['species']]
+            custom_data['tracks_query'] = 'tracks=Ref sequence flybase lab,genes flybase,' + ','.join(vcf_tracks)
+        except:
+            pass
 
     return custom_data
 
@@ -146,7 +149,7 @@ def _render_gene_search(request):
 
     try:
         symbols = GeneSymbol.objects.get(
-          symbol=GeneSymbol.normalize(form.cleaned_data['gene'])).all_symbols
+          symbol=GeneSymbol.normalize(form.cleaned_data['gene'])).all_symbols()
         fasta_objects = Gene.multi_gene_fasta(form.cleaned_data['gene'],
           form.cleaned_data['species'])
     except GeneSymbol.DoesNotExist:
