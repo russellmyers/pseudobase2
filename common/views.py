@@ -71,16 +71,18 @@ def assemble_jbrowse_chromosome_query_data(request):
     if form.is_valid():
         custom_data['chr'] = form.cleaned_data['chromosome'].name
         custom_data['species'] = []
+        custom_data['strain_names'] = []
         for species in form.cleaned_data['species']:
             for strain in species.strain_set.all():
+                custom_data['strain_names'].append(strain.name)
                 for strain_symbol in strain.strainsymbol_set.all():
                     custom_data['species'].append(strain_symbol.symbol)
             #custom_data['species'].extend([x.strainsymbol_set.all()[0].symbol for x in species.strain_set.all()])
         #custom_data['species'] = [x.symbol for x in form.cleaned_data['species']]
         custom_data['pos_from'] = form.cleaned_data['position'][0]
         custom_data['pos_to'] = form.cleaned_data['position'][1]
-        vcf_tracks = [x + '_VCF_r304_sample_only' for x in custom_data['species']]
-        custom_data['tracks_query'] = 'tracks=Ref sequence flybase lab,genes flybase,' + ','.join(vcf_tracks)
+        vcf_tracks = [x + '_VCF' for x in custom_data['species']]
+        custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
 
     return custom_data
 
@@ -106,8 +108,8 @@ def assemble_jbrowse_gene_query_data(request):
             #custom_data['species'] = [x.symbol for x in form.cleaned_data['species']]
             custom_data['pos_from'] = int(gene.start_position)
             custom_data['pos_to'] = int(gene.end_position)
-            vcf_tracks = [x + '_VCF_r304_sample_only' for x in custom_data['species']]
-            custom_data['tracks_query'] = 'tracks=Ref sequence flybase lab,genes flybase,' + ','.join(vcf_tracks)
+            vcf_tracks = [x + '_VCF' for x in custom_data['species']]
+            custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
         except:
             pass
 
