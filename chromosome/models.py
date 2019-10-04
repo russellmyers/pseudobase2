@@ -40,7 +40,7 @@ class ChromosomeBaseManager(models.Manager):
     def get_all_ref_bases(self,chrom_name, flybase_release_name):
         try:
             strain_name = StrainSymbol.objects.filter(strain__is_reference=True, strain__release__name=flybase_release_name)[0].strain.name
-            chrom = self.filter(strain__name=strain_name,chromosome__name=chrom_name)[0]
+            chrom = self.filter(strain__name=strain_name,strain__release__name=flybase_release_name, chromosome__name=chrom_name)[0]
             return chrom.get_all_bases()
         except:
             return None
