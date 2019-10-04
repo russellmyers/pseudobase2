@@ -13,13 +13,20 @@ distributed, efficient and sane method of batch processing.
 
 from django.core.management.base import BaseCommand
 from chromosome.models import ChromosomeBatchImportProcess, ChromosomeImporter
+from optparse import make_option
 
 class Command(BaseCommand):
     '''A custom command to process "chromososome batch import" requests.
     '''
- 
 
-    def _process_batch_import_request(self, request):
+    option_list = BaseCommand.option_list + (
+        make_option('-f', '--flybasereleaseversion',
+                    dest='flybase_release',
+                    default='pse1',
+                    help='Flybase release version aligned against (eg r3.04)'),
+    )
+
+    def _process_batch_import_request(self, request, options):
         '''Process a "chromosome batch import" request '''
     
         #request_status = {'partial': False}
@@ -37,7 +44,7 @@ class Command(BaseCommand):
             #for pending_import_file in request.chromosomebatchimportlog_set.filter(status = 'P'):
             for batch_file in batch_file_list:
                 try:
-                    chr_importer = ChromosomeImporter(batch_file)
+                    chr_importer = ChromosomeImporter(batch_file,flybase_release=options['flybase_release'])
                     chr_importer.import_data(request)
                     chr_importer.print_summary()
                     
@@ -74,6 +81,6 @@ class Command(BaseCommand):
         pending_batches = ChromosomeBatchImportProcess.objects.pending_batches()
         
         if (len(pending_batches) > 0):
-            self._process_batch_import_request(pending_batches[0])
+            self._process_batch_import_request(pending_batches[0],options)
         else:
            print ('No pending batches to process') 
