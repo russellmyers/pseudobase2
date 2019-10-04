@@ -37,9 +37,9 @@ def my_custom_sql(import_id):
 
 
 class ChromosomeBaseManager(models.Manager):
-    def get_all_ref_bases(self,chrom_name):
+    def get_all_ref_bases(self,chrom_name, flybase_release_name):
         try:
-            strain_name = StrainSymbol.objects.filter(strain__is_reference=True)[0].strain.name
+            strain_name = StrainSymbol.objects.filter(strain__is_reference=True, strain__release__name=flybase_release_name)[0].strain.name
             chrom = self.filter(strain__name=strain_name,chromosome__name=chrom_name)[0]
             return chrom.get_all_bases()
         except:
@@ -855,7 +855,7 @@ class ChromosomeImporter():
                     bases_count = 0
                     if incl_rec_count:
                         rec_count = vcf_reader.get_num_records()
-                        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom)
+                        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, self.flybase_release)
                         bases_count = len(ref_bases)
                     if chrom is None or strain is None:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
@@ -935,7 +935,7 @@ class ChromosomeImporter():
         # data = chromosome_reader.get_and_parse_next_line(reset=True)
 
         #ref_bases, chrom_len, header = self.get_ref_seq_from_fasta(chrom,debug=True)
-        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom)
+        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, self.flybase_release)
 
         tot_summary_flags = [0 for i in range(len(VCFRecord.vcf_types))]
 
