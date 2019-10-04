@@ -53,6 +53,8 @@ class GFFReader():
         fasta_stuff = []
 
         fin = gzip.open(self.fPath, 'r')
+
+        print('Reading gff file')
         for i, line in enumerate(fin):
 
             if i % 1000000 == 0:
@@ -161,6 +163,7 @@ class GFFReader():
              attr_dict['Alias'] if 'Alias' in attr_dict else ''])
 
     def split_attributes(self,df):
+        print('Splitting attributes')
         df_spl = df.copy()
         df_spl[['ID', 'Parent', 'Name', 'Import_Code', 'Alias']] = df_spl['attributes'].apply(self.attr_split)
         df_spl.head()
@@ -168,6 +171,7 @@ class GFFReader():
 
 
     def pre_parse(self,df):
+        print('Pre-parsing')
         parent_dict = {}
         gene_dict = {}
         mrna_dict = {}
@@ -232,6 +236,7 @@ class GFFReader():
 
     def allocate_gene_and_mrna_per_record(self,df):
 
+        print('Allocating gene and mrna per record')
         gene_list = []
         mrna_list = []
 
@@ -660,6 +665,8 @@ class Command(BaseCommand):
     
         print 'Constructing Gene objects from file:\n%s' % gene_data
         print '  ',
+
+        print('Chromosome(s): ', options['chrom_list'])
 
         gff_based_import = True
 
