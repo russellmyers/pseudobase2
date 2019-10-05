@@ -55,6 +55,28 @@ class Gene(models.Model):
     def bases_for_largest_transcript(self):
         pass
 
+
+    def max_bases_per_position(self,strains):
+        # Used in post alignment
+
+        #cds_list = self.largest_transcript().cds_list()
+
+        bases_per_position = []
+        for strain in strains:
+            bases_per_position.append(self.largest_transcript().base_positions_for_strain(strain))
+
+        bases_len = len(bases_per_position[0])
+        max_bases_per_pos = []
+        for j in range(bases_len):
+             max_for_pos = 0
+             for i in range(len(bases_per_position)):
+                 bases = bases_per_position[i][j]
+                 if len(bases) > max_for_pos:
+                     max_for_pos = len(bases)
+             max_bases_per_pos.append(max_for_pos)
+
+        return max_bases_per_pos
+
     def fasta_header(self, delimiter='|',use_strain=None):
         '''Return a FASTA-compliant header containing sequence metadata.
         
@@ -75,7 +97,7 @@ class Gene(models.Model):
           '%s_%s %s' %(self.chromosome.name, self.start_position if largest_transcript is None else largest_transcript.start_position(), '' if largest_transcript is None else largest_transcript.name),
           self.symbols()))
   
-    def fasta_bases(self, wrapped=True,use_strain=None):
+    def fasta_bases(self, wrapped=True,use_strain=None, max_bases_per_pos = None):
         '''Return the sequence data for the specified range.
       
         This data is retrieved from the data file.  It is generally wrapped
@@ -98,7 +120,26 @@ class Gene(models.Model):
             # if ref_strain is None:
             #     bases = self.bases
             # else:
-            bases = largest_transcript.bases_for_strain(strain)   #(self.strain)
+            if max_bases_per_pos is None:
+                bases = largest_transcript.bases_for_strain(strain)   #(self.strain)
+            else: # use post alignment
+                base_positions = largest_transcript.base_positions_for_strain(strain)
+                bases_aligned = []
+                for i, base in enumerate(base_positions):
+                    if len(base_positions[i]) < max_bases_per_pos[i]:
+                        if self.strand == '-':
+                            base_aligned_str = ChromosomeBase.realign_char * (max_bases_per_pos[i] - len(base_positions[i])) + base_positions[i]
+                        else:
+                            base_aligned_str = base_positions[i] + ChromosomeBase.realign_char * (max_bases_per_pos[i] - len(base_positions[i]))
+                        # bases_str += ChromosomeBase.realign_char * (max_bases[i] - len(bases[i]))
+                        bases_aligned.append(base_aligned_str)
+                    else:
+                        bases_aligned.append(base_positions[i])
+
+                bases = ''.join(bases_aligned)
+                if self.strand == '-':
+                    bases = MRNA.reverse_complement(bases)
+
     
         if wrapped:
             # We have to go through this little eval dance because the
@@ -151,7 +192,39 @@ class Gene(models.Model):
         #New method Flybase release r3.04 onwards
         strains = Strain.objects.strains_in_species_list(species,release_to_exclude=settings.ORIGINAL_RELEASE_VERSION)
 
+
+        #Pre-process to determine post-alignment
+        alignment_strains = []
         for strain in strains:
+            if strain.is_reference:
+                try:
+                    ref_gene = Gene.objects.get(strain=strain, import_code__in=n_symbols)
+                    alignment_strains.append(strain)  # ref gene exists
+                except:
+                    pass
+            else:
+                strain_gene = None
+                try:
+                    strain_gene = Gene.objects.get(strain=strain, import_code__in=n_symbols)
+                except:
+                    pass
+                if strain_gene is None:
+                    ref_strain = Strain.objects.ref_strain_for_release(strain.release.name)
+                    try:
+                        ref_gene = Gene.objects.get(strain=ref_strain, import_code__in=n_symbols)
+                        alignment_strains.append(strain) # Strain uses ref gene base positions, and ref gene exists
+                    except:
+                        pass
+        if len(alignment_strains) < 2:
+            pass
+        else:
+            for alignment_strain in alignment_strains:
+                strains.remove(alignment_strain)
+            max_bases_per_pos = ref_gene.max_bases_per_position(alignment_strains)
+            for alignment_strain in alignment_strains:
+                yield (ref_gene.fasta_header(use_strain=alignment_strain), ref_gene.fasta_bases(use_strain=alignment_strain, max_bases_per_pos = max_bases_per_pos))
+
+        for strain in strains: # Remaining strains which don't use ref gene base positions
             strain_gene = None
             try:
               strain_gene = Gene.objects.get(strain=strain,import_code__in=n_symbols)
@@ -202,8 +275,9 @@ class MRNA(models.Model):
 
         return cds_list
 
-    def reverse_complement(self,bases):
-        compl = {'A':'T','C':'G','G':'C','T':'A'}
+    @staticmethod
+    def reverse_complement(bases):
+        compl = {'A':'T','C':'G','G':'C','T':'A','-':'-'}
         rev_bases = ''
         for base in reversed(bases):
             if base in compl:
@@ -223,10 +297,16 @@ class MRNA(models.Model):
             bases = ''.join(bases_list)
 
         if self.gene.strand == '-':
-            return self.reverse_complement(bases)
+            return MRNA.reverse_complement(bases)
         else:
             return bases
 
+    def base_positions_for_strain(self,strain):
+        cb = ChromosomeBase.objects.get(strain=strain, chromosome=self.gene.chromosome)
+        strain_bases_per_position = []
+        for cds_range in self.cds_list():
+            strain_bases_per_position.extend(cb.get_bases_per_position(cds_range[0], cds_range[1]))
+        return strain_bases_per_position
 
     def start_position(self):
         cds_list = self.cds_list()
