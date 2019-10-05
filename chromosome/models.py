@@ -358,13 +358,24 @@ class ChromosomeBase(models.Model):
         
         bases = self.get_bases_per_position(start_position,end_position)
         
-        bases_str = ''
+        #bases_str = ''
+        bases_aligned = []
         for i,base in enumerate(bases):
-            bases_str += bases[i]
+
+            #bases_str += bases[i]
             if (max_bases):
                 if len(bases[i]) < max_bases[i]:
-                   bases_str += ChromosomeBase.realign_char * (max_bases[i] - len(bases[i])) 
-               
+                   base_aligned_str = base + ChromosomeBase.realign_char * (max_bases[i] - len(bases[i]))
+                   #bases_str += ChromosomeBase.realign_char * (max_bases[i] - len(bases[i]))
+                   bases_aligned.append(base_aligned_str)
+                else:
+                   bases_aligned.append(base)
+
+            else:
+                bases_aligned.append(base)
+
+
+        bases_str = ''.join(bases_aligned)
         if wrapped:
             return self.wrap_data(bases_str)
         else:
@@ -452,7 +463,7 @@ class ChromosomeBase(models.Model):
         return max_bases         
  
     @staticmethod  
-    def multi_strain_fasta(chromosome, species, start, end):
+    def multi_strain_fasta(chromosome, species, start, end, show_aligned=False):
         '''Generator which returns FASTA header/data individually.
         
         There can potentially be a lot of sequences for any given pair of
@@ -470,16 +481,18 @@ class ChromosomeBase(models.Model):
             '-strain__is_reference', 'strain__species__id', 'strain__name')
 
         bases_per_position = []
-        for c in chromosomes:
-            bases_per_position.append(c.get_bases_per_position(start,end))
-        max_bases = ChromosomeBase.max_num_bases_per_position(bases_per_position)
- 
+        max_bases = None
+        if (len(chromosomes) < 2) or (not show_aligned):
+            pass
+        else:
+            for c in chromosomes:
+                bases_per_position.append(c.get_bases_per_position(start, end))
+            max_bases = ChromosomeBase.max_num_bases_per_position(bases_per_position)
     
-    
         for c in chromosomes:
-            if (len(chromosomes) < 2):
+            if (len(chromosomes) < 2) or (not show_aligned):
                 yield (c.fasta_header(start, end), c.fasta_bases(start, end))
-            else:    
+            else:
                 yield (c.fasta_header(start, end), c.fasta_bases_formatted(start, end,max_bases))
   
     @staticmethod

@@ -163,6 +163,7 @@ class GFFReader():
              attr_dict['Alias'] if 'Alias' in attr_dict else ''])
 
     def split_attributes(self,df):
+        print(' ')
         print('Splitting attributes')
         df_spl = df.copy()
         df_spl[['ID', 'Parent', 'Name', 'Import_Code', 'Alias']] = df_spl['attributes'].apply(self.attr_split)
@@ -702,6 +703,7 @@ class Command(BaseCommand):
         char_search = re.compile(r'[^ACTGN\_]').search
         replace_no_data = re.compile(r'[_]').sub
 
+        print('Writing genes')
         if gff_based_import:
             gff_reader.write_genes(gff_reader.df,import_log)
         else:

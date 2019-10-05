@@ -58,7 +58,8 @@ def _render_chromosome_search(request):
           form.cleaned_data['chromosome'],
           form.cleaned_data['species'],
           form.cleaned_data['position'][0],
-          form.cleaned_data['position'][1])
+          form.cleaned_data['position'][1],
+          form.cleaned_data['show_aligned'])
         return render_to_response('chromosome_fasta.html', custom_data,
           context_instance=RequestContext(request))
     log.warning('In _render_chrom_search. Not valid form')

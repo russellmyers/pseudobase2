@@ -95,6 +95,8 @@ class SearchForm(forms.Form):
                                   help_text=\
       '<div class="help_text">Format: &lt;start&gt;..&lt;end&gt;</div>')
 
+    show_aligned = forms.BooleanField(required=False, initial=True)
+
 class ImportForm(forms.Form):
       import_files = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
