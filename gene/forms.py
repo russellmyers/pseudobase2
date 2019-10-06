@@ -80,6 +80,8 @@ class SearchForm(forms.Form):
         'href="/static/examples/gene_batch_example.html">gene_batch_example'
         '</a></div>')
 
+    show_aligned = forms.BooleanField(required=False, initial=True)
+
     def clean(self):
         '''Clean the submitted form data and handle high level validation.'''
       

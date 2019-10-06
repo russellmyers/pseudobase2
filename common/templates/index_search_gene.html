@@ -35,42 +35,63 @@
                         {% endif %}
                     </div>    
                 </div>
-                    
+               <br>
+               <div class="row fieldWrapper">
+
+                    <div align="left" class = "col-md-5">
+                        <b> {{ gene_form.show_aligned.label_tag }} </b>
+
+                    </div>
+                    <div align="left" class = "col-md-7">
+                        {% if gene_form.show_aligned.errors  %}
+                            <div class="alert-message block-message error">
+                                {{ gene_form.show_aligned.errors }}
+                            </div>
+                        {% endif %}
+                        {{ gene_form.show_aligned }}
+                        {% if gene_form.show_aligned.help_text %}
+                              <!--p class = "help"-->
+                            {{ gene_form.show_aligned.help_text|safe }}
+                              <!--/p-->
+                        {% endif %}
+                    </div>
+                </div>
             </div>        
-           <div class = "form-group col-md-7"> 
-                  	
-          
+           <div class = "form-group col-md-7">
+
+
                 {% for field in gene_form %}
                     {% if field.label == 'Species' %}
-                 	   
- 
+
+                    {%  elif field.label == 'Show aligned' %}
+
                     {% else %}
                         <br>
                         <div class="row fieldWrapper">
-                          
-                            <div class = "col-md-3">
+
+                            <div align="left" class = "col-md-3">
                                 <b> {{ field.label_tag }} </b>
-                              
-                            </div>    
-                            <div class = "col-md-9">
+
+                            </div>
+                            <div align="left" class = "col-md-9">
                                 {% if field.errors  %}
                                     <div class="alert-message block-message error">
                                         {{ field.errors }}
                                     </div>
-                                {% endif %}  
+                                {% endif %}
                                {{ field }}
-            
-          
+
+
                                 {% if field.help_text %}
                               <!--p class = "help"-->
                                     {{ field.help_text|safe }}
-                              <!--/p-->   
+                              <!--/p-->
                                 {% endif %}
-                            </div>    
+                            </div>
                         </div>
                     {% endif %}
-                {% endfor %}	
-            </div>	
+                {% endfor %}
+            </div>
         </div>
        <div class = "row justify-content-center">
            <input type="submit" class="btn btn-primary mt-3" name="gene_search_type" value="Quick search" /><!--/td></tr-->

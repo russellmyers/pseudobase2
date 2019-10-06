@@ -159,7 +159,7 @@ class Gene(models.Model):
           GeneSymbol.objects.get(symbol=self.import_code).all_symbols())
 
     @staticmethod  
-    def multi_gene_fasta(symbol, species):
+    def multi_gene_fasta(symbol, species, show_aligned=False):
         '''Generator which returns FASTA header/data individually.
         
         Provided with a gene symbol and an array of the species that should be
@@ -215,7 +215,7 @@ class Gene(models.Model):
                         alignment_strains.append(strain) # Strain uses ref gene base positions, and ref gene exists
                     except:
                         pass
-        if len(alignment_strains) < 2:
+        if len(alignment_strains) < 2 or (not show_aligned):
             pass
         else:
             for alignment_strain in alignment_strains:

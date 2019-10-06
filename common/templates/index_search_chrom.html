@@ -21,34 +21,56 @@
            <div class = "form-group col-md-5"> 
                 <br>
                 <div class="row fieldWrapper">
-                          
+
                     <div class = "col-md-1">
                         <b> {{ chromosome_form.species.label_tag }} </b>
-         
-                    </div>    
+
+                    </div>
                     <div class = "col-md-11">
                         {% if chromosome_form.species.errors  %}
                             <div class="alert-message block-message error">
                                 {{ chromosome_form.species.errors }}
                             </div>
-                        {% endif %}  
+                        {% endif %}
                         {{ chromosome_form.species }}
                         {% if chromosome_form.species.help_text %}
                               <!--p class = "help"-->
                             {{ chromosome_form.species.help_text|safe }}
-                              <!--/p-->   
+                              <!--/p-->
                         {% endif %}
-                    </div>    
+                    </div>
                 </div>
-                    
+               <br>
+                <div class="row fieldWrapper">
+
+                    <div align="left" class = "col-md-5">
+                        <b> {{ chromosome_form.show_aligned.label_tag }} </b>
+
+                    </div>
+                    <div align="left" class = "col-md-7">
+                        {% if chromosome_form.show_aligned.errors  %}
+                            <div class="alert-message block-message error">
+                                {{ chromosome_form.show_aligned.errors }}
+                            </div>
+                        {% endif %}
+                        {{ chromosome_form.show_aligned }}
+                        {% if chromosome_form.show_aligned.help_text %}
+                              <!--p class = "help"-->
+                            {{ chromosome_form.show_aligned.help_text|safe }}
+                              <!--/p-->
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
+
                 
             <div class = "form-group col-md-7"> 
                   	
           
                 {% for field in chromosome_form %}
                     {% if field.label == 'Species' %}
-                	  
+                    {% elif field.label == 'Show aligned' %}
                 	  
                     {% else %}
                         <br>
