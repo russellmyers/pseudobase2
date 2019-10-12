@@ -194,6 +194,10 @@ class Gene(models.Model):
         strains = []
         for strain in all_strains:
             try:
+                genes = Gene.objects.filter(strain__species__pk__in=species).filter(
+                    import_code__in=n_symbols, strain__release__name=strain.release.name).order_by(
+                    '-strain__is_reference',
+                    'strain__species__id', 'strain__name')
                 cb = ChromosomeBase.objects.get(strain=strain, chromosome=genes[0].chromosome)
                 strains.append(strain)
             except:
