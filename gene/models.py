@@ -190,7 +190,14 @@ class Gene(models.Model):
 
 
         #New method Flybase release r3.04 onwards
-        strains = Strain.objects.strains_in_species_list(species,release_to_exclude=settings.ORIGINAL_RELEASE_VERSION)
+        all_strains = Strain.objects.strains_in_species_list(species,release_to_exclude=settings.ORIGINAL_RELEASE_VERSION)
+        strains = []
+        for strain in all_strains:
+            try:
+                cb = ChromosomeBase.objects.get(strain=strain, chromosome=genes[0].chromosome)
+                strains.append(strain)
+            except:
+                pass # Only process strain if chromosomebase data actually exists
 
 
         #Pre-process to determine post-alignment
