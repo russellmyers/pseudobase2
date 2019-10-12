@@ -82,7 +82,7 @@ class Strain(models.Model):
     def __str__(self):
         '''Define the string representation of this class of object.'''
         rel = 'Norel' if self.release is None else self.release.name
-        return '%s, %s, %s' % (rel, self.species.name, self.name)
+        return '%s, %s, %s, %s' % (self.id, rel, self.species.name, self.name)
     
     @property
     def formatted_info(self):

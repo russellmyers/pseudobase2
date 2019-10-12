@@ -1,0 +1,6 @@
+# Fixtures to load strain collection info data.
+#
+
+-   fields: {strain: 27, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 27

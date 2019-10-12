@@ -869,6 +869,8 @@ class ChromosomeImporter():
                     if incl_rec_count:
                         rec_count = vcf_reader.get_num_records()
                         ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, self.flybase_release)
+                        if ref_bases is None:
+                            print('No reference sequence imported for: ',chrom,self.flybase_release,' - Need to import ref fasta first')
                         bases_count = len(ref_bases)
                     if chrom is None or strain is None:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
@@ -1280,7 +1282,11 @@ class ChromosomeImporter():
                     vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
                     chrom,strain = vcf_reader.get_chrom_and_strain()
                     self.cb.start_position = 1
-                    self.cb.strain = StrainSymbol.objects.get(symbol=strain).strain
+                    try:
+                        self.cb.strain = StrainSymbol.objects.get(symbol=strain).strain
+                    except:
+                        print('Error - No strain: ' + str(strain))
+                        raise Exception('Strain does not exist yet for : ' + strain)
                     self.cb.chromosome = self._lookup_chromosome(chrom)[0]
                 else:
                     chromosome_reader = ChromosomeImportFileReader(self.chromosome_data)
