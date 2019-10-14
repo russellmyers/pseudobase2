@@ -43,21 +43,27 @@ class Command(BaseCommand):
         chrom = chrom_part.split('chr')[1]
         return path,ext_part,chrom, species_strain
 
-    def assemble_output_file(self, chrom, output_folder, ext_part, species_strain):
+    def assemble_output_file(self, chrom, output_folder, ext_part, species_strain,filtered=False):
 
         # file_name = 'genotyped_filtered'
         # file_name += 'ALL'
         # file_name += '_' + strain + '_chr' + chrom + '.vcf.gz'
         file_path = os.path.join(output_folder,species_strain)
+        if filtered:
+            file_path = os.path.join(file_path,'filtered')
 
         if not os.path.exists(file_path):
             os.makedirs(file_path)
 
-        file_path_and_name = os.path.join(file_path, 'chr' + chrom + ext_part)
+        if filtered:
+            first_part = ext_part.split('.vcf.gz')[0]
+            file_path_and_name = os.path.join(file_path, 'chr' + chrom + first_part + '_filtered' + '.vcf.gz')
+        else:
+            file_path_and_name = os.path.join(file_path, 'chr' + chrom + ext_part)
         return file_path_and_name
 
 
-    def split(self,file_name,reduce=False):
+    def split(self,file_name,ext_part,path,species_strain,reduce=False):
         vcf_reader = ChromosomeVCFImportFileReader(file_name)
         vcf_reader.open()
         comments = []
@@ -71,9 +77,9 @@ class Command(BaseCommand):
 
         for i, line in enumerate(vcf_reader.vcf_file):
             if i % 250000 == 0:
-                sys.stdout.write('.')
-                sys.stdout.flush()
-
+                #sys.stdout.write('.')
+                #sys.stdout.flush()
+                self.stdout.write('Processing: ' + str(i))
 
 
             line = line.decode('utf-8').rstrip()
@@ -101,27 +107,64 @@ class Command(BaseCommand):
                     stars +=1
                     skip_this_record = True
 
-                if reduce and skip_this_record:
-                    pass
+
+                if v.CHROM in chroms:
+                       #chroms[v.CHROM].append(line)
+                       f = chroms[v.CHROM]['file']
+                       f.write('\n')
+                       f.write(line.encode())
+                       chroms[v.CHROM]['records'] +=1
+                       if reduce and not skip_this_record:
+                           f_filtered = chroms[v.CHROM]['filtered_file']
+                           f_filtered.write('\n')
+                           f_filtered.write(line.encode())
+                           chroms[v.CHROM]['filtered_records'] += 1
+
+
                 else:
-                   if v.CHROM in chroms:
-                       chroms[v.CHROM].append(line)
-                   else:
-                       chroms[v.CHROM] = [line]
-                   lines.append(line)
+                       #chroms[v.CHROM] = [line]
+                       file_name = self.assemble_output_file(v.CHROM,path,ext_part,species_strain)
+                       print('Creating out file name: ' + file_name)
+                       f = gzip.open(file_name, 'wb')
+                       chroms[v.CHROM] = {'file': f, 'records': 1}
+                       out_comments_str = '\n'.join(comments)
+                       f.write(out_comments_str)
+                       f.write('\n')
+                       f.write(line.encode())
+                       if reduce:
+                           file_name_filtered = self.assemble_output_file(v.CHROM, path, ext_part, species_strain,filtered=True)
+                           print('Creating filtered out file name: ' + file_name_filtered)
+                           f_filtered = gzip.open(file_name_filtered, 'wb')
+                           chroms[v.CHROM]['filtered_file'] =  f_filtered
+                           f_filtered.write(out_comments_str)
+                           if skip_this_record:
+                               chroms[v.CHROM]['filtered_records'] = 0
+                           else:
+                               chroms[v.CHROM]['filtered_records'] = 1
+                               f_filtered.write('\n')
+                               f_filtered.write(line.encode())
+
+
+
+
+
 
         print(' ')
         print('Num comment lines: ' + str(len(comments)))
         if reduce:
-            print('Ignoring:')
+            print('Ignoring for filtered file:')
             print('  Not passed: ' + str(not_passed))
             print('  Hom Ref: ' + str(hom_ref))
             print('  Uncalled: ' + str(not_called))
             print('  *: ' + str(stars))
         for chrom in chroms:
-            print('chrom: ' + chrom + ' ' +  str(len(chroms[chrom])) + ' called variants')
-
-
+            print('chrom: ' + chrom + ' records: ' + str(chroms[chrom]['records'])  +  ' - closing ')
+            f = chroms[v.CHROM]['file']
+            f.close()
+            if reduce:
+                print('chrom: ' + chrom + ' filtered records: ' + str(chroms[chrom]['filtered_records']) + ' - closing ')
+                f = chroms[v.CHROM]['filtered_file']
+                f.close()
 
         print('Finished reading vcf. Num records: ' + str(i))
 
@@ -156,11 +199,11 @@ class Command(BaseCommand):
             self.stdout.write('Species/Strain: ' + species_strain)
             self.stdout.write('Reduce to called variants only for strain: ' + str(options['filter']))
 
-            chroms,comments = self.split(file_name,reduce=options['filter'])
+            chroms,comments = self.split(file_name,ext_part,path,species_strain,reduce=options['filter'])
 
-            for chrom in chroms:
-                  out_name = self.assemble_output_file(chrom,path,ext_part,species_strain)
-                  self.output_file(out_name,comments,chroms[chrom])
+            # for chrom in chroms:
+            #       out_name = self.assemble_output_file(chrom,path,ext_part,species_strain)
+            #       self.output_file(out_name,comments,chroms[chrom])
 
 
 
