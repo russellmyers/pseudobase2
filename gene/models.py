@@ -194,7 +194,7 @@ class Gene(models.Model):
         strains = []
         for strain in all_strains:
             try:
-                genes = Gene.objects.filter(strain__species__pk__in=species).filter(
+                genes = Gene.objects.filter(
                     import_code__in=n_symbols, strain__release__name=strain.release.name).order_by(
                     '-strain__is_reference',
                     'strain__species__id', 'strain__name')
