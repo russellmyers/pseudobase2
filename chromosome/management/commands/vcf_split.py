@@ -88,9 +88,6 @@ class Command(BaseCommand):
                 self.stdout.write(' Processing: ' + str(i))
 
 
-            if i > 300000:
-                break
-
             line = line.decode('utf-8').rstrip()
             if line[:1] == '#':
                 comments.append(line)
