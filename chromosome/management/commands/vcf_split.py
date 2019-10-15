@@ -24,14 +24,20 @@ class Command(BaseCommand):
     '''A custom command to convert VCF to psepileup format'''
 
     help = 'Split a vcf file into separate files per chromosome'
-    args = '<path to VCF file>'
+    #args = '<path to VCF file>'
 
     option_list = BaseCommand.option_list + (
         make_option('-f', '--filter',
                     dest='filter',
                     action="store_true",
                     default=False,
-                    help='reduce to called variants for strain only'),
+                    help='Also create file filtered to only called variants for strain'),
+        make_option('-l', '--filelist',
+                    dest='file_list',
+                    action="append",
+                    default=[],
+                    help='List of files to split'),
+
     )
 
     def assemble_input_file_name_components(self, file_name):
@@ -79,8 +85,11 @@ class Command(BaseCommand):
             if i % 250000 == 0:
                 #sys.stdout.write('.')
                 #sys.stdout.flush()
-                self.stdout.write('Processing: ' + str(i))
+                self.stdout.write(' Processing: ' + str(i))
 
+
+            if i > 300000:
+                break
 
             line = line.decode('utf-8').rstrip()
             if line[:1] == '#':
@@ -150,23 +159,23 @@ class Command(BaseCommand):
 
 
         print(' ')
-        print('Num comment lines: ' + str(len(comments)))
+        print(' Num comment lines: ' + str(len(comments)))
         if reduce:
-            print('Ignoring for filtered file:')
-            print('  Not passed: ' + str(not_passed))
-            print('  Hom Ref: ' + str(hom_ref))
-            print('  Uncalled: ' + str(not_called))
-            print('  *: ' + str(stars))
+            print(' Ignoring for filtered file:')
+            print('   Not passed: ' + str(not_passed))
+            print('   Hom Ref: ' + str(hom_ref))
+            print('   Uncalled: ' + str(not_called))
+            print('   *: ' + str(stars))
         for chrom in chroms:
-            print('chrom: ' + chrom + ' records: ' + str(chroms[chrom]['records'])  +  ' - closing ')
+            print(' chrom: ' + chrom + ' records: ' + str(chroms[chrom]['records'])  +  ' - closing ')
             f = chroms[v.CHROM]['file']
             f.close()
             if reduce:
-                print('chrom: ' + chrom + ' filtered records: ' + str(chroms[chrom]['filtered_records']) + ' - closing ')
+                print(' chrom: ' + chrom + ' filtered records: ' + str(chroms[chrom]['filtered_records']) + ' - closing ')
                 f = chroms[v.CHROM]['filtered_file']
                 f.close()
 
-        print('Finished reading vcf. Num records: ' + str(i))
+        print(' Finished reading vcf. Num records: ' + str(i))
 
 
         vcf_reader.close()
@@ -188,18 +197,23 @@ class Command(BaseCommand):
         f.write(out_str.encode())
         f.close()
 
-    def handle(self, file_name, **options):
+    def handle(self,  **options):
             '''The main entry point for the Django management command.
 
             '''
 
-            path,ext_part,in_chrom,species_strain = self.assemble_input_file_name_components(file_name)
-            self.stdout.write('Input file: ' + file_name)
-            self.stdout.write('Chrom group: ' + in_chrom)
-            self.stdout.write('Species/Strain: ' + species_strain)
+            self.stdout.write('Number of files to process: ' + str(len(options['file_list'])))
             self.stdout.write('Reduce to called variants only for strain: ' + str(options['filter']))
 
-            chroms,comments = self.split(file_name,ext_part,path,species_strain,reduce=options['filter'])
+            for file_name in options['file_list']:
+                path,ext_part,in_chrom,species_strain = self.assemble_input_file_name_components(file_name)
+                self.stdout.write('*******************')
+                self.stdout.write(' Input file: ' + file_name)
+                self.stdout.write(' Chrom group: ' + in_chrom)
+                self.stdout.write(' Species/Strain: ' + species_strain)
+
+
+                chroms,comments = self.split(file_name,ext_part,path,species_strain,reduce=options['filter'])
 
             # for chrom in chroms:
             #       out_name = self.assemble_output_file(chrom,path,ext_part,species_strain)
