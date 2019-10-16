@@ -29,7 +29,7 @@
     <div class = "card-columns mt-4">  
         {% for species in species_tab %}
             <div class = "card">
-               <h5 class="card-title"><i><b>{{ species.name }}</i></b></h4>
+               <h5 class="card-title"><b><i>{{ species.name }}</i></b></h5>
                <h6 class = "card-subtitle mb-2 text-muted">{{ species.num_lines }}
                    {% if species.num_lines == 1 %}
                       line

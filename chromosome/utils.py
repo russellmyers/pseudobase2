@@ -133,6 +133,8 @@ class VCFRecord:
 
     def __init__(self,line):
 
+        self.line = line
+
         self.CHROM,self.POS,self.ID,self.REF,self.ALT,self.QUAL,self.FILTER,self.INFO,self.FORMAT,self.SAMPLE= line.split('\t')[:10]
 
         self.alts =  self.ALT.split(',')
@@ -223,6 +225,38 @@ class VCFRecord:
 
         return summary_flags
 
+
+    def simplify_alts(self):
+
+        sample_data = self.SAMPLE.split(':')
+        sample_alts = sample_data[0].split('/')
+        if len(sample_alts) != 2:
+            return None,None
+
+        if (sample_alts[0] == sample_alts[1]) and  (sample_alts[0] != '0') and  (sample_alts[0] != '.'):
+            pass # Only cater for homozygous alt
+        else:
+            return None,None
+
+        alt_num = int(sample_alts[0])
+
+        alt_bases_simplified = self.ALT.split(',')[alt_num - 1]
+
+        sample_data_simplified = sample_data[:]
+
+        sample_data_simplified[0] = '1/1'
+        ads = sample_data_simplified[1].split(',')
+        new_ads = [ads[0], ads[alt_num]]
+        new_ads_str = ','.join(new_ads)
+        sample_data_simplified[1] = new_ads_str
+        sample_simplified = ':'.join(sample_data_simplified)
+
+        line_simplified = self.line.split('\t')
+        line_simplified[4] = alt_bases_simplified
+        line_simplified[9] = sample_simplified
+        new_line = '\t'.join(line_simplified)
+
+        return new_line
 
 
     def determine_indel(self,called_bases):

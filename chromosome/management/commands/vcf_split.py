@@ -113,6 +113,10 @@ class Command(BaseCommand):
                     stars +=1
                     skip_this_record = True
 
+                if skip_this_record or v.is_het():
+                    line_simplified = line
+                else:
+                    line_simplified = v.simplify_alts()
 
                 if v.CHROM in chroms:
                        #chroms[v.CHROM].append(line)
@@ -123,7 +127,7 @@ class Command(BaseCommand):
                        if reduce and not skip_this_record:
                            f_filtered = chroms[v.CHROM]['filtered_file']
                            f_filtered.write('\n')
-                           f_filtered.write(line.encode())
+                           f_filtered.write(line_simplified.encode())
                            chroms[v.CHROM]['filtered_records'] += 1
 
 
@@ -148,7 +152,7 @@ class Command(BaseCommand):
                            else:
                                chroms[v.CHROM]['filtered_records'] = 1
                                f_filtered.write('\n')
-                               f_filtered.write(line.encode())
+                               f_filtered.write(line_simplified.encode())
 
 
 
