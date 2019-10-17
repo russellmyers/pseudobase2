@@ -11,7 +11,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
   # The main index page
   
-   url(r'^$', 'common.views.index',name='index'),
+   url(r'^/$', 'common.views.index',name='index'),
   
    url(r'^info/$','common.views.info',name='info'),
    
