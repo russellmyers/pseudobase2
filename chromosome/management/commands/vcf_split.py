@@ -31,7 +31,12 @@ class Command(BaseCommand):
                     dest='filter',
                     action="store_true",
                     default=False,
-                    help='Also create file filtered to only called variants for strain'),
+                    help='Also create file filtered to only called variants for strain (SNPS and INDELS'),
+        make_option('-i', '--indels',
+                    dest='indels',
+                    action="store_true",
+                    default=False,
+                    help='Also create file filtered to only called  INDEL variants for strain'),
         make_option('-l', '--filelist',
                     dest='file_list',
                     action="append",
@@ -49,7 +54,7 @@ class Command(BaseCommand):
         chrom = chrom_part.split('chr')[1]
         return path,ext_part,chrom, species_strain
 
-    def assemble_output_file(self, chrom, output_folder, ext_part, species_strain,filtered=False):
+    def assemble_output_file(self, chrom, output_folder, ext_part, species_strain,filtered=False,indels=False):
 
         # file_name = 'genotyped_filtered'
         # file_name += 'ALL'
@@ -57,6 +62,8 @@ class Command(BaseCommand):
         file_path = os.path.join(output_folder,species_strain)
         if filtered:
             file_path = os.path.join(file_path,'filtered')
+        elif indels:
+            file_path = os.path.join(file_path, 'indels')
 
         if not os.path.exists(file_path):
             os.makedirs(file_path)
@@ -64,12 +71,15 @@ class Command(BaseCommand):
         if filtered:
             first_part = ext_part.split('.vcf.gz')[0]
             file_path_and_name = os.path.join(file_path, 'chr' + chrom + first_part + '_filtered' + '.vcf.gz')
+        elif indels:
+            first_part = ext_part.split('.vcf.gz')[0]
+            file_path_and_name = os.path.join(file_path, 'chr' + chrom + first_part + '_indels_only' + '.vcf.gz')
         else:
             file_path_and_name = os.path.join(file_path, 'chr' + chrom + ext_part)
         return file_path_and_name
 
 
-    def split(self,file_name,ext_part,path,species_strain,reduce=False):
+    def split(self,file_name,ext_part,path,species_strain,reduce=False,indels=False):
         vcf_reader = ChromosomeVCFImportFileReader(file_name)
         vcf_reader.open()
         comments = []
@@ -129,6 +139,11 @@ class Command(BaseCommand):
                            f_filtered.write('\n')
                            f_filtered.write(line_simplified.encode())
                            chroms[v.CHROM]['filtered_records'] += 1
+                       if indels and not skip_this_record and (var_type ==  'I' or var_type == 'D'):
+                           f_indels = chroms[v.CHROM]['indel_file']
+                           f_indels.write('\n')
+                           f_indels.write(line_simplified.encode())
+                           chroms[v.CHROM]['indel_records'] += 1
 
 
                 else:
@@ -153,6 +168,18 @@ class Command(BaseCommand):
                                chroms[v.CHROM]['filtered_records'] = 1
                                f_filtered.write('\n')
                                f_filtered.write(line_simplified.encode())
+                       if indels:
+                           file_name_indels = self.assemble_output_file(v.CHROM, path, ext_part, species_strain, indels=True)
+                           print('Creating indels out file name: ' + file_name_indels)
+                           f_indels = gzip.open(file_name_indels, 'wb')
+                           chroms[v.CHROM]['indel_file'] = f_indels
+                           f_indels.write(out_comments_str)
+                           if skip_this_record or not (var_type == 'I' or var_type == 'D') :
+                               chroms[v.CHROM]['indel_records'] = 0
+                           else:
+                               chroms[v.CHROM]['indel_records'] = 1
+                               f_indels.write('\n')
+                               f_indels.write(line_simplified.encode())
 
 
 
@@ -204,7 +231,8 @@ class Command(BaseCommand):
             '''
 
             self.stdout.write('Number of files to process: ' + str(len(options['file_list'])))
-            self.stdout.write('Reduce to called variants only for strain: ' + str(options['filter']))
+            self.stdout.write('Also create reduced VCF with called variants only (SNPS and INDELS) for strain: ' + str(options['filter']))
+            self.stdout.write('Also create reduced VCF with called INDEL variants only for strain: ' + str(options['indels']))
 
             for file_name in options['file_list']:
                 path,ext_part,in_chrom,species_strain = self.assemble_input_file_name_components(file_name)
@@ -214,7 +242,7 @@ class Command(BaseCommand):
                 self.stdout.write(' Species/Strain: ' + species_strain)
 
 
-                chroms,comments = self.split(file_name,ext_part,path,species_strain,reduce=options['filter'])
+                chroms,comments = self.split(file_name,ext_part,path,species_strain,reduce=options['filter'],indels=options['indels'])
 
             # for chrom in chroms:
             #       out_name = self.assemble_output_file(chrom,path,ext_part,species_strain)
