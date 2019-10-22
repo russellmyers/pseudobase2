@@ -202,6 +202,11 @@ class Command(BaseCommand):
                 print(' chrom: ' + chrom + ' filtered records: ' + str(chroms[chrom]['filtered_records']) + ' - closing ')
                 f = chroms[v.CHROM]['filtered_file']
                 f.close()
+            if indels:
+                print(' chrom: ' + chrom + ' indel records: ' + str(chroms[chrom]['indel_records']) + ' - closing ')
+                f = chroms[v.CHROM]['indel_file']
+                f.close()
+
 
         print(' Finished reading vcf. Num records: ' + str(i))
 
