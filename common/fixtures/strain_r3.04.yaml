@@ -32,6 +32,87 @@
 # Under D. lowei (low):
 # lowei
 
--   fields: {name: 'Mount St. Helena, CA 24', species: 1,release: 1, is_reference: false}
+-   fields: {name: 'American Fork Canyon, UT 12', species: 1, release: 2, is_reference: false}
     model: common.strain
-    pk: 27
+    pk: 1
+
+-   fields: {name: 'Flagstaff, AZ 18', species: 1, release: 2,  is_reference: false}
+    model: common.strain
+    pk: 2
+
+-   fields: {name: 'Mather, CA 32', species: 1, release: 2,  is_reference: false}
+    model: common.strain
+    pk: 3
+
+-   fields: {name: 'Mather, CA TL', species: 1, release: 2,  is_reference: false}
+    model: common.strain
+    pk: 4
+
+-   fields: {name: 'Mesa Verde, CO 2-25 reference line', species: 1, release: 2, is_reference: true}
+    model: common.strain
+    pk: 5
+
+-   fields: {name: 'Mount St. Helena, CA 9', species: 1, release: 2, is_reference: false}
+    model: common.strain
+    pk: 6
+
+-   fields: {name: 'Mount St. Helena, CA 24', species: 1, release: 2, is_reference: false}
+    model: common.strain
+    pk: 7
+
+-   fields: {name: 'San Antonio, NM, Pikes Peak 1134', species: 1, release: 2, is_reference: false}
+    model: common.strain
+    pk: 8
+
+-   fields: {name: 'San Antonio, NM, Pikes Peak 1137', species: 1, release: 2, is_reference: false}
+    model: common.strain
+    pk: 9
+
+-   fields: {name: 'MA28', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 10
+
+-   fields: {name: 'MAO101.4', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 11
+
+-   fields: {name: 'MAO3.3', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 12
+
+-   fields: {name: 'MAO3.4', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 13
+
+-   fields: {name: 'MAO3.5', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 14
+
+-   fields: {name: 'MAO3.6', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 15
+
+-   fields: {name: 'ML14', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 16
+
+-   fields: {name: 'ML16', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 17
+
+-   fields: {name: 'ML6f', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 18
+
+-   fields: {name: 'SP138', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 19
+
+-   fields: {name: 'SP235', species: 4, release: 2, is_reference: false}
+    model: common.strain
+    pk: 20
+
+-   fields: {name: 'Lab3Lowei', species: 5, release: 2, is_reference: false}
+    model: common.strain
+    pk: 21
+

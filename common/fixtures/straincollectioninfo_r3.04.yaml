@@ -1,6 +1,38 @@
 # Fixtures to load strain collection info data.
 #
 
--   fields: {strain: 27, year: 1997, info: ''}
+-   fields: {strain: 1, year: 1997, info: ''}
     model: common.straincollectioninfo
-    pk: 27
+    pk: 1
+
+-   fields: {strain: 2, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 2
+
+-   fields: {strain: 3, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 3
+
+-   fields: {strain: 4, year: 1959, info: ''}
+    model: common.straincollectioninfo
+    pk: 4
+
+-   fields: {strain: 5, year: 2005, info: '"Source":"Richards"'}
+    model: common.straincollectioninfo
+    pk: 5
+
+-   fields: {strain: 6, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 6
+
+-   fields: {strain: 7, year: 1997, info: ''}
+    model: common.straincollectioninfo
+    pk: 7
+
+-   fields: {strain: 8, year: 2006, info: ''}
+    model: common.straincollectioninfo
+    pk: 8
+
+-   fields: {strain: 9, year: 2006, info: ''}
+    model: common.straincollectioninfo
+    pk: 9

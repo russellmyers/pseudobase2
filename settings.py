@@ -19,13 +19,21 @@ MANAGERS = (
   ('Mohamed Noor', 'noor@duke.edu'),
 )
 
+# DATABASES = {
+#   'default': {
+#     'ENGINE': 'django.db.backends.mysql',
+#     'NAME': 'pseudobase',
+#     'USER': 'root',
+#     'PASSW  ORD': '',
+#   }
+# }
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'pseudobase',
-    'USER': 'root',
-    'PASSWORD': '',
-  }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'pse2_test_db.sqlite3'),
+        #'NAME': 'db.sqlite3'),
+    }
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False

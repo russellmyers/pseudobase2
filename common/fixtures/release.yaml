@@ -1,0 +1,9 @@
+# Fixtures to load release data (ie which Flybase release strains are aligned against)
+#
+
+-   fields: {name: pse1, description: Flybase Pseudobase 1}
+    model: common.release
+    pk: 1
+-   fields: {name: r3.04, description: Flybase Release 3.04}
+    model: common.release
+    pk: 2

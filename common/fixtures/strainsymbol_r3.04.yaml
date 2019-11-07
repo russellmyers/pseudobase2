@@ -33,6 +33,87 @@
 # lowei
 
 
--   fields: {symbol: 'MSH24', strain: 27}
+-   fields: {symbol: 'AFC12', strain: 1}
     model: common.strainsymbol
-    pk: 35
+    pk: 1
+
+-   fields: {symbol: 'FS18', strain: 2}
+    model: common.strainsymbol
+    pk: 2
+
+-   fields: {symbol: 'MAT32', strain: 3}
+    model: common.strainsymbol
+    pk: 3
+
+-   fields: {symbol: 'MATTL', strain: 4}
+    model: common.strainsymbol
+    pk: 4
+
+-   fields: {symbol: 'MVRef', strain: 5}
+    model: common.strainsymbol
+    pk: 5
+
+-   fields: {symbol: 'MSH9', strain: 6}
+    model: common.strainsymbol
+    pk: 6
+
+-   fields: {symbol: 'MSH24', strain: 7}
+    model: common.strainsymbol
+    pk: 7
+
+-   fields: {symbol: 'PP1134', strain: 8}
+    model: common.strainsymbol
+    pk: 8
+
+-   fields: {symbol: 'PP1137', strain: 9}
+    model: common.strainsymbol
+    pk: 9
+
+-   fields: {symbol: 'MA28', strain: 10}
+    model: common.strainsymbol
+    pk: 10
+
+-   fields: {symbol: 'MAO101-4', strain: 11}
+    model: common.strainsymbol
+    pk: 11
+
+-   fields: {symbol: 'MAO3-3', strain: 12}
+    model: common.strainsymbol
+    pk: 12
+
+-   fields: {symbol: 'MAO3-4', strain: 13}
+    model: common.strainsymbol
+    pk: 13
+
+-   fields: {symbol: 'MAO3-5', strain: 14}
+    model: common.strainsymbol
+    pk: 14
+
+-   fields: {symbol: 'MAO3-6', strain: 15}
+    model: common.strainsymbol
+    pk: 15
+
+-   fields: {symbol: 'ML14', strain: 16}
+    model: common.strainsymbol
+    pk: 16
+
+-   fields: {symbol: 'ML16', strain: 17}
+    model: common.strainsymbol
+    pk: 17
+
+-   fields: {symbol: 'ML6f', strain: 18}
+    model: common.strainsymbol
+    pk: 18
+
+-   fields: {symbol: 'SP138', strain: 19}
+    model: common.strainsymbol
+    pk: 19
+
+-   fields: {symbol: 'SP235', strain: 20}
+    model: common.strainsymbol
+    pk: 20
+
+-   fields: {symbol: 'LOW3', strain: 21}
+    model: common.strainsymbol
+    pk: 21
+

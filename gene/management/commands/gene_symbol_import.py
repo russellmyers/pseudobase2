@@ -106,8 +106,11 @@ class Command(BaseCommand):
                 if line[0].startswith('#'): continue
 
                 ## Format: FlyBase FBgn-GLEANR ID Correspondence Table
-                if len(line) == 3:
-                    data_fields = ['gene_symbol', 'flybase_id', 'gleanr_id']
+                if (len(line) == 3) or (len(line) == 4):
+                    if len(line) == 3:
+                        data_fields = ['gene_symbol', 'flybase_id', 'gleanr_id']
+                    else:
+                        data_fields = ['organism_abbreviation','gene_symbol', 'flybase_id', 'gleanr_id']
                     data = dict(zip(data_fields, line))
 
                     # We only want Dpse (D. pseudoobscura) information.
@@ -116,9 +119,13 @@ class Command(BaseCommand):
                     self._process_fbgn_gleanr_data(master_translation_table, 
                       data)
                 ## Format: FlyBase FBgn-Annotation ID Correspondence Table
-                elif len(line) == 5:
-                    data_fields = ['gene_name', 'flybase_id', 
-                      'sec_flybase_ids', 'annotation_id', 'sec_annotation_id']
+                elif (len(line) == 5) or (len(line) == 6):
+                    if len(line) == 5:
+                        data_fields = ['gene_name', 'flybase_id',
+                          'sec_flybase_ids', 'annotation_id', 'sec_annotation_id']
+                    else:
+                        data_fields = ['gene_name','organism_abbreviation','flybase_id',
+                                       'sec_flybase_ids', 'annotation_id', 'sec_annotation_id']
                     data = dict(zip(data_fields, line))
 
                     # We only want Dpse (D. pseudoobscura) information.
@@ -127,11 +134,17 @@ class Command(BaseCommand):
                     self._process_fbgn_annotation_data(
                       master_translation_table, data)
                 ## Format: FlyBase melanogaster gene ortholog report
-                elif len(line) == 10:
-                    data_fields = ['flybase_id','gene_symbol', 'arm', 
-                      'location', 'strand', 'ortholog_flybase_id', 
-                      'orholog_gene_symbol', 'ortholog_arm', 
-                      'ortholog_location', 'ortholog_strand']
+                elif (len(line) == 10) or (len(line) == 11):
+                    if len(line) == 10:
+                        data_fields = ['flybase_id','gene_symbol', 'arm',
+                          'location', 'strand', 'ortholog_flybase_id',
+                          'orholog_gene_symbol', 'ortholog_arm',
+                          'ortholog_location', 'ortholog_strand']
+                    else:
+                        data_fields = ['flybase_id', 'gene_symbol', 'arm',
+                                       'location', 'strand', 'ortholog_flybase_id',
+                                       'orholog_gene_symbol', 'ortholog_arm',
+                                       'ortholog_location', 'ortholog_strand','ortholog_DB_Group_ID']
                     data = dict(zip(data_fields, line))
 
                     # Only add ortholog data for genes we want.
