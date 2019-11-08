@@ -119,6 +119,8 @@ def assemble_jbrowse_gene_query_data(request):
 def assemble_general_browse_query_data():
     custom_data = {}
     custom_data['chr'] = '2'
+    custom_data['pos_from'] = 1
+    custom_data['pos_to'] = 200
     custom_data['species'] = []
     for strain in Strain.objects.all():
         for strain_symbol in strain.strainsymbol_set.all():
