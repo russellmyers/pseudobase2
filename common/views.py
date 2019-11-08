@@ -116,6 +116,18 @@ def assemble_jbrowse_gene_query_data(request):
 
     return custom_data
 
+def assemble_general_browse_query_data():
+    custom_data = {}
+    custom_data['chr'] = '2'
+    custom_data['species'] = []
+    for strain in Strain.objects.all():
+        for strain_symbol in strain.strainsymbol_set.all():
+            custom_data['species'].append(strain_symbol.symbol)
+    vcf_tracks = [x + '_VCF' for x in custom_data['species']]
+    custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
+    return custom_data
+
+
 def _submit_new_gene_batch(request, form):
     '''Submit a new batch gene search for processing.'''
 
@@ -197,13 +209,22 @@ def index(request):
         log.info('Posting')
 
         if 'chrom_browse_type' in request.POST:
-            custom_data = assemble_jbrowse_chromosome_query_data(request)
-            return render_to_response('test_jb.html', custom_data,
-                                      context_instance=RequestContext(request))
+            form = chromosome.forms.SearchForm(request.POST)
+            if form.is_valid():
+                custom_data = assemble_jbrowse_chromosome_query_data(request)
+                return render_to_response('test_jb.html', custom_data,
+                                          context_instance=RequestContext(request))
+            else:
+                return _render_search_forms(request, chromosome_form=form)
         elif 'gene_browse_type' in request.POST:
-            custom_data = assemble_jbrowse_gene_query_data(request)
-            return render_to_response('test_jb.html', custom_data,
-                                      context_instance=RequestContext(request))
+            form = gene.forms.SearchForm(request.POST, request.FILES)
+            if form.is_valid():
+                custom_data = assemble_jbrowse_gene_query_data(request)
+                return render_to_response('test_jb.html', custom_data,
+                                          context_instance=RequestContext(request))
+            else:
+                return _render_search_forms(request, gene_form=form)
+
         elif 'chrom_search_type' in request.POST: #['search_type'] ==  'Quick search': #'Search by chromosome':
             log.info('In index. Showing results. chrom search type: %s' % request.POST['chrom_search_type'])
             return _render_chromosome_search(request)
@@ -226,6 +247,14 @@ def info(request):
 
     return render_to_response('info.html', custom_data,
       context_instance=RequestContext(request))
+
+
+def browse(request):
+    custom_data = assemble_general_browse_query_data()
+    custom_data['tab'] = 'Browse'
+
+    return render_to_response('test_jb.html', custom_data,
+                              context_instance=RequestContext(request))
 
 
 def delivery(request, code):

@@ -14,7 +14,9 @@ urlpatterns = patterns('',
    url(r'^$', 'common.views.index',name='index'),
   
    url(r'^info/$','common.views.info',name='info'),
-   
+
+   url(r'^browse/$', 'common.views.browse', name='browse'),
+
    (r'^chromosome/', include('chromosome.urls')),
 
    url(r'^jb/stats/global$','common.views.jb_stats_global',name='jb_stats_global'),
