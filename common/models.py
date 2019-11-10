@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
+import json
 
 
 class Species(models.Model):
@@ -94,7 +95,28 @@ class Strain(models.Model):
         except:
             pass 
         return strain_info
-    
+
+    @property
+    def formatted_year(self):
+        year = ''
+        try:
+            if self.straincollectioninfo:
+                year = self.straincollectioninfo.formatted_year
+        except:
+            pass
+
+        return year
+
+    @property
+    def formatted_info_dict(self):
+        info_dict = {}
+        if self.straincollectioninfo:
+            if self.straincollectioninfo.info == '':
+                pass
+            else:
+                info_dict = json.loads(self.straincollectioninfo.info)
+        return info_dict
+
     def num_chromosomes(self):
         from chromosome.models import ChromosomeBase
         chrom_bases = ChromosomeBase.objects.filter(strain = self)
@@ -146,7 +168,14 @@ class StrainCollectionInfo(models.Model):
                strain_info += ', '
            strain_info += self.info
            
-        return strain_info    
+        return strain_info
+
+    @property
+    def formatted_year(self):
+        strain_year = ''
+        if (self.year is not None):
+            strain_year += 'collected: ' + str(self.year)
+        return strain_year
 
 class StrainSymbol(models.Model):
     '''Short symbols identifying a strain, used for importing mainly. Can be many symbols mapping to one strain.'''

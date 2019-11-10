@@ -29,6 +29,7 @@
     <div class = "card-columns mt-4">  
         {% for species in species_tab %}
             <div class = "card">
+              <div class = "card-header bg-light">
                <h5 class="card-title"><b><i>{{ species.name }}</i></b></h5>
                <h6 class = "card-subtitle mb-2 text-muted">{{ species.num_lines }}
                    {% if species.num_lines == 1 %}
@@ -37,13 +38,36 @@
                       lines
                    {% endif %}   
                </h6>
-                 <ul class="list-unstyled">
-                 {% for line in species.lines %}
-                       
-                        <li class="text-left">-- {{ line.formatted_info }}</li>
-                        
-                 {% endfor %}       
-               
+              </div>
+                 <!--ul class="list-unstyled"-->
+                 <div class = "list-group">
+                     {% for line in species.lines %}
+
+                            <div class = "list-group-item">
+                                <!--li class="text-left"-->
+                                 {{ line.name }}
+                                {%  if line.formatted_year != '' %}
+                                        <br>
+                                        <span class = "small">
+                                        {{  line.formatted_year }}
+                                        </span>
+
+                                {%  endif %}
+                           {%  if line.formatted_info_dict %}
+                                        <br>
+                                        <span class = "small">
+                                        {%  for key,values in line.formatted_info_dict.items %}
+                                         {{  key }} : {{  values }}
+                                        {%  endfor %}
+                                        </span>
+
+                                {%  endif %}
+
+                            </div>
+
+                     {% endfor %}
+                 </div>
+
             </div>    
         {% endfor %}   
     </div>     
