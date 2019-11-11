@@ -863,21 +863,32 @@ class ChromosomeImporter():
                             'format': 'VCF gzipped', 'chromosome_name': 'Unknown', 'strain_name': 'Unknown','bases_count':0,'rec_count':0}
                 else:
                     vcf_reader = ChromosomeVCFImportFileReader(self.chromosome_data)
-                    chrom,strain = vcf_reader.get_chrom_and_strain()
+                    chrom,strain_symbol = vcf_reader.get_chrom_and_strain()
+
+                    release_name = ' '
+                    if strain_symbol is None:
+                        pass
+                    else:
+                        try:
+                            str_sym = StrainSymbol.objects.get(symbol=strain_symbol)
+                            release_name = str_sym.strain.release.name
+                        except:
+                            pass
+
                     rec_count = 0
                     bases_count = 0
                     if incl_rec_count:
                         rec_count = vcf_reader.get_num_records()
-                        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, self.flybase_release)
+                        ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, release_name) #self.flybase_release)
                         if ref_bases is None:
-                            print('No reference sequence imported for: ',chrom,self.flybase_release,' - Need to import ref fasta first')
+                            print('No reference sequence imported for: ',chrom, release_name,' - Need to import ref fasta first')
                         bases_count = len(ref_bases)
-                    if chrom is None or strain is None:
+                    if chrom is None or strain_symbol is None:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
                             'format': 'Unknown','rec_count':rec_count, 'bases_count':bases_count}
                     else:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain,'rec_count':rec_count, 'bases_count':bases_count}
+                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'rec_count':rec_count, 'bases_count':bases_count}
 
 
 

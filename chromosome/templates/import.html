@@ -184,7 +184,7 @@ function updateBaseCount(xhttp) {
                 tdSize = tr[i].getElementsByTagName("td")[6];
                 tdFormat = tr[i].getElementsByTagName("td")[7];
                 //alert ('size: ' + tdSize.innerHTML)
-                if (tdFormat ==  'VCF gzipped') {
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
                     lineType = 'records';
                 }
 

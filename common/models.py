@@ -113,6 +113,9 @@ class Strain(models.Model):
         if self.straincollectioninfo:
             if self.straincollectioninfo.info == '':
                 pass
+            elif self.straincollectioninfo.info[:1] != '{':
+                return {'Error':'Invalid json: ' + self.straincollectioninfo.info }
+                pass # Invalid JSON
             else:
                 info_dict = json.loads(self.straincollectioninfo.info)
         return info_dict
