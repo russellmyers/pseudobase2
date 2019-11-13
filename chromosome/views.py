@@ -105,6 +105,8 @@ def preprocess_files(request):
 
 
     dirs_info = []
+
+    preprocessed_files_info = []
     for d in directories:
         if d[:1] == 'D':
             dir_info = {}
@@ -113,7 +115,6 @@ def preprocess_files(request):
             strain_dir = join(mypath,d)
             strain_files = [f for f in listdir(strain_dir) if isfile(join(strain_dir,f))]
 
-            preprocessed_files_info = []
             for f in strain_files:
                 c_importer = ChromosomeImporter(join(strain_dir, f))
                 preprocessed_file_info = c_importer.get_info(incl_rec_count=False)
