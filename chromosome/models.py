@@ -720,6 +720,7 @@ class ChromosomeVCFImportFileReader():
         self.vcf_file = None
         self.chrom = None
         self.strain = None
+        self.chromosomes = {} # List of chromosomes if VCF contains multiple chromosomes of a group
 
 
     def open(self):
@@ -750,13 +751,24 @@ class ChromosomeVCFImportFileReader():
 
         return self.chrom,self.strain
 
-    def get_num_records(self):
+    def get_num_records(self,also_retrieve_chromosomes=False):
 
         i = 0
 
         vcf_file = gzip.open(self.fPath, 'r')
         for i, line in enumerate(vcf_file):
             i+=1
+            if also_retrieve_chromosomes:
+                line = line.decode('utf-8').rstrip()
+                if line[:1] == '#':
+                    pass
+                else:
+                    chrom = line.split('\t')[0]
+                    if chrom in self.chromosomes:
+                        self.chromosomes[chrom] +=1
+                    else:
+                        self.chromosomes[chrom] = 1
+
 
         vcf_file.close()
 
@@ -852,7 +864,7 @@ class ChromosomeImporter():
         return struct.pack('I', n)
 
 
-    def get_info(self,incl_rec_count = False):
+    def get_info(self,incl_rec_count = False,incl_all_chromosomes=False):
 
             chromosome_reader = None
 
@@ -877,8 +889,14 @@ class ChromosomeImporter():
 
                     rec_count = 0
                     bases_count = 0
+
+                    chromosome_names = {}
+                    num_chromosomes = 0
+
                     if incl_rec_count:
-                        rec_count = vcf_reader.get_num_records()
+                        rec_count = vcf_reader.get_num_records(also_retrieve_chromosomes=incl_all_chromosomes)
+                        if incl_all_chromosomes:
+                            chromosome_names = vcf_reader.chromosomes
                         ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, release_name) #self.flybase_release)
                         if ref_bases is None:
                             print('No reference sequence imported for: ',chrom, release_name,' - Need to import ref fasta first')
@@ -888,7 +906,7 @@ class ChromosomeImporter():
                             'format': 'Unknown','rec_count':rec_count, 'bases_count':bases_count}
                     else:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'rec_count':rec_count, 'bases_count':bases_count}
+                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'rec_count':rec_count, 'bases_count':bases_count,'chromosome_names':chromosome_names,'num_chromosomes':len(chromosome_names)}
 
 
 
@@ -924,8 +942,9 @@ class ChromosomeImporter():
                     
                     return  first_data
              
-            except:
-                print ('whoops exc')
+            except Exception as error:
+                print ('whoops exc: ')
+                print(error)
                 raise
                 
             finally:

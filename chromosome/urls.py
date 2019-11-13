@@ -5,7 +5,11 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
   # The main index page
-   
+
+  url(r'^preprocess/$', 'chromosome.views.preprocess_files', name='preprocess'),
+
+  url(r'^preprocess/(?P<fname>.+)/(?P<pre>.+)/info/$', 'chromosome.views._get_file_info', name='preprocessfileinfo'),
+
   url(r'^import/$','chromosome.views.import_files',name='import'),
    
   url(r'^import/delchr/$','chromosome.views._delete_latest',name='dellatest'),

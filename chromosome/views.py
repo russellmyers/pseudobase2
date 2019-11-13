@@ -14,7 +14,155 @@ import json
 import chromosome.forms
 from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatchImportProcess, ChromosomeBatchImportLog
 
-    
+
+def preprocess_files(request):
+    mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX  # 'raw_data/chromosome/pending_import/'
+    abspath = os.path.abspath(mypath)
+
+    if request.method == 'POST':
+        print ('posttt')
+        form = chromosome.forms.ImportForm(request.POST)
+        selected_values = request.POST.getlist('import_files')
+
+        # Start transaction management.
+        transaction.commit_unless_managed()
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        try:
+            if (len(selected_values) == 0):
+                raise Exception('No files selected for import')
+
+            current_batches = ChromosomeBatchImportProcess.objects.current_batches()  # ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))
+            if (len(current_batches) > 0):
+                raise Exception('Batch import already in process. Please wait ')
+
+            bp = ChromosomeBatchImportProcess(submitted_at=django.utils.timezone.now(), batch_status='P')
+
+            #            orig_req = ''
+            #            for i,sel_file in enumerate(selected_values):
+            #               file_path = os.path.join(abspath,sel_file)
+            #               orig_req += file_path
+            #               if i == len(selected_values) - 1:
+            #                   pass
+            #               else:
+            #                   orig_req += '\n'
+            #            bp.original_request = orig_req
+            bp.set_orig_request_from_filenames(selected_values)
+
+            bp.save()
+
+            # Finalize the transaction and close the db connection.
+            transaction.commit()
+            transaction.leave_transaction_management()
+            connection.close()
+            messages.success(request, str(len(selected_values)) + ' files selected for import',
+                             extra_tags='html_safe alert alert-success')
+            return redirect(import_progress)
+        except Exception as e:
+            transaction.rollback()
+            transaction.leave_transaction_management()
+
+            messages.error(request, 'Batch import process failed: ' + str(e), extra_tags='html_safe alert alert-danger')
+            return redirect(import_files)
+
+
+
+    # current_batches = ChromosomeBatchImportProcess.objects.current_batches()  # ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))
+    # if (len(current_batches) > 0):
+    #     return redirect(import_progress)
+
+    custom_data = {}
+    custom_data['tab'] = 'Preprocess'
+
+    from os import listdir
+    from os.path import isfile, join
+    custom_data['pending_preprocess_path'] = abspath
+    files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    directories = [d for d in listdir(mypath) if not isfile(join(mypath,d))]
+
+    files_info = []
+    for f in files:
+        c_importer = ChromosomeImporter(join(mypath, f))
+        file_info = c_importer.get_info(incl_rec_count=False)
+
+        if 'file_size' in file_info:
+            file_info['file_size_MB'] = "%.2fMB" % file_info['file_size']
+
+        files_info.append(file_info)
+
+    num_valid_pending_files = 0
+    for f_info in files_info:
+        if (f_info['format'] == 'unknown'):
+            pass
+        else:
+            num_valid_pending_files += 1
+    custom_data['num_valid_pending_files'] = num_valid_pending_files
+
+    custom_data['pending_files'] = files_info
+
+    # Get recent completed imports
+    custom_data['recent_imports'] = ChromosomeBatchImportLog.objects.filter(status='C').order_by('-end')
+
+
+    dirs_info = []
+    for d in directories:
+        if d[:1] == 'D':
+            dir_info = {}
+            dir_info['strain'] = d
+
+            strain_dir = join(mypath,d)
+            strain_files = [f for f in listdir(strain_dir) if isfile(join(strain_dir,f))]
+
+            preprocessed_files_info = []
+            for f in strain_files:
+                c_importer = ChromosomeImporter(join(strain_dir, f))
+                preprocessed_file_info = c_importer.get_info(incl_rec_count=False)
+
+                if 'file_size' in preprocessed_file_info:
+                    preprocessed_file_info['file_size_MB'] = "%.2fMB" % preprocessed_file_info['file_size']
+
+                preprocessed_file_info['strain'] = d
+                preprocessed_file_info['type'] = 'Split'
+                preprocessed_files_info.append(preprocessed_file_info)
+
+            strain_subdirectories = [d_sub for d_sub in listdir(strain_dir) if not isfile(join(strain_dir, d_sub))]
+            dir_info['split'] = len(strain_files)
+
+            for sub_dir in strain_subdirectories:
+                strain_subdir = join(strain_dir, sub_dir)
+                strain_subdir_files = [f for f in listdir(strain_subdir) if
+                                       isfile(join(strain_subdir, f))]
+
+                for f in strain_subdir_files:
+                    c_importer = ChromosomeImporter(join(strain_subdir, f))
+                    preprocessed_file_info = c_importer.get_info(incl_rec_count=False)
+
+                    if 'file_size' in preprocessed_file_info:
+                        preprocessed_file_info['file_size_MB'] = "%.2fMB" % preprocessed_file_info['file_size']
+
+                    preprocessed_file_info['strain'] = d
+                    preprocessed_file_info['type'] = sub_dir
+                    preprocessed_files_info.append(preprocessed_file_info)
+                # if sub_dir == 'filtered':
+                #     strain_filtered_dir = join(strain_dir,sub_dir)
+                #     strain_filtered_files = [f for f in listdir(strain_filtered_dir) if isfile(join(strain_filtered_dir, f))]
+                #     dir_info['filtered'] = len(strain_filtered_files)
+                #
+                # elif sub_dir == 'indels':
+                #     strain_indels_dir = join(strain_dir, sub_dir)
+                #     strain_indels_files = [f for f in listdir(strain_indels_dir) if   isfile(join(strain_indels_dir, f))]
+                #     dir_info['indels'] = len(strain_indels_files)
+            dirs_info.append(dir_info)
+
+
+
+    custom_data['dirs_info'] = dirs_info
+
+    custom_data['preprocessed_files'] = preprocessed_files_info
+
+    return render_to_response('preprocess.html', custom_data,
+                              context_instance=RequestContext(request))
+
 def import_files(request):
     
     
@@ -302,10 +450,15 @@ def _delete_latest(request):
     return redirect(import_files)
  
 
-def _get_file_info(request,fname = ''):
-    
-    
-    mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX  #'raw_data/chromosome/pending_import/'
+def _get_file_info(request,fname = '',pre=False):
+
+
+    also_retrieve_chromosomes = False
+    if pre:
+        mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX
+        also_retrieve_chromosomes = True
+    else:
+        mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX  #'raw_data/chromosome/pending_import/'
     
     response_data = {}
     error = ''
@@ -328,7 +481,7 @@ def _get_file_info(request,fname = ''):
     
     try:
         c_importer = ChromosomeImporter(join(mypath, fname))
-        file_info = c_importer.get_info(incl_rec_count = True)
+        file_info = c_importer.get_info(incl_rec_count = True,incl_all_chromosomes=also_retrieve_chromosomes)
     except Exception as e:   
         file_info = {}
         error = str(e)
