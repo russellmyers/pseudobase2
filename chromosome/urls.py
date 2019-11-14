@@ -8,7 +8,7 @@ urlpatterns = patterns('',
 
   url(r'^preprocess/$', 'chromosome.views.preprocess_files', name='preprocess'),
 
-  url(r'^preprocess/(?P<fname>.+)/(?P<pre>.+)/info/$', 'chromosome.views._get_file_info', name='preprocessfileinfo'),
+  url(r'^preprocess/(?P<fname>.+)/(?P<pre>.+)/(?P<subdir>.+)/(?P<type>.+)/info/$', 'chromosome.views._get_file_info', name='preprocessfileinfo'),
 
   url(r'^import/$','chromosome.views.import_files',name='import'),
    

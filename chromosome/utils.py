@@ -128,7 +128,7 @@ def merge_vcfs(file_name_1, file_name_2, out_file_name, num_recs=None):
 
 class VCFRecord:
 
-    vcf_types = ['Filtered', 'Uncalled', 'Hom Ref', 'Het Ref', 'Hom Alt', 'Het Alt', '*', 'SNP', 'INDEL', 'Insertion',
+    vcf_types = ['Filtered', 'Uncalled', 'HomRef', 'HetRef', 'HomAlt', 'HetAlt', '*', 'SNP', 'INDEL', 'Insertion',
              'Deletion']
 
     def __init__(self,line):
@@ -224,6 +224,8 @@ class VCFRecord:
 
 
         return summary_flags
+
+
 
 
     def simplify_alts(self):

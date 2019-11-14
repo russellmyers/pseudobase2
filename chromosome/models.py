@@ -721,6 +721,7 @@ class ChromosomeVCFImportFileReader():
         self.chrom = None
         self.strain = None
         self.chromosomes = {} # List of chromosomes if VCF contains multiple chromosomes of a group
+        self.summary_flag_dict = {}
 
 
     def open(self):
@@ -753,26 +754,36 @@ class ChromosomeVCFImportFileReader():
 
     def get_num_records(self,also_retrieve_chromosomes=False):
 
-        i = 0
+        rec_num = 0
+        tot_summary_flags = [0 for i in range(len(VCFRecord.vcf_types))]
 
         vcf_file = gzip.open(self.fPath, 'r')
-        for i, line in enumerate(vcf_file):
-            i+=1
+        for line in vcf_file:
+            #i+=1
             if also_retrieve_chromosomes:
                 line = line.decode('utf-8').rstrip()
                 if line[:1] == '#':
                     pass
                 else:
+                    if rec_num  % 100000 == 0:
+                        print('_get_file_info progress: ' + str(rec_num) + ' file name: ' + self.fPath)
+                    rec_num += 1
                     chrom = line.split('\t')[0]
                     if chrom in self.chromosomes:
                         self.chromosomes[chrom] +=1
                     else:
                         self.chromosomes[chrom] = 1
 
+                    v = VCFRecord(line)
+                    record_summary_flags = v.summary_flags()
+                    tot_summary_flags = [prev_tot + record_summary_flags[i] for i, prev_tot in enumerate(tot_summary_flags)]
+
+        if also_retrieve_chromosomes:
+            self.summary_flag_dict = VCFRecord.tot_summary_flags_to_meta_data(tot_summary_flags)
 
         vcf_file.close()
 
-        return i
+        return rec_num
 
 class ChromosomeImporter():
 #Not a database table
@@ -891,22 +902,26 @@ class ChromosomeImporter():
                     bases_count = 0
 
                     chromosome_names = {}
+                    summary_flag_dict = {}
                     num_chromosomes = 0
 
                     if incl_rec_count:
                         rec_count = vcf_reader.get_num_records(also_retrieve_chromosomes=incl_all_chromosomes)
                         if incl_all_chromosomes:
                             chromosome_names = vcf_reader.chromosomes
+                            summary_flag_dict = vcf_reader.summary_flag_dict
                         ref_bases = ChromosomeBase.objects.get_all_ref_bases(chrom, release_name) #self.flybase_release)
                         if ref_bases is None:
                             print('No reference sequence imported for: ',chrom, release_name,' - Need to import ref fasta first')
-                        bases_count = len(ref_bases)
+                            bases_count = 0
+                        else:
+                            bases_count = len(ref_bases)
                     if chrom is None or strain_symbol is None:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
                             'format': 'Unknown','rec_count':rec_count, 'bases_count':bases_count}
                     else:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'rec_count':rec_count, 'bases_count':bases_count,'chromosome_names':chromosome_names,'num_chromosomes':len(chromosome_names)}
+                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'rec_count':rec_count, 'bases_count':bases_count,'chromosome_names':chromosome_names,'num_chromosomes':len(chromosome_names),'summary_flag_dict':summary_flag_dict}
 
 
 

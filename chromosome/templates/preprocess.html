@@ -40,13 +40,17 @@
                                 <thead>
                                     <tr>
                                          <th scope = "col"> </th>
-                                         <th scope = "col">Action</th>
                                          <th scope = "col">File name</th>
                                          <th scope = "col">Chromosome</th>
                                          <th scope = "col">Strain</th>
-                                         <th scope = "col">Start position</th>
                                          <th scope = "col">File size</th>
                                          <th scope = "col">File format</th>
+                                         <th scope = "col">Not passed</th>
+                                         <th scope = "col">Uncalled</th>
+                                         <th scope = "col">Hom Ref</th>
+                                         <th scope = "col">SNPs</th>
+                                         <th scope = "col">INDELs</th>
+
                                      </tr>
                                 
                                 </thead>
@@ -58,40 +62,18 @@
                                                  <!--th scope = "row"-->
                                                      {% if file_info.format == 'unknown' %}
                                                          <td></td>
-                                                         <td class = "small"></td>
                                                          <td class = "small text-muted"><i>{{ file_info.file_name }}</i></td>
                                                      
                                                      {% else %}
                                                          {% if file_info.import_status %}
                                                             <td></td>
-                                                            <td class = "small">
-                                                               {{ file_info.import_status }}
-                                                            </td>
+
                                                          {% else %}     
            
                                                              <td>
                                                                 <input type="checkbox"  value="{{ file_info.file_name }}" name="import_files">
                                                              </td> 
-                                                             <td class = "small">
-                                                                 <!--
-                                                                 <a href = "{% url 'importfile' file_info.file_name %}"
-                                                                  {% if file_info.exists_in_db %}
-                                                                       onclick = "return confirm('Data exists already in Pseudobase for\n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n This will update/overwrite existing data in Pseudobase. Are you sure?')">
-                                                                      <span class = "text-warning">&#9851; Update</span>
-                                                                  {% else %}
-                                                                       onclick = "return confirm('Importing new data into Pseudobase for \n  - chromosome: {{ file_info.chromosome_name }} \n  - strain: {{ file_info.strain_name }} \n Are you sure?')">
-                                                                      <span>&#10133; New</span>
-                                                                  {% endif %}  
-                                                                  </a>
-                                                                  -->
-                                                                  {% if file_info.exists_in_db %}
-                                                                      <span class = "text-warning" data-toggle="tooltip" title="Warning: Data exists already in Pseudobase for Chromosome: {{ file_info.chromosome_name }} / Strain: {{ file_info.strain_name }}. Selecting this file will update/overwrite existing data in Pseudobase.">&#9851; Update</span>
-                                                                  {% else %}
-                                                                      <span data-toggle="tooltip" title="This will Import new data into Pseudobase for Chromosome: {{ file_info.chromosome_name }} / Strain: {{ file_info.strain_name }}">&#10133; New</span>
-                                                                  {% endif %}  
-                                                                
-                                                         </td>  
-                                                         {% endif %}    
+                                                        {% endif %}
                                                          <td class = "small">{{ file_info.file_name }}</td>
                                                     {% endif %}  
                                                      
@@ -99,18 +81,23 @@
                                                          <!--/th-->
                                                      <td class = "small"> {{ file_info.chromosome_name }}</td>
                                                      <td class = "small"> {{ file_info.strain_name }} </td>
-                                                     <td class = "small"> {{ file_info.position }} </td>
-                                                     <td class = "small"> {{ file_info.file_size_MB }}</td> 
+                                                     <td class = "small"> {{ file_info.file_size_MB }}</td>
                                                      <td class = "small"> {{ file_info.format }} </td>
+                                                     <td class = "small"><i>Calculating.. </i></td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.Uncalled }} </td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.HomRef }} </td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.SNP }} </td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.INDEL }} </td>
+
                  
                                                  
                                                         
                 
                                              </tr>
                                          {% endfor %}
-                                         {% if num_valid_pending_files == 0 %}
+                                         {% if num_valid_pending_preprocess_files == 0 %}
                                             <tr>
-                                              <td class = "text-success">No files currently pending import!</td>
+                                              <td class = "text-success">No files currently pending preprocessing!</td>
                                               <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->        
                                             </tr>
                                          {% endif %}   
@@ -129,9 +116,9 @@
         </div>  
      </div>
  
-                 {% if num_valid_pending_files == 0 %}
+                 {% if num_valid_pending_preprocess_files == 0 %}
                  <p>  
-                 <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
+                 <small class = "text-muted">Please place new pending preprocessing files into folder:  {{ pending_import_path }}</small>
                  </p>
                  {% else %}
                       <button type="submit" name="importfiles" class = "btn btn-primary mt-2" disabled>Split / Filter selected file(s)</button>
@@ -153,7 +140,7 @@
 
 
         <div class="col-md-10 border border-primary" style="background-color:white;">
-                            <table id="pending_tab" class = "table table-sm">
+                            <table id="preprocessed_tab" class = "table table-sm">
                                 <thead>
                                     <tr>
                                          <th scope = "col"> </th>
@@ -164,9 +151,12 @@
                                          <th scope = "col">Strain</th>
                                          <th scope = "col">File size</th>
                                          <th scope = "col">File format</th>
-
-
-                                     </tr>
+                                         <th scope = "col">Not passed</th>
+                                         <th scope = "col">Uncalled</th>
+                                         <th scope = "col">Hom Ref</th>
+                                         <th scope = "col">SNPs</th>
+                                         <th scope = "col">INDELs</th>
+                                      </tr>
 
                                 </thead>
 
@@ -183,14 +173,19 @@
                                                     <td class = "small"> {{ preprocessed_file_info.strain_name }} </td>
                                                     <td class = "small"> {{ preprocessed_file_info.file_size_MB }}</td>
                                                     <td class = "small"> {{ preprocessed_file_info.format }} </td>
+                                                    <td class = "small"><i>Calculating.. </i></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.Uncalled }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.HomRef }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.SNP }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.INDEL }} </td>
 
 
 
                                              </tr>
                                          {% endfor %}
-                                         {% if num_valid_pending_files == 0 %}
+                                         {% if num_valid_preprocessed_files == 0 %}
                                             <tr>
-                                              <td class = "text-success">No files currently pending import!</td>
+                                              <td class = "text-success">No files preprocessed!</td>
                                               <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->
                                             </tr>
                                          {% endif %}
@@ -209,7 +204,7 @@
         </div>
      </div>
 
-                 {% if num_valid_pending_files == 0 %}
+                 {% if num_valid_preprocessed_files == 0 %}
                  <p>
                  <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
                  </p>
@@ -225,19 +220,29 @@
 {%load static %}
 <script>
 
+    {% for file_info in preprocessed_files %}
+
+        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True subdir=file_info.strain type=file_info.type %}", updateBaseCountPreProcessed);
+
+    {% endfor %}
 
     {% for file_info in pending_files %}
        
-        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True %}", updateBaseCount);
+        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True subdir='_' type='_' %}", updateBaseCount);
 
     {% endfor %}
- 
+
+
+
 function ajaxGet(url, callbackFunction) {
   var xhttp;
   xhttp=new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       callbackFunction(this);
+    }
+    else if (this.readyState == 4) {
+        console.log('Ready but not 200: ' + xhttp.responseText)
     }
     
  };
@@ -248,9 +253,15 @@ function ajaxGet(url, callbackFunction) {
 function updateBaseCount(xhttp) {
      info  =  JSON.parse(xhttp.responseText);
      fname = info['file_info']['file_name'];
+     console.log('Update Base Count: ' + fname);
      recCount = info['file_info']['rec_count'];
-     numChromosomes = info['file_info']['num_chromosomes']
-     if (recCount == null) {
+     numChromosomes = info['file_info']['num_chromosomes'];
+     numNotPassed = info['file_info']['summary_flag_dict']['Filtered'];
+     numUncalled = info['file_info']['summary_flag_dict']['Uncalled'];
+     numSNPs = info['file_info']['summary_flag_dict']['SNP'];
+     numINDELs = info['file_info']['summary_flag_dict']['INDEL'];
+     numHomRef = info['file_info']['summary_flag_dict']['HomRef'];
+    if (recCount == null) {
          return;
      }
 
@@ -258,12 +269,17 @@ function updateBaseCount(xhttp) {
      tr = table.getElementsByTagName("tr");
      var lineType = 'bases';
       for (i = 1; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[2];
+        td = tr[i].getElementsByTagName("td")[1];
         if (td) {
             if (td.innerHTML == fname) {
-                tdSize = tr[i].getElementsByTagName("td")[6];
-                tdFormat = tr[i].getElementsByTagName("td")[7];
-                tdChrom = tr[i].getElementsByTagName("td")[3];
+                tdSize = tr[i].getElementsByTagName("td")[4];
+                tdFormat = tr[i].getElementsByTagName("td")[5];
+                tdChrom = tr[i].getElementsByTagName("td")[2];
+                tdNotPassed = tr[i].getElementsByTagName("td")[6];
+                tdUncalled = tr[i].getElementsByTagName("td")[7];
+                tdHomRef = tr[i].getElementsByTagName("td")[8];
+                tdSNPs = tr[i].getElementsByTagName("td")[9];
+                tdINDELs = tr[i].getElementsByTagName("td")[10];
                 //alert ('size: ' + tdSize.innerHTML)
                 if (tdFormat.innerText.substring(0,3) == 'VCF') {
                     lineType = 'records';
@@ -271,11 +287,68 @@ function updateBaseCount(xhttp) {
 
                 tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
                 tdChrom.innerHTML = 'x' + numChromosomes + ' chromosomes';
+                tdNotPassed.innerHTML = '' + numNotPassed;
+                tdUncalled.innerHTML = '' + numUncalled;
+                tdHomRef.innerHTML = '' + numHomRef;
+                tdSNPs.innerHTML = '' + numSNPs;
+                tdINDELs.innerHTML = '' + numINDELs;
+
                 //alert ('fname: ' + fname +  ' i: ' + i.toString())
             }
         }    
       }  
      
 }
+
+function updateBaseCountPreProcessed(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     console.log('Update Base Count Preprocessed: ' + fname);
+     recCount = info['file_info']['rec_count'];
+     numChromosomes = info['file_info']['num_chromosomes'];
+     numNotPassed = info['file_info']['summary_flag_dict']['Filtered'];
+     numUncalled = info['file_info']['summary_flag_dict']['Uncalled'];
+     numSNPs = info['file_info']['summary_flag_dict']['SNP'];
+     numINDELs = info['file_info']['summary_flag_dict']['INDEL'];
+     numHomRef = info['file_info']['summary_flag_dict']['HomRef'];
+    if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("preprocessed_tab");
+     tr = table.getElementsByTagName("tr");
+     var lineType = 'bases';
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[3];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[6];
+                tdFormat = tr[i].getElementsByTagName("td")[7];
+                tdChrom = tr[i].getElementsByTagName("td")[4];
+                tdNotPassed = tr[i].getElementsByTagName("td")[8];
+                tdUncalled = tr[i].getElementsByTagName("td")[9];
+                tdHomRef = tr[i].getElementsByTagName("td")[10];
+                tdSNPs = tr[i].getElementsByTagName("td")[11];
+                tdINDELs = tr[i].getElementsByTagName("td")[12];
+                //alert ('size: ' + tdSize.innerHTML)
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
+                //tdChrom.innerHTML = 'x' + numChromosomes + ' chromosomes';
+                tdNotPassed.innerHTML = '' + numNotPassed;
+                tdUncalled.innerHTML = '' + numUncalled;
+                tdHomRef.innerHTML = '' + numHomRef;
+                tdSNPs.innerHTML = '' + numSNPs;
+                tdINDELs.innerHTML = '' + numINDELs;
+
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }
+      }
+
+}
+
 </script>
 {% endblock %}

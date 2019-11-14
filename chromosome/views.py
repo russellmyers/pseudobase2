@@ -90,13 +90,13 @@ def preprocess_files(request):
 
         files_info.append(file_info)
 
-    num_valid_pending_files = 0
+    num_valid_pending_preprocess_files = 0
     for f_info in files_info:
         if (f_info['format'] == 'unknown'):
             pass
         else:
-            num_valid_pending_files += 1
-    custom_data['num_valid_pending_files'] = num_valid_pending_files
+            num_valid_pending_preprocess_files += 1
+    custom_data['num_valid_pending_preprocess_files'] = num_valid_pending_preprocess_files
 
     custom_data['pending_files'] = files_info
 
@@ -155,7 +155,14 @@ def preprocess_files(request):
                 #     dir_info['indels'] = len(strain_indels_files)
             dirs_info.append(dir_info)
 
+    num_valid_preprocessed_files = 0
+    for f_info in preprocessed_files_info:
+        if (f_info['format'] == 'unknown'):
+            pass
+        else:
+            num_valid_preprocessed_files += 1
 
+    custom_data['num_valid_preprocessed_files'] = num_valid_preprocessed_files
 
     custom_data['dirs_info'] = dirs_info
 
@@ -451,12 +458,22 @@ def _delete_latest(request):
     return redirect(import_files)
  
 
-def _get_file_info(request,fname = '',pre=False):
-
+def _get_file_info(request,fname = '',pre=False, subdir='_', type='_'):
+    from os.path import join
 
     also_retrieve_chromosomes = False
     if pre:
         mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX
+        if subdir == '_':
+            pass
+        else:
+            mypath = join(mypath,subdir)
+        if type == '_' or type == 'Split':
+            pass
+        else:
+            mypath = join(mypath, type)
+
+
         also_retrieve_chromosomes = True
     else:
         mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX  #'raw_data/chromosome/pending_import/'
@@ -477,7 +494,7 @@ def _get_file_info(request,fname = '',pre=False):
 #    
 #    files_info = []
 #    for f in files:
-    from os.path import join
+
 
     
     try:
