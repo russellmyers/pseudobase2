@@ -206,6 +206,19 @@ LOGGING = {
     }
 }
 
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/raw_data/cache',
+        'TIMEOUT':None,
+        'OPTIONS':
+            {'MAX_ENTRIES':1000,
+             'CULL_FREQUENCY':5}
+
+    }
+}
+
 # Application-specific settings
 PSEUDOBASE_CHROMOSOME_DATA_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/chromosome/'
 PSEUDOBASE_RESULTS_FILENAME = 'pseudobase_results.zip'

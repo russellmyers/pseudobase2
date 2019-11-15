@@ -20,6 +20,8 @@ from django.db import connection, transaction
 from django.db.models import Q
 
 from chromosome.utils import VCFRecord
+from django.core.cache import get_cache
+import hashlib
 
 
 from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader, BatchProcess
@@ -33,6 +35,17 @@ def my_custom_sql(import_id):
     from django.db import connection, transaction
     with connection.cursor() as cursor:
         cursor.execute("UPDATE chromosome_chromosomebatchimportlog SET records_read = 42 WHERE id = %s", [import_id])
+
+
+def hashfile(path, blocksize = 65536):
+    afile = open(path, 'rb')
+    hasher = hashlib.md5()
+    buf = afile.read(blocksize)
+    while len(buf) > 0:
+        hasher.update(buf)
+        buf = afile.read(blocksize)
+    afile.close()
+    return hasher.hexdigest()
 
 
 
@@ -757,6 +770,25 @@ class ChromosomeVCFImportFileReader():
         rec_num = 0
         tot_summary_flags = [0 for i in range(len(VCFRecord.vcf_types))]
 
+        def_cache = get_cache('default')
+        hash_key = hashfile(self.fPath)
+
+        hash_record = def_cache.get(hash_key)
+        if hash_record is None:
+            pass # No cached record found
+        else:
+            rec_num = hash_record['num_records']
+            if also_retrieve_chromosomes:
+                if ('summary_flags_dict' in hash_record) and ('chromosomes' in hash_record):
+                    self.summary_flag_dict = hash_record['summary_flags_dict']
+                    self.chromosomes = hash_record['chromosomes']
+                    return rec_num
+                else:
+                    pass
+            else:
+                return rec_num
+
+
         vcf_file = gzip.open(self.fPath, 'r')
         for line in vcf_file:
             #i+=1
@@ -778,8 +810,14 @@ class ChromosomeVCFImportFileReader():
                     record_summary_flags = v.summary_flags()
                     tot_summary_flags = [prev_tot + record_summary_flags[i] for i, prev_tot in enumerate(tot_summary_flags)]
 
+        hash_record = {'num_records':rec_num}
+
         if also_retrieve_chromosomes:
             self.summary_flag_dict = VCFRecord.tot_summary_flags_to_meta_data(tot_summary_flags)
+            hash_record['summary_flags_dict'] = self.summary_flag_dict
+            hash_record['chromosomes'] = self.chromosomes
+
+        def_cache.set(hash_key, hash_record,604800)
 
         vcf_file.close()
 

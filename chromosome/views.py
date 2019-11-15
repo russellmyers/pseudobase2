@@ -107,27 +107,31 @@ def preprocess_files(request):
     dirs_info = []
 
     preprocessed_files_info = []
+    split_files_info = []
+    filtered_files_info = []
+    indel_files_info = []
+
     for d in directories:
         if d[:1] == 'D':
             dir_info = {}
             dir_info['strain'] = d
 
             strain_dir = join(mypath,d)
-            strain_files = [f for f in listdir(strain_dir) if isfile(join(strain_dir,f))]
-
-            for f in strain_files:
-                c_importer = ChromosomeImporter(join(strain_dir, f))
-                preprocessed_file_info = c_importer.get_info(incl_rec_count=False)
-
-                if 'file_size' in preprocessed_file_info:
-                    preprocessed_file_info['file_size_MB'] = "%.2fMB" % preprocessed_file_info['file_size']
-
-                preprocessed_file_info['strain'] = d
-                preprocessed_file_info['type'] = 'Split'
-                preprocessed_files_info.append(preprocessed_file_info)
+            # strain_files = [f for f in listdir(strain_dir) if isfile(join(strain_dir,f))]
+            #
+            # for f in strain_files:
+            #     c_importer = ChromosomeImporter(join(strain_dir, f))
+            #     preprocessed_file_info = c_importer.get_info(incl_rec_count=False)
+            #
+            #     if 'file_size' in preprocessed_file_info:
+            #         preprocessed_file_info['file_size_MB'] = "%.2fMB" % preprocessed_file_info['file_size']
+            #
+            #     preprocessed_file_info['strain'] = d
+            #     preprocessed_file_info['type'] = 'Split'
+            #     preprocessed_files_info.append(preprocessed_file_info)
 
             strain_subdirectories = [d_sub for d_sub in listdir(strain_dir) if not isfile(join(strain_dir, d_sub))]
-            dir_info['split'] = len(strain_files)
+            #dir_info['split'] = len(strain_files)
 
             for sub_dir in strain_subdirectories:
                 strain_subdir = join(strain_dir, sub_dir)
@@ -143,7 +147,13 @@ def preprocess_files(request):
 
                     preprocessed_file_info['strain'] = d
                     preprocessed_file_info['type'] = sub_dir
-                    preprocessed_files_info.append(preprocessed_file_info)
+                    if sub_dir == 'split':
+                       split_files_info.append(preprocessed_file_info)
+                    elif sub_dir == 'filtered':
+                       filtered_files_info.append(preprocessed_file_info)
+                    else:
+                        indel_files_info.append(preprocessed_file_info)
+                    #preprocessed_files_info.append(preprocessed_file_info)
                 # if sub_dir == 'filtered':
                 #     strain_filtered_dir = join(strain_dir,sub_dir)
                 #     strain_filtered_files = [f for f in listdir(strain_filtered_dir) if isfile(join(strain_filtered_dir, f))]
@@ -155,18 +165,41 @@ def preprocess_files(request):
                 #     dir_info['indels'] = len(strain_indels_files)
             dirs_info.append(dir_info)
 
-    num_valid_preprocessed_files = 0
-    for f_info in preprocessed_files_info:
+    num_valid_split_files = 0
+    for f_info in split_files_info:
         if (f_info['format'] == 'unknown'):
             pass
         else:
-            num_valid_preprocessed_files += 1
+            num_valid_split_files += 1
 
-    custom_data['num_valid_preprocessed_files'] = num_valid_preprocessed_files
+    custom_data['num_valid_split_files'] = num_valid_split_files
+
+    num_valid_filtered_files = 0
+    for f_info in filtered_files_info:
+        if (f_info['format'] == 'unknown'):
+            pass
+        else:
+            num_valid_filtered_files += 1
+
+    custom_data['num_valid_filtered_files'] = num_valid_filtered_files
+
+    num_valid_indel_files = 0
+    for f_info in indel_files_info:
+        if (f_info['format'] == 'unknown'):
+            pass
+        else:
+            num_valid_indel_files += 1
+
+    custom_data['num_valid_indel_files'] = num_valid_indel_files
+
 
     custom_data['dirs_info'] = dirs_info
 
-    custom_data['preprocessed_files'] = preprocessed_files_info
+    #custom_data['preprocessed_files'] = preprocessed_files_info
+    custom_data['split_files'] = split_files_info
+    custom_data['filtered_files'] = filtered_files_info
+    custom_data['indel_files'] = indel_files_info
+
 
     return render_to_response('preprocess.html', custom_data,
                               context_instance=RequestContext(request))
@@ -468,7 +501,7 @@ def _get_file_info(request,fname = '',pre=False, subdir='_', type='_'):
             pass
         else:
             mypath = join(mypath,subdir)
-        if type == '_' or type == 'Split':
+        if type == '_':
             pass
         else:
             mypath = join(mypath, type)
