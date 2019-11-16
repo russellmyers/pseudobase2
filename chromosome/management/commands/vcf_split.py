@@ -64,6 +64,8 @@ class Command(BaseCommand):
             file_path = os.path.join(file_path,'filtered')
         elif indels:
             file_path = os.path.join(file_path, 'indels')
+        else:
+            file_path = os.path.join(file_path, 'split')
 
         if not os.path.exists(file_path):
             os.makedirs(file_path)
