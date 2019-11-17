@@ -771,7 +771,8 @@ class ChromosomeVCFImportFileReader():
         tot_summary_flags = [0 for i in range(len(VCFRecord.vcf_types))]
 
         def_cache = get_cache('default')
-        hash_key = hashfile(self.fPath)
+        #hash_key = hashfile(self.fPath)
+        hash_key = str(self.fPath) + '_' + str(os.path.getmtime(self.fPath))
 
         hash_record = def_cache.get(hash_key)
         if hash_record is None:
