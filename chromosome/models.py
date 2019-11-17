@@ -37,7 +37,7 @@ def my_custom_sql(import_id):
         cursor.execute("UPDATE chromosome_chromosomebatchimportlog SET records_read = 42 WHERE id = %s", [import_id])
 
 
-def hashfile(path, blocksize = 65536):
+def hashfile(path, blocksize = 1048576): # 1MB  #65536):
     afile = open(path, 'rb')
     hasher = hashlib.md5()
     buf = afile.read(blocksize)
