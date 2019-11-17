@@ -930,6 +930,8 @@ class ChromosomeImporter():
                     chrom,strain_symbol = vcf_reader.get_chrom_and_strain()
 
                     release_name = ' '
+                    ref_exists = ' '
+
                     if strain_symbol is None:
                         pass
                     else:
@@ -946,6 +948,11 @@ class ChromosomeImporter():
                     summary_flag_dict = {}
                     num_chromosomes = 0
 
+                    if release_name == ' ':
+                        release_name_formatted = 'unknown'
+                    else:
+                        release_name_formatted = release_name
+
                     if incl_rec_count:
                         rec_count = vcf_reader.get_num_records(also_retrieve_chromosomes=incl_all_chromosomes)
                         if incl_all_chromosomes:
@@ -957,12 +964,13 @@ class ChromosomeImporter():
                             bases_count = 0
                         else:
                             bases_count = len(ref_bases)
+                            ref_exists = 'Y'
                     if chrom is None or strain_symbol is None:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
                             'format': 'Unknown','rec_count':rec_count, 'bases_count':bases_count}
                     else:
                         return {'file_name': self.chromosome_data_fname, 'file_size': file_size / 1000000.0,
-                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'rec_count':rec_count, 'bases_count':bases_count,'chromosome_names':chromosome_names,'num_chromosomes':len(chromosome_names),'summary_flag_dict':summary_flag_dict}
+                            'format': 'VCF gzipped','chromosome_name':chrom,'strain_name':strain_symbol,'release_name':release_name_formatted,'ref_exists':ref_exists,'rec_count':rec_count, 'bases_count':bases_count,'chromosome_names':chromosome_names,'num_chromosomes':len(chromosome_names),'summary_flag_dict':summary_flag_dict}
 
 
 
