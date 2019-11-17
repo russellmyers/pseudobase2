@@ -810,6 +810,8 @@ class ChromosomeVCFImportFileReader():
                     v = VCFRecord(line)
                     record_summary_flags = v.summary_flags()
                     tot_summary_flags = [prev_tot + record_summary_flags[i] for i, prev_tot in enumerate(tot_summary_flags)]
+            else:
+                rec_num +=1
 
         hash_record = {'num_records':rec_num}
 
