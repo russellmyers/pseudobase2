@@ -88,7 +88,10 @@ def preprocess_files(request):
         if 'file_size' in file_info:
             file_info['file_size_MB'] = "%.2fMB" % file_info['file_size']
 
-        files_info.append(file_info)
+        if file_info['format'] == 'unknown':
+            pass
+        else:
+            files_info.append(file_info)
 
     num_valid_pending_preprocess_files = 0
     for f_info in files_info:
