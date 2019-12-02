@@ -85,6 +85,8 @@ def assemble_jbrowse_chromosome_query_data(request):
         vcf_tracks = [x + '_VCF' for x in custom_data['species']]
         custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
 
+        custom_data['jbrowse_location'] = settings.JBROWSE_LOCATION
+
     return custom_data
 
 def assemble_jbrowse_gene_query_data(request):

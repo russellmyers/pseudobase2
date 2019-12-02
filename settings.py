@@ -24,7 +24,7 @@ DATABASES = {
     'ENGINE': 'django.db.backends.mysql',
     'NAME': 'pseudobase',
     'USER': 'root',
-    'PASSW  ORD': '',
+    'PASSWORD': '',
   }
 }
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -233,3 +233,5 @@ PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX = os.path.join(PSEUDOBASE_RAW_DATA_PRE
 
 CURRENT_FLYBASE_RELEASE_VERSION = 'r3.04'
 ORIGINAL_RELEASE_VERSION = 'pse1'
+
+JBROWSE_LOCATION = 'https://pseudotest.a2hosted.com/jb/?data=ps_data'
