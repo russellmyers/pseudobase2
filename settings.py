@@ -235,3 +235,4 @@ CURRENT_FLYBASE_RELEASE_VERSION = 'r3.04'
 ORIGINAL_RELEASE_VERSION = 'pse1'
 
 JBROWSE_LOCATION = 'https://pseudotest.a2hosted.com/jb/?data=ps_data'
+JBROWSE_REL_LOCATION = 'jb/?data=ps_data'
