@@ -114,6 +114,8 @@ def assemble_jbrowse_gene_query_data(request):
             custom_data['pos_to'] = int(gene.end_position)
             vcf_tracks = [x + '_VCF' for x in custom_data['species']]
             custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
+            custom_data['jbrowse_location'] = settings.JBROWSE_LOCATION
+            custom_data['jbrowse_rel_location'] = settings.JBROWSE_REL_LOCATION
         except:
             pass
 
