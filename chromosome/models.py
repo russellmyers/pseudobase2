@@ -81,7 +81,20 @@ class ChromosomeBase(models.Model):
         return '%s %s %s' % (rel, self.chromosome, self.strain.name)
 
 
-  
+    def missing_data(self):
+        """ Check if file_tag is empty, or data file referenced by file_tag is missing"""
+        if (self.file_tag is None) or (self.file_tag == ''):
+            return True
+
+
+        try:
+            f = open(self.data_file_path)
+            f.close()
+        except:
+            return True
+
+        return False
+
     def has_insertions(self,stAbs,endAbs):
         #check if selected region has inserts, ie at least one position with > 1 base
         #Note: returns false if selected region is out of bounds
@@ -305,6 +318,10 @@ class ChromosomeBase(models.Model):
           '%s..%s' % (start_position, end_position)))
 
     def get_all_bases(self):
+
+        if self.missing_data():
+            return None
+
         bases = self._base_data(self.start_position-1, self.end_position)
         return bases
 
@@ -499,14 +516,22 @@ class ChromosomeBase(models.Model):
             pass
         else:
             for c in chromosomes:
-                bases_per_position.append(c.get_bases_per_position(start, end))
+                if c.missing_data():
+                    print ('Missing chromosomebase data: ',c)
+                    pass
+                else:
+                    bases_per_position.append(c.get_bases_per_position(start, end))
             max_bases = ChromosomeBase.max_num_bases_per_position(bases_per_position)
     
         for c in chromosomes:
-            if (len(chromosomes) < 2) or (not show_aligned):
-                yield (c.fasta_header(start, end), c.fasta_bases(start, end))
+            if c.missing_data():
+                print ('Missing chromosomebase data: ', c)
+                pass
             else:
-                yield (c.fasta_header(start, end), c.fasta_bases_formatted(start, end,max_bases))
+                if (len(chromosomes) < 2) or (not show_aligned):
+                    yield (c.fasta_header(start, end), c.fasta_bases(start, end))
+                else:
+                    yield (c.fasta_header(start, end), c.fasta_bases_formatted(start, end,max_bases))
   
     @staticmethod
     def generate_file_tag():

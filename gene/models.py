@@ -301,7 +301,15 @@ class MRNA(models.Model):
 
     def bases_for_strain(self,strain):
         bases_list = []
-        cb = ChromosomeBase.objects.get(strain=strain,chromosome=self.gene.chromosome)
+        try:
+            cb = ChromosomeBase.objects.get(strain=strain,chromosome=self.gene.chromosome)
+            if cb.missing_data():
+                print('Missing chromosome base data for strain: ',strain, ' chromosome: ',self.gene.chromosome)
+                return ''
+        except:
+            print('Missing chromosome bases for strain: ',strain, ' chromosome: ',self.gene.chromosome)
+            return ''
+
         for cds_range in self.cds_list():
             cds_bases = cb.fasta_bases(cds_range[0],cds_range[1])
             bases_list.extend(cds_bases)
@@ -313,8 +321,18 @@ class MRNA(models.Model):
             return bases
 
     def base_positions_for_strain(self,strain):
-        cb = ChromosomeBase.objects.get(strain=strain, chromosome=self.gene.chromosome)
+
         strain_bases_per_position = []
+        try:
+             cb = ChromosomeBase.objects.get(strain=strain, chromosome=self.gene.chromosome)
+             if cb.missing_data():
+                print('Missing chromosome base data for strain: ',strain, ' chromosome: ',self.gene.chromosome)
+                return strain_bases_per_position
+        except:
+            print('Missing chromosome bases for strain: ',strain, ' chromosome: ',self.gene.chromosome)
+            return strain_bases_per_position
+
+
         for cds_range in self.cds_list():
             strain_bases_per_position.extend(cb.get_bases_per_position(cds_range[0], cds_range[1]))
         return strain_bases_per_position
