@@ -132,6 +132,8 @@ def assemble_general_browse_query_data():
             custom_data['species'].append(strain_symbol.symbol)
     vcf_tracks = [x + '_VCF' for x in custom_data['species']]
     custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
+    custom_data['jbrowse_location'] = settings.JBROWSE_LOCATION
+    custom_data['jbrowse_rel_location'] = settings.JBROWSE_REL_LOCATION
     return custom_data
 
 
