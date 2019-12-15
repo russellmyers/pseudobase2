@@ -207,11 +207,12 @@ class Command(BaseCommand):
               django.utils.timezone.now() + datetime.timedelta(days=7))
             request.stop()
             request.save()
-        except Exception:
+        except Exception as e:
             request.stop(batch_status='F')
             request.batch_start = None
             request.batch_end = None
             request.save()
+            print('Gene batch failed. Request delivery tag: ',request.delivery_tag,'error: ',e)
             raise
            
     def handle(self, **options):
