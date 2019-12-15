@@ -27,6 +27,7 @@ from django.db import connection, transaction
 from django.template.loader import render_to_string
 
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
+from common.models import Species
 
 
 class Command(BaseCommand):
@@ -117,6 +118,7 @@ class Command(BaseCommand):
   
             # Get the species to process.
             gene_species = request.original_species.split(',')
+            gene_species = [Species.objects.get(id=pk) for pk in gene_species]
   
             # Get the list (actually a generator) of gene symbols to process.
             gene_symbols = (g_s.strip() for g_s in \

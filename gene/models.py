@@ -182,11 +182,11 @@ class Gene(models.Model):
 
 
         #Old Method - check for original release (pse1) formatted genes
-        genes = Gene.objects.filter(strain__species__pk__in=species).filter(
-          import_code__in=n_symbols, strain__release__name=settings.ORIGINAL_RELEASE_VERSION).order_by('-strain__is_reference',
-            'strain__species__id', 'strain__name')
-        for g in genes:
-            yield (g.fasta_header(), g.fasta_bases())
+        # genes = Gene.objects.filter(strain__species__pk__in=species).filter(
+        #   import_code__in=n_symbols, strain__release__name=settings.ORIGINAL_RELEASE_VERSION).order_by('-strain__is_reference',
+        #     'strain__species__id', 'strain__name')
+        # for g in genes:
+        #     yield (g.fasta_header(), g.fasta_bases())
 
 
         #New method Flybase release r3.04 onwards
