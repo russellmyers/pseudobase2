@@ -58,6 +58,19 @@ class ChromosomeBaseManager(models.Manager):
         except:
             return None
 
+    def get_all_chromosomebases_for_strain(self,strain_symbol):
+        try:
+            strain = StrainSymbol.objects.get(symbol=strain_symbol).strain
+            chromosomebases = self.filter(strain=strain)
+            return chromosomebases
+        except:
+            return []
+
+    def get_all_filetags_for_strain(self,strain_symbol):
+        cbs = self.get_all_chromosomebases_for_strain(strain_symbol)
+        file_tags = [cb.file_tag for cb in cbs]
+        return file_tags
+
 
 class ChromosomeBase(models.Model):
     '''Sequence Data and metadata about a particular chromosome.'''
