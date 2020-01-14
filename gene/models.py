@@ -199,8 +199,12 @@ class Gene(models.Model):
                     '-strain__is_reference',
                     'strain__species__id', 'strain__name')
                 cb = ChromosomeBase.objects.get(strain=strain, chromosome=genes[0].chromosome)
-                strains.append(strain)
+                if cb.missing_data():
+                    print('Missing chromosomebase data for strain: ',strain)
+                else:
+                    strains.append(strain)
             except:
+                print('Missing chromosomebase record for strain: ',strain)
                 pass # Only process strain if chromosomebase data actually exists
 
 
