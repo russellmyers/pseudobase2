@@ -29,7 +29,6 @@ from django.template.loader import render_to_string
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
 from common.models import Species
 
-from django.contrib.sites.models import RequestSite
 
 
 class Command(BaseCommand):
@@ -186,7 +185,7 @@ class Command(BaseCommand):
                   'batch request:\n\n%s' % '\n'.join(report_text))
   
             # Email the user with a notice that their package is ready.
-            full_delivery_url = request.full_delivery_url(site=RequestSite(request).domain)
+            full_delivery_url = request.full_delivery_url(site=settings.ALLOWED_HOSTS[0])
             email = EmailMessage(
               'Pseudobase: Your batch gene results are now available',
               'The results of your batch gene request are now ready to be '
