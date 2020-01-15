@@ -16,7 +16,7 @@ ADMINS = (
 
 MANAGERS = (
   ('Django Admin', 'django@biology.duke.edu'),
-  ('Mohamed Noor', 'noor@duke.edu'),
+  ('Russell dev', 'flipside@netspace.net.au'),
 )
 
 DATABASES = {
