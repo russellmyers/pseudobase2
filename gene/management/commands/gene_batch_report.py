@@ -9,9 +9,10 @@ report was run.  This should ideally be run from cron.
 import textwrap
 
 import django.utils.timezone
-from django.core.mail import mail_managers
+from django.core.mail import mail_managers,  EmailMessage
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
+from django.conf import settings
 
 from gene.models import GeneBatchProcess
 
@@ -55,11 +56,22 @@ class Command(BaseCommand):
             report_lines = self._generate_report()
             if report_lines:
                 date_report = django.utils.timezone.now()
-                mail_managers(      
-                  'Pseudobase report: Batch gene requests - %s' % (
-                    date_report.date()),
-                  'The following batch gene requests were submitted since '
-                  'the last report:\n\n%s\n' % '\n'.join(report_lines))
+                # mail_managers(
+                #   'Pseudobase report: Batch gene requests - %s' % (
+                #     date_report.date()),
+                #   'The following batch gene requests were submitted since '
+                #   'the last report:\n\n%s\n' % '\n'.join(report_lines))
+                email = EmailMessage(
+                    'Pseudobase report: Batch gene requests - %s' % (
+                        date_report.date()),
+                    'The following batch gene requests were submitted since '
+                    'the last report:\n\n%s\n' % '\n'.join(report_lines),
+                    'django @ biology.duke.edu',
+                    [address for name, address in settings.MANAGERS],
+                    []
+                )
+                email.send(fail_silently=False)
+
         except:
             transaction.rollback()
             transaction.leave_transaction_management()

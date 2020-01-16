@@ -489,6 +489,10 @@ class GeneBatchProcess(BatchProcess):
     total_symbols = models.PositiveIntegerField(null=True)
     failed_symbols = models.PositiveIntegerField(null=True)
 
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return '%s, %s, %s' % (self.submitted_at,self.submitter_email,self.batch_status)
+
     @staticmethod
     def generate_unique_tag():
         '''Return a unique tag used for delivery of "batch gene" results.'''
