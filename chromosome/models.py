@@ -375,6 +375,7 @@ class ChromosomeBase(models.Model):
             else:    
                 bases = self._base_data(self._position_offset(start_position_clipped),
                   self._position_offset(end_position_clipped))
+                bases = bases.replace('-','') # strip deletion chars
                 bases = self.pad(start_position,start_position_clipped) \
                         + bases  \
                         + self.pad(end_position_clipped,end_position)
@@ -394,7 +395,7 @@ class ChromosomeBase(models.Model):
                 return bases
 
     def fasta_bases_formatted(self, start_position, end_position, max_bases=None,wrapped=True):
-        #re-Formatted version of fasta bases - cater for aligning insertions
+        #re-Formatted version of fasta bases - cater for aligning insertions/deletions
         
         if start_position > self.end_position:
            return self.wrap_data('No data beyond base %s available for this strain' % (str(self.end_position)))
