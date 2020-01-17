@@ -148,6 +148,7 @@ def _submit_new_gene_batch(request, form):
     gene_batch.submitter_email = email
     gene_batch.original_request = ''.join(symbols)
     gene_batch.delivery_tag = GeneBatchProcess.generate_unique_tag()
+    gene_batch.show_aligned = form.cleaned_data['show_aligned']
     gene_batch.save()
   
     custom_data = {}  

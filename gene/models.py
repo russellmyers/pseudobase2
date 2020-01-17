@@ -486,6 +486,7 @@ class GeneBatchProcess(BatchProcess):
     '''Metadata about the processing of a "batch gene" request.'''
     original_species = models.CharField(max_length=255)
     original_request = models.TextField()
+    show_aligned = models.BooleanField(default=False)
     total_symbols = models.PositiveIntegerField(null=True)
     failed_symbols = models.PositiveIntegerField(null=True)
 

@@ -120,7 +120,9 @@ class Command(BaseCommand):
             # Get the species to process.
             gene_species = request.original_species.split(',')
             gene_species = [Species.objects.get(id=pk) for pk in gene_species]
-  
+
+            show_aligned = request.show_aligned
+
             # Get the list (actually a generator) of gene symbols to process.
             gene_symbols = (g_s.strip() for g_s in \
               request.original_request.split('\n'))
@@ -133,7 +135,7 @@ class Command(BaseCommand):
                 try:
                     fasta_output = []
                     for h, b in Gene.multi_gene_fasta(gene_symbol, 
-                      gene_species):
+                      gene_species,show_aligned=show_aligned):
                         fasta_output.append(h)
                         fasta_output.append('\r\n'.join(b))
                         
