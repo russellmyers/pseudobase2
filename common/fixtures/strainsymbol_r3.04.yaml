@@ -117,3 +117,6 @@
     model: common.strainsymbol
     pk: 21
 
+-   fields: {symbol: 'lowei', strain: 21}
+    model: common.strainsymbol
+    pk: 22

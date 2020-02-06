@@ -37,6 +37,7 @@ static/css/base_LOCAL_7584.css
 static/css/base_REMOTE_7584.css
 media/Pseudobase_chromosome_test_results.pptx
 media/pseudobase_update_toolkit.xlsx
+common/templates/admin/
 *.bat
 *.pyc
 *.pptx

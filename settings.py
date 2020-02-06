@@ -22,7 +22,7 @@ MANAGERS = (
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'pseudobase',
+    'NAME':  'pse2_test', #'pseudobase',
     'USER': 'root',
     'PASSWORD': '',
   }
@@ -69,7 +69,7 @@ USE_TZ = True
 # Absolute filesystem path to the directory that will hold user-uploaded 
 # files.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/media/'
+MEDIA_ROOT = 'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -80,14 +80,14 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/staticfiles/'
+STATIC_ROOT = 'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/staticfiles/'
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
 # Additional locations of static files.
 STATICFILES_DIRS = (
-  'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/static/',
+  'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -127,7 +127,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
   # Always use forward slashes, even on Windows.
   # Don't forget to use absolute paths, not relative paths.
-  'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/templates',
+  'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/templates',
 )
 
 INSTALLED_APPS = (
@@ -187,7 +187,7 @@ LOGGING = {
         'logfile': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': "C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2" + "/rbm_logfile.log",
+            'filename': "C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2" + "/rbm_logfile.log",
             'maxBytes': 50000,
             'backupCount': 2,
             #'formatter': 'simple',
@@ -210,7 +210,7 @@ LOGGING = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/raw_data/cache',
+        'LOCATION': 'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/raw_data/cache',
         'TIMEOUT':None,
         'OPTIONS':
             {'MAX_ENTRIES':1000,
@@ -220,10 +220,10 @@ CACHES = {
 }
 
 # Application-specific settings
-PSEUDOBASE_CHROMOSOME_DATA_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/chromosome/'
+PSEUDOBASE_CHROMOSOME_DATA_ROOT = 'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/chromosome/'
 PSEUDOBASE_RESULTS_FILENAME = 'pseudobase_results.zip'
 PSEUDOBASE_RESULTS_PREFIX = '/delivery/'
-PSEUDOBASE_DELIVERY_ROOT = 'C:/NewOneDrive/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/delivery/'
+PSEUDOBASE_DELIVERY_ROOT = 'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/project_data/pseudobase/delivery/'
 
 PSEUDOBASE_RAW_DATA_PREFIX = 'raw_data/'
 PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX = os.path.join(PSEUDOBASE_RAW_DATA_PREFIX,'chromosome/')
