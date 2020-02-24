@@ -154,7 +154,7 @@ class VCFRecord:
         if '/' in gen_info:
             split_char = '/'
         else:
-            split_char = '|'
+            split_char = '|' #can also be found as delimiter in vcf file
         self.gens = [None if x == '.' else int(x) for x in strain_info_list[self.gen_ind].split(split_char)]
         self.ads = [int(x) for x in strain_info_list[self.ad_ind].split(',')]
 
