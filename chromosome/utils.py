@@ -151,11 +151,16 @@ class VCFRecord:
 
         strain_info_list = self.SAMPLE.split(':')
         gen_info = strain_info_list[self.gen_ind]
+
         if '/' in gen_info:
             split_char = '/'
-        else:
+            self.gens = [None if x == '.' else int(x) for x in strain_info_list[self.gen_ind].split(split_char)]
+        elif '|' in gen_info:
             split_char = '|' #can also be found as delimiter in vcf file
-        self.gens = [None if x == '.' else int(x) for x in strain_info_list[self.gen_ind].split(split_char)]
+            self.gens = [None if x == '.' else int(x) for x in strain_info_list[self.gen_ind].split(split_char)]
+        else:
+            self.gens = [None, None]
+
         self.ads = [int(x) for x in strain_info_list[self.ad_ind].split(',')]
 
     def parse_gens(self):
@@ -163,7 +168,7 @@ class VCFRecord:
             self.gen_1 = self.gens[0]
             self.gen_2 = self.gens[1]
         except:
-            print('gens is not a list: ', self.gens)
+            print('gens is not a list: ', self.gens, self.SAMPLE, self.FORMAT, self.line)
             raise
 
     def passed_filter(self):
@@ -238,9 +243,13 @@ class VCFRecord:
         sample_data = self.SAMPLE.split(':')
         if '/' in sample_data[0]:
             split_char = '/'
-        else:
+            sample_alts = sample_data[0].split(split_char)
+        elif '|' in sample_data[0]:
             split_char = '|'
-        sample_alts = sample_data[0].split(split_char)
+            sample_alts = sample_data[0].split(split_char)
+        else:
+            return None,None
+
         if len(sample_alts) != 2:
             return None,None
 
