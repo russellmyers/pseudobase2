@@ -150,7 +150,12 @@ class VCFRecord:
         self.ad_ind = format_types.index('AD')
 
         strain_info_list = self.SAMPLE.split(':')
-        self.gens = [None if x == '.' else int(x) for x in strain_info_list[self.gen_ind].split('/')]
+        gen_info = strain_info_list[self.gen_ind]
+        if '/' in gen_info:
+            split_char = '/'
+        else:
+            split_char = '|'
+        self.gens = [None if x == '.' else int(x) for x in strain_info_list[self.gen_ind].split(split_char)]
         self.ads = [int(x) for x in strain_info_list[self.ad_ind].split(',')]
 
     def parse_gens(self):
@@ -231,7 +236,11 @@ class VCFRecord:
     def simplify_alts(self):
 
         sample_data = self.SAMPLE.split(':')
-        sample_alts = sample_data[0].split('/')
+        if '/' in sample_data[0]:
+            split_char = '/'
+        else:
+            split_char = '|'
+        sample_alts = sample_data[0].split(split_char)
         if len(sample_alts) != 2:
             return None,None
 

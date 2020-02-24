@@ -9,6 +9,7 @@ parser.add_argument("file_name",help="trackList json file")
 parser.add_argument("strain_from",help="strain to copy from")
 parser.add_argument("strain_symbol_to",help="strain symbol to")
 parser.add_argument("strain_name_to",help="strain name to")
+parser.add_argument("-v",type=int,default=0,dest="verbose",help="Verbose output")
 
 
 args = parser.parse_args()
@@ -18,7 +19,8 @@ with open(args.file_name,"r+") as f:
     data_in = json.load(f)
 
 for i,track in enumerate(data_in['tracks']):
-    print(track)
+    if args.verbose > 1:
+         print(track)
 
 data_out = copy.deepcopy(data_in)
 
@@ -35,12 +37,14 @@ def find_source_track(data,source_type='filtered'):
             spl2 = spl[0].split('strain')
             if len(spl2) > 1:
                 sym = spl2[1]
-                print('sym is: ',sym, 'for: ',templ)
+                if args.verbose > 1:
+                    print('sym is: ',sym, 'for: ',templ)
             else:
                 print('cant find symbol for: ',templ)
                 continue
             if sym == args.strain_from:
-                print('aha!!: ',sym)
+                if args.verbose > 0:
+                  print('aha!!: ',sym)
                 insert_point = i+1
                 copy_from = track
                 break
@@ -59,6 +63,7 @@ def copy_track(data,copy_from,insert_point,source_type='filtered'):
             new_track[el] = copy_from[el]
 
     data['tracks'].insert(insert_point, new_track)
+    print('track inserted: ',new_track)
 
 
 copy_from_filtered,insert_point_filtered = find_source_track(data_in)
@@ -78,7 +83,8 @@ else:
 
 
 for track in data_out['tracks']:
-    print(track)
+    if args.verbose > 1:
+        print(track)
 
 with open(args.file_name, 'w') as f:
     json.dump(data_out,f,indent=4)

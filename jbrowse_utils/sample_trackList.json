@@ -46,6 +46,86 @@
         {
             "category": "VCF r304/D. pseudoobscura", 
             "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
             "key": "Mao Tse Tung strain", 
             "label": "MAO90_VCF", 
             "urlTemplate": "seq/vcf/Dpse_strainMAO90/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO90_filtered.vcf.gz", 
@@ -161,6 +241,86 @@
             "key": "Mao Tse Tung strain", 
             "label": "MAO90_VCF", 
             "urlTemplate": "seq/vcf/Dpse_strainMAO90/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO90_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
             "type": "JBrowse/View/Track/HTMLVariants"
         }, 
         {
