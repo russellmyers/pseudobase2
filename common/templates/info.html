@@ -26,61 +26,74 @@
 </div>   
 <div class="col-md-10 border border-primary" style="background-color:white";>    
     <h4 class="mt-2">Lines available (not all lines available for all queries)</h4>
-    <div class = "card-columns mt-4">  
+    <div class = "card-columns mt-4">
         {% for species in species_tab %}
-            <div class = "card">
-              <div class = "card-header bg-info">
-               <h5 class="card-title"><b><i>{{ species.name }}</i></b></h5>
-               <h6 class = "card-subtitle mb-2 text-muted">{{ species.num_lines }}
-                   {% if species.num_lines == 1 %}
-                      line
-                   {% else %}   
-                      lines
-                   {% endif %}   
-               </h6>
-              </div>
-                 <!--ul class="list-unstyled"-->
-                 <div class = "list-group">
-                     {% for line in species.lines %}
 
-                            <div class = "list-group-item">
-                                <!--li class="text-left"-->
-                                <span class = "font-weight-bold">{{ line.name }}</span>
-                                {%  if line.formatted_year != '' %}
-                                        <br>
-                                        <span class = "small">
-                                        {{  line.formatted_year }}
-                                        </span>
+                <div class = "card">
+                  <div class = "card-header bg-info">
+                   <h5 class="card-title"><b><i>{{ species.name }}</i></b></h5>
+                   <h6 class = "card-subtitle mb-2 text-muted">{{ species.num_lines }}
+                       {% if species.num_lines == 1 %}
+                          line
+                       {% else %}
+                          lines
+                       {% endif %}
+                   </h6>
+                  </div>
+                     <!--ul class="list-unstyled"-->
+                     <div class = "list-group">
+                         {% for line in species.lines %}
 
-                                {%  endif %}
-                           {%  if line.formatted_info_dict %}
-                                        <br>
-                                        <span class = "small">
-                                        {%  for key,values in line.formatted_info_dict.items %}
-                                         {{  key }} : {{  values }}
-                                        {%  endfor %}
-                                        </span>
+                                <div class = "list-group-item">
+                                    <!--li class="text-left"-->
+                                    <span class = "font-weight-bold">{{ line.name }}</span>
+                                    {%  if line.formatted_year != '' %}
+                                            <br>
+                                            <span class = "small">
+                                            {{  line.formatted_year }}
+                                            </span>
 
-                                {%  endif %}
+                                    {%  endif %}
+                               {%  if line.formatted_info_dict %}
+                                            <br>
+                                            <span class = "small">
+                                            {%  for key,values in line.formatted_info_dict.items %}
+                                             {{  key }} : {{  values }}
+                                            {%  endfor %}
+                                            </span>
 
-                            </div>
+                                    {%  endif %}
 
-                     {% endfor %}
-                 </div>
+                                </div>
 
-            </div>    
+                         {% endfor %}
+                     </div>
+
+                </div>
+
         {% endfor %}   
     </div>     
     
     
     <p>
-    <h4>Sequencing Information</h4></p>
-    <p>
-    For each line, DNA from 15-20 virgin female inbred flies was extracted using the GentraSystems PureGene DNA preparation and sequenced with Illumina Genome Analyzer IIx at The University of North Carolina-Chapel Hill High Throughput Sequencing Facility. Illumina reads were aligned to the <i>Drosophila pseudoobscura</i> reference genome v2.9 using bwa-0.5.5 (default alignment settings were used except the maximum number of gap extensions was set to 4). Consensus assemblies for each resequenced line were generated using the bwa alignments and Samtools 0.1.6 pileup. Default pileup settings were used except the theta parameter (error dependency coefficient) in the maq consensus calling model was set to 0.9, and the number of haplotypes in the sample was set to one because each resequenced line was inbred.
-    </p>
-    <p>
-        The raw traces used to generate the alignments here are available from the NIH NCBI Short Read Archive under accession SRP007802. Additional related sequences are available under PRJNA277849.
-    </p>
+    <h4>Sequencing Information and Variant Calling</h4>
+<p class="text-left">
+    Raw sequencing data and associated details are available on the NCBI Short Read Archive under the sample accessions provided above. The pipeline used for genome alignment and variant calling is available on GitHub (<a href="https://github.com/kkorunes/PseudobaseScripts">https://github.com/kkorunes/PseudobaseScripts</a>). <br>
+    In summary, we first used BWA-0.7.17 (Li & Durbin 2009) to align all sequences to the D. pseudoobscura genome assembly, obtained from FlyBase (Dpse_3.04: GCA_000001765.2; Thurmond et al. 2019). We used Picard to mark adapters and duplicates that might introduce bias from data generation steps such as PCR amplification (<a href="http://broadinstitute.github.io/picard/">http://broadinstitute.github.io/picard/</a>). Variants were then called and filtered using GATK v4.1.1 (McKenna et al. 2010; Van der Auwera et al. 2013). We filtered SNPs and INDELs separately, according to the hard filtering recommendations provide by GATK. Specifically, we excluded SNPs with QualByDepth (QD) < 2.0 , FisherStrand (FS) > 60, and StrandOddsRatio (SOR) > 3.0, MQ < 40, MQRankSum < -12.5, ReadPosRankSum < -8. INDELs were filtered to exclude variants with QualByDepth (QD) < 2.0 , FisherStrand (FS) > 200, and StrandOddsRatio (SOR) > 10.0, ReadPosRankSum < 20.
+</p>
+    <h4>Citations:</h4>
+<p class="text-left">
+    Van der Auwera GA, Carneiro MO, Hartl C <i>et al.</i> (2013) From FastQ data to high-confidence variant calls: The Genome Analysis Toolkit best practices pipeline. <i>Current Protocols in Bioinformatics,</i> 43, 11.10.1-11.10.33. doi:10.1002/0471250953.bi1110s43
+</p>
+<p class="text-left">
+    Li H, Durbin R (2009) Fast and accurate short read alignment with Burrows-Wheeler Transform. <i>Bioinformatics,</i> 25, 1754–60. doi:10.1093/bioinformatics/btp324
+</p>
+<p class="text-left">
+    McKenna A, Hanna M, Banks E et al. (2010) The Genome Analysis Toolkit: a MapReduce framework for analyzing next-generation DNA sequencing data. <i>Genome Research,</i> 20, 1297–303. doi:10.1101/gr.107524.110
+</p>
+<p class="text-left">
+    Thurmond J, Goodman JL, Strelets VB et al. (2019) FlyBase 2.0: The next generation. <i>Nucleic Acids Research,</i> 47, D759–D765. doi:10.1093/nar/gk
+
 </div>
 <div class = "col-md-1">
 </div>   
