@@ -127,9 +127,15 @@ def assemble_general_browse_query_data():
     custom_data['pos_from'] = 1
     custom_data['pos_to'] = 100
     custom_data['species'] = []
-    for strain in Strain.objects.all():
-        for strain_symbol in strain.strainsymbol_set.all():
-            custom_data['species'].append(strain_symbol.symbol)
+    #all_strains = Strain.objects.all()
+    # for strain in Strain.objects.all():
+    try:
+      strain = Strain.objects.get(strainsymbol__symbol="AFC12")   # Only select first strain for general browse (users can then select rqd strains within JBrowse)
+    except:
+      strain = Strain.objects.all()[0]
+
+    for strain_symbol in strain.strainsymbol_set.all():
+        custom_data['species'].append(strain_symbol.symbol)
     vcf_tracks = [x + '_VCF' for x in custom_data['species']]
     custom_data['tracks_query'] = 'tracks=ref,genes,' + ','.join(vcf_tracks)
     custom_data['jbrowse_location'] = settings.JBROWSE_LOCATION
