@@ -26,9 +26,13 @@
 </div>   
 <div class="col-md-10 border border-primary" style="background-color:white";>    
     <h4 class="mt-2">Lines available (not all lines available for all queries)</h4>
-    <div class = "card-columns mt-4">
+    <div class = "mt-4"> <!-- previously used card-columns. Now replaced with manually placed cards-->
+       <div class = "row">
         {% for species in species_tab %}
-
+             {%  if species.name == "D.pseudoobscura" or species.name == "D.pseudoobscura bogotana" or species.name == "D.miranda" %}
+               <!-- Note: best to replace above line with better logic to arrange the species cards-->
+               <div class="col">
+             {%  endif %}
                 <div class = "card">
                   <div class = "card-header bg-info">
                    <h5 class="card-title"><b><i>{{ species.name }}</i></b></h5>
@@ -71,7 +75,12 @@
 
                 </div>
 
-        {% endfor %}   
+             {%  if species.name == "D.pseudoobscura" or species.name == "D.persimilis" or species.name == "D.lowei" %}
+                 <!-- Note: best to replace above line with better logic to arrange the species cards-->
+               </div>
+             {%  endif %}
+        {% endfor %}
+       </div>
     </div>     
     
     
