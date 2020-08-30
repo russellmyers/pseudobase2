@@ -45,6 +45,7 @@ common/templates/admin/
 *.sqlite3
 wsgi.py
 settings_testproduction.py
+settings_production.py
 rbm_logfile.log
 
 *.idea/
