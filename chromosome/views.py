@@ -439,6 +439,7 @@ def import_file(request,fname=''):
     return render_to_response('import_file.html', custom_data,
       context_instance=RequestContext(request))   
 
+
 def _delete_latest(request):
     custom_data = {}
     custom_data['tab'] = 'Delete File'
@@ -543,4 +544,45 @@ def _get_file_info(request,fname = '',pre=False, subdir='_', type='_'):
            
     response_data = {'error':error,'file_info':file_info}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
-    
+
+
+def audit(request):
+    custom_data = {}
+    proj_data_folder = settings.PSEUDOBASE_CHROMOSOME_DATA_ROOT
+    custom_data['project_folder'] = proj_data_folder
+
+    from os import listdir
+    from os.path import isfile, join, getsize
+    files = [f for f in listdir(proj_data_folder) if isfile(join(proj_data_folder, f))]
+    directories = [d for d in listdir(proj_data_folder) if not isfile(join(proj_data_folder,d))]
+    seq_files = [f for f in files if len(f.split('.')) == 1]
+    cov_files = [f for f in files if ( (len(f.split('.')) > 1) and (f.split('.')[1] == 'coverage'))]
+    ind_files = [f for f in files if ((len(f.split('.')) > 1) and (f.split('.')[1] == 'index'))]
+
+
+    file_tab = [{'file_tag': f, 'file_size': getsize(join(proj_data_folder,f)) / 1000000} for f in seq_files]
+    custom_data['files'] = file_tab
+    custom_data['directories'] = directories
+
+    for f in file_tab:
+        try:
+            if (f['file_tag'] + '.coverage') in cov_files:
+                f['cov'] = 'Y'
+            else:
+                f['cov'] = 'N'
+            if (f['file_tag'] + '.index') in ind_files:
+                f['ind'] = 'Y'
+            else:
+                f['ind'] = 'N'
+            chrBase = ChromosomeBase.objects.get(file_tag=f['file_tag'])
+            f['chrom'] = chrBase.chromosome.name
+            f['strain'] = chrBase.strain.name
+            f['rel'] = chrBase.strain.release.name
+            f['is_ref'] = 'Y' if chrBase.strain.is_reference else 'N'
+
+        except:
+            f['chrom'] = 'Orphan'
+
+
+    return render_to_response('audit.html', custom_data,
+                              context_instance=RequestContext(request))

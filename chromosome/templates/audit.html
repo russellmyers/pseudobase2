@@ -1,0 +1,148 @@
+<html><title>Audit</title>
+{% extends "base.html" %}
+
+{% block page_title %}Audit{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>Audit Project Data files</h1>
+        <h4>Check for orphans etc in Project Data folder:  <small>{{  project_folder }}</small></h4>
+    <!--h6 class = "text-muted">Select a file to import</h6-->
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div>
+  
+
+
+{% endblock header %}
+
+{% block content %}
+
+
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table id="audit-tab" class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col">File tag</th>
+                                         <th scope = "col">Coverage?</th>
+                                         <th scope = "col">Index?</th>
+                                         <th scope = "col">Chromosome</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Release</th>
+                                         <th scope = "col">Ref?</th>
+                                         <th scope = "col">File size (MB)</th>
+                                     </tr>
+                                
+                                </thead>
+                            
+                                <tbody>
+                                    
+                                         {% for file_info in files %}
+
+                                             <tr>
+                                                    <td class = "small"> {{ file_info.file_tag }}</td>
+                                                    <td class = "small"> {{ file_info.cov }} </td>
+                                                    <td class = "small"> {{ file_info.ind }} </td>
+                                                    <td class = "small">{{ file_info.chrom }} </td>
+                                                    <td class = "small"> {{ file_info.strain }} </td>
+                                                    <td class = "small"> {{ file_info.rel }}</td>
+                                                    <td class = "small"> {{ file_info.is_ref }}</td>
+                                                    <td class = "small"> {{ file_info.file_size }}</td>
+
+                                             </tr>
+                                         {% endfor %}
+                                         {% if num_valid_pending_files == 0 %}
+                                            <tr>
+                                              <td class = "text-success">No files currently pending import!</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->        
+                                            </tr>
+                                         {% endif %}   
+                                        
+                                           
+                                       
+                                
+                                </tbody>
+                      
+                           </table>
+                           
+                       
+               
+        </div>
+        <div class = "col-md-1">
+        </div>  
+
+
+{% endblock content %}
+
+{% block script %}
+{%load static %}
+<script>
+
+
+    {% for file_info in pending_files %}
+       
+        ajaxGet("{% url 'importfileinfo' fname=file_info.file_name %}", updateBaseCount);
+
+    {% endfor %}
+ 
+function ajaxGet(url, callbackFunction) {
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      callbackFunction(this);
+    }
+    
+ };
+  xhttp.open("GET", url, true);
+  xhttp.send();
+}
+
+function updateBaseCount(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     recCount = info['file_info']['rec_count'];
+     refExists = ' ';
+     if ('ref_exists' in info['file_info']) {
+         refExists =  info['file_info']['ref_exists'];
+     }
+
+
+     if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("pending_tab");
+     tr = table.getElementsByTagName("tr");
+     var lineType = 'bases';
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[2];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[8];
+                tdFormat = tr[i].getElementsByTagName("td")[9];
+                tdRefExists = tr[i].getElementsByTagName("td")[6];
+                //alert ('size: ' + tdSize.innerHTML)
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
+                tdRefExists.innerHTML = '' + refExists;
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }    
+      }  
+     
+}
+</script>
+{% endblock %}

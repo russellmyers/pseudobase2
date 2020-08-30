@@ -19,7 +19,9 @@ urlpatterns = patterns('',
   url(r'^import/progress/$','chromosome.views.import_progress',name='importprogress'),
    
   url(r'^import/(?P<fname>.+)/$','chromosome.views.import_file',name='importfile'),
-  
-)
+
+  url(r'^audit/$', 'chromosome.views.audit', name='audit'),
+
+                       )
 
 
