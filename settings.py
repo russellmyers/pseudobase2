@@ -19,22 +19,23 @@ MANAGERS = (
   ('Russell dev', 'flipside@netspace.net.au'),
 )
 
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME':  'pse2_test', #'pseudobase',
-    'USER': 'root',
-    'PASSWORD': '',
-  }
-}
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'pse2_test_db.sqlite3'),
-#         #'NAME': 'db.sqlite3'),
-#     }
+#   'default': {
+#     'ENGINE': 'django.db.backends.mysql',
+#     'NAME':  'pse2_test', #'pseudobase',
+#     'USER': 'root',
+#     'PASSWORD': '',
+#   }
 # }
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'pse2_test_db.sqlite3'),
+        #'NAME': 'db.sqlite3'),
+    }
+}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts

@@ -42,4 +42,7 @@ common/templates/admin/
 *.pyc
 *.pptx
 
+*.sqlite3
+wsgi.py
+
 *.idea/
