@@ -561,8 +561,6 @@ def audit(request):
 
 
     file_tab = [{'file_tag': f, 'file_size': getsize(join(proj_data_folder,f)) / 1000000} for f in seq_files]
-    custom_data['files'] = file_tab
-    custom_data['directories'] = directories
 
     for f in file_tab:
         try:
@@ -581,8 +579,15 @@ def audit(request):
             f['is_ref'] = 'Y' if chrBase.strain.is_reference else 'N'
 
         except:
-            f['chrom'] = 'Orphan'
+            f['strain'] = 'Orphan'
+            f['chrom'] = ''
+            f['is_ref'] = ''
 
+
+    file_tab.sort(key=lambda x:  (0 if x['is_ref'] == 'Y' else 1, x['strain'], x['chrom']))
+
+    custom_data['files'] = file_tab
+    custom_data['directories'] = directories
 
     return render_to_response('audit.html', custom_data,
                               context_instance=RequestContext(request))
