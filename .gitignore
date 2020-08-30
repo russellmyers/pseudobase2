@@ -47,5 +47,6 @@ wsgi.py
 settings_testproduction.py
 settings_production.py
 rbm_logfile.log
+rbm_logfile*
 
 *.idea/
