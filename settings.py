@@ -239,3 +239,5 @@ ORIGINAL_RELEASE_VERSION = 'pse1'
 
 JBROWSE_LOCATION = 'https://pseudotest.a2hosted.com/jb/?data=ps_data'
 JBROWSE_REL_LOCATION = 'jb/?data=ps_data'
+
+JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES = 3

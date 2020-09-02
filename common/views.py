@@ -74,7 +74,12 @@ def assemble_jbrowse_chromosome_query_data(request):
         custom_data['species'] = []
         custom_data['strain_names'] = []
         for species in form.cleaned_data['species']:
-            for strain in species.strain_set.all():
+            for i, strain in enumerate(species.strain_set.all()):
+                if settings.JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES is None:
+                    pass
+                else:
+                    if i >= settings.JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES:
+                        break
                 custom_data['strain_names'].append(strain.name)
                 for strain_symbol in strain.strainsymbol_set.all():
                     custom_data['species'].append(strain_symbol.symbol)
@@ -105,7 +110,12 @@ def assemble_jbrowse_gene_query_data(request):
             custom_data['chr'] = gene.chromosome.name
             custom_data['species'] = []
             for species in form.cleaned_data['species']:
-                for strain in species.strain_set.all():
+                for i, strain in enumerate(species.strain_set.all()):
+                    if settings.JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES is None:
+                        pass
+                    else:
+                        if i >= settings.JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES:
+                            break
                     for strain_symbol in strain.strainsymbol_set.all():
                         custom_data['species'].append(strain_symbol.symbol)
                 #custom_data['species'].extend([x.strainsymbol_set.all()[0].symbol for x in species.strain_set.all()])
