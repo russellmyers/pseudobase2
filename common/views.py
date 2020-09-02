@@ -74,7 +74,7 @@ def assemble_jbrowse_chromosome_query_data(request):
         custom_data['species'] = []
         custom_data['strain_names'] = []
         for species in form.cleaned_data['species']:
-            for i, strain in enumerate(species.strain_set.all()):
+            for i, strain in enumerate(species.strain_set.all().order_by('name')):
                 if settings.JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES is None:
                     pass
                 else:
@@ -110,7 +110,7 @@ def assemble_jbrowse_gene_query_data(request):
             custom_data['chr'] = gene.chromosome.name
             custom_data['species'] = []
             for species in form.cleaned_data['species']:
-                for i, strain in enumerate(species.strain_set.all()):
+                for i, strain in enumerate(species.strain_set.all().order_by('name')):
                     if settings.JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES is None:
                         pass
                     else:
