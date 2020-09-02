@@ -12,6 +12,7 @@ from django.conf import settings
 import json
 
 import logging
+log = logging.getLogger(__name__)
 
 import chromosome.forms
 from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatchImportProcess, ChromosomeBatchImportLog
@@ -549,7 +550,7 @@ def _get_file_info(request,fname = '',pre=False, subdir='_', type='_'):
 
 
 def audit(request):
-    logging.info('In Audit')
+    log.info('In Audit')
     custom_data = {}
     proj_data_folder = settings.PSEUDOBASE_CHROMOSOME_DATA_ROOT
     custom_data['project_folder'] = proj_data_folder
