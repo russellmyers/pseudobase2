@@ -239,6 +239,7 @@ def index(request):
             form = chromosome.forms.SearchForm(request.POST)
             if form.is_valid():
                 custom_data = assemble_jbrowse_chromosome_query_data(request)
+                log.info('JBrowsing to Chrom region: %s' % custom_data)
                 return render_to_response('test_jb.html', custom_data,
                                           context_instance=RequestContext(request))
             else:
@@ -247,6 +248,7 @@ def index(request):
             form = gene.forms.SearchForm(request.POST, request.FILES)
             if form.is_valid():
                 custom_data = assemble_jbrowse_gene_query_data(request)
+                log.info('JBrowsing to Gene: %s' % custom_data)
                 return render_to_response('test_jb.html', custom_data,
                                           context_instance=RequestContext(request))
             else:
