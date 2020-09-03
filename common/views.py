@@ -53,7 +53,7 @@ def _render_chromosome_search(request):
     custom_data = {}
     form = chromosome.forms.SearchForm(request.POST)
     if form.is_valid():
-        log.info('In _render_chrom_search. Valid form.. %s' % form.cleaned_data['chromosome'])
+        log.info('In _render_chrom_search. Valid form.. Chr: %s From: %s To: %s Aligned?: %s Species: %s' % (form.cleaned_data['chromosome'].name, form.cleaned_data['position'][0], form.cleaned_data['position'][1], form.cleaned_data['show_aligned'], form.cleaned_data['species']) )
         custom_data['fasta_objects'] = ChromosomeBase.multi_strain_fasta(
           form.cleaned_data['chromosome'],
           form.cleaned_data['species'],
@@ -155,7 +155,7 @@ def assemble_general_browse_query_data():
 
 def _submit_new_gene_batch(request, form):
     '''Submit a new batch gene search for processing.'''
-
+    log.info('Submitting gene batch search')
     gene_batch = GeneBatchProcess()
     gene_batch.submitted_at = django.utils.timezone.now()
     gene_batch.original_species  = ','.join(
@@ -189,6 +189,7 @@ def _render_gene_search(request):
         return _submit_new_gene_batch(request, form=form)
 
     try:
+        log.info('In _render_gene_search. Valid form.. Gene: %s Aligned?: %s Species: %s' % (form.cleaned_data['gene'], form.cleaned_data['show_aligned'], form.cleaned_data['species']) )
         symbols = GeneSymbol.objects.get(
           symbol=GeneSymbol.normalize(form.cleaned_data['gene'])).all_symbols()
         fasta_objects = Gene.multi_gene_fasta(form.cleaned_data['gene'],
