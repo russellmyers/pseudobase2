@@ -214,6 +214,7 @@ class Command(BaseCommand):
             request.stop(batch_status='F')
             request.batch_start = None
             request.batch_end = None
+            request.final_report = 'Gene batch failed. Request delivery tag: ' + request.delivery_tag + ' error: ' + str(e)
             request.save()
             print('Gene batch failed. Request delivery tag: ',request.delivery_tag,'error: ',e)
             raise
