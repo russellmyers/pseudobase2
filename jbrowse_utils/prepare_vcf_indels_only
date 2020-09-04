@@ -1,0 +1,67 @@
+# My first script
+echo 2
+gunzip pse/seq/vcf/$1/indels/chr2_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr2_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr2_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+
+echo 3
+gunzip pse/seq/vcf/$1/indels/chr3_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr3_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr3_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo 4_group1
+gunzip pse/seq/vcf/$1/indels/chr4_group1_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr4_group1_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr4_group1_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo 4_group2
+gunzip pse/seq/vcf/$1/indels/chr4_group2_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr4_group2_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr4_group2_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo 4_group3
+gunzip pse/seq/vcf/$1/indels/chr4_group3_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr4_group3_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr4_group3_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo 4_group4
+gunzip pse/seq/vcf/$1/indels/chr4_group4_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr4_group4_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr4_group4_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo 4_group5
+gunzip pse/seq/vcf/$1/indels/chr4_group5_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chr4_group5_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chr4_group5_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XL_group1a
+gunzip pse/seq/vcf/$1/indels/chrXL_group1a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXL_group1a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXL_group1a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XL_group1e
+gunzip pse/seq/vcf/$1/indels/chrXL_group1e_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXL_group1e_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXL_group1e_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XL_group3a
+gunzip pse/seq/vcf/$1/indels/chrXL_group3a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXL_group3a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXL_group3a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XL_group3b
+gunzip pse/seq/vcf/$1/indels/chrXL_group3b_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXL_group3b_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXL_group3b_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XR_group3a
+gunzip pse/seq/vcf/$1/indels/chrXR_group3a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXR_group3a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXR_group3a_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XR_group5
+gunzip pse/seq/vcf/$1/indels/chrXR_group5_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXR_group5_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXR_group5_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XR_group6
+gunzip pse/seq/vcf/$1/indels/chrXR_group6_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXR_group6_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXR_group6_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+echo XR_group8
+gunzip pse/seq/vcf/$1/indels/chrXR_group8_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+/usr/local/bin/bgzip pse/seq/vcf/$1/indels/chrXR_group8_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf
+/usr/local/bin/tabix -p vcf pse/seq/vcf/$1/indels/chrXR_group8_forPseudobase_mergedSNPS-INDELS_$1_indels_only.vcf.gz
+
+
+
+
+

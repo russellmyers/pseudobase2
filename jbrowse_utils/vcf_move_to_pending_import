@@ -1,0 +1,10 @@
+# My first script
+mv raw_data/chromosome/strain_vcf/$1/split/*  raw_data/chromosome/pending_import
+mkdir ../jb/ps_data/seq/vcf/$1/filtered
+cp raw_data/chromosome/strain_vcf/$1/filtered/*  ../jb/ps_data/seq/vcf/$1/filtered
+mkdir ../jb/ps_data/seq/vcf/$1/indels
+cp raw_data/chromosome/strain_vcf/$1/indels/*  ../jb/ps_data/seq/vcf/$1/indels
+
+
+
+

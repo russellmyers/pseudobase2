@@ -1,0 +1,17 @@
+# My first script
+python manage.py vcf_split -f -i -l raw_data/chromosome/strain_vcf/chr2_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz -l  raw_data/chromosome/strain_vcf/chr3_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz -l raw_data/chromosome/strain_vcf/chr4_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz -l raw_data/chromosome/strain_vcf/chrXL_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz -l raw_data/chromosome/strain_vcf/chrXR_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz
+mv raw_data/chromosome/strain_vcf/chr2_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz raw_data/chromosome/strain_vcf/processed
+mv raw_data/chromosome/strain_vcf/chr3_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz raw_data/chromosome/strain_vcf/processed
+mv raw_data/chromosome/strain_vcf/chr4_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz raw_data/chromosome/strain_vcf/processed
+mv raw_data/chromosome/strain_vcf/chrXL_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz raw_data/chromosome/strain_vcf/processed
+mv raw_data/chromosome/strain_vcf/chrXR_forPseudobase_mergedSNPS-INDELS_$1.vcf.gz raw_data/chromosome/strain_vcf/processed
+mkdir staticfiles/jb/pse/seq/vcf/$1
+mkdir staticfiles/jb/pse/seq/vcf/$1/filtered
+mkdir staticfiles/jb/pse/seq/vcf/$1/indels
+cp raw_data/chromosome/strain_vcf/$1/filtered/* staticfiles/jb/pse/seq/vcf/$1/filtered
+cp raw_data/chromosome/strain_vcf/$1/indels/* staticfiles/jb/pse/seq/vcf/$1/indels
+mv raw_data/chromosome/strain_vcf/$1/split/* raw_data/chromosome/pending_import
+
+
+
+
