@@ -14,7 +14,8 @@
     <center>
     
     <h1>Pending Preprocessing - <i>Chromosome Sequences</i></h1>
-    <h4>Files awaiting preprocessing<small class = "text-muted"> (select files to preprocess)</small></h4>
+        <h4>Files awaiting preprocessing</h4>
+        <small class = "text-muted">To preprocess: <br>run "jbrowse/utils/vcf_split" <br> <br>Then to import: <br> run /chromosome/import endpoint to import into Pseudobase2<br> run "jbrowse_utils/prepare_vcf_all" to load into JBrowse, then add tracks to trackList.json</small></h4>
     <!--h6 class = "text-muted">Select a file to import</h6-->
     </center>
   </div>
@@ -118,7 +119,7 @@
  
                  {% if num_valid_pending_preprocess_files == 0 %}
                  <p>  
-                 <small class = "text-muted">Please place new pending preprocessing files into folder:  {{ pending_import_path }}</small>
+                 <small class = "text-muted">Please place new pending preprocessing files into folder:  {{ pending_preprocess_path }}</small>
                  </p>
                  {% else %}
                       <button type="submit" name="importfiles" class = "btn btn-primary mt-2" disabled>Split / Filter selected file(s)</button>
@@ -128,9 +129,9 @@
 
 
    <hr>
-   <h4> Split/Filtered files<small class = "text-muted"> (select files to further process)</small></h4>
+   <h4> Preprocessed files</h4>
    <br>
-   <h4>Split files:</h4>
+   <h4>Split files: <small class = "text-muted">(To import into Pseudobase2: Move these to pending_import folder and run endpoint /chromosome/import)</small></h4>
 {{ form.non_field_errors }}
   <form action="" method="post">
      {% csrf_token %}
@@ -186,7 +187,7 @@
                                          {% endfor %}
                                          {% if num_valid_split_files == 0 %}
                                             <tr>
-                                              <td class = "text-success">No split files preprocessed!</td>
+                                              <td class = "text-success">No split files preprocessed! (or split files have already been moved to pending_import folder - if so run /chromosome/import endpoint to import into Pseudobase2)</td>
                                               <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->
                                             </tr>
                                          {% endif %}
@@ -205,17 +206,9 @@
         </div>
      </div>
 
-                 {% if num_valid_preprocessed_files == 0 %}
-                 <p>
-                 <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
-                 </p>
-                 {% else %}
-                      <button type="submit" name="importfiles" class = "btn btn-primary mt-2" disabled>Import selected file(s)</button>
-
-                 {% endif %}
   </form>
 
-       <h4>Filtered files:</h4>
+       <h4>Filtered files: <small class = "text-muted">(To import into JBrowse as tracks: Run "jbrowse/utils/prepare_vcf_all" then add tracks to trackList.json)</small> </h4>
 {{ form.non_field_errors }}
   <form action="" method="post">
      {% csrf_token %}
@@ -290,17 +283,9 @@
         </div>
      </div>
 
-                 {% if num_valid_preprocessed_files == 0 %}
-                 <p>
-                 <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
-                 </p>
-                 {% else %}
-                      <button type="submit" name="importfiles" class = "btn btn-primary mt-2" disabled>Import selected file(s)</button>
-
-                 {% endif %}
   </form>
 
-    <h4>Indel files:</h4>
+    <h4>Indel files: <small class = "text-muted">(To import into JBrowse as tracks: Run "jbrowse/utils/prepare_vcf_all" then add tracks to trackList.json)</small></h4>
 {{ form.non_field_errors }}
   <form action="" method="post">
      {% csrf_token %}
@@ -375,18 +360,13 @@
         </div>
      </div>
 
-                 {% if num_valid_preprocessed_files == 0 %}
-                 <p>
-                 <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
-                 </p>
-                 {% else %}
-                      <button type="submit" name="importfiles" class = "btn btn-primary mt-2" disabled>Import selected file(s)</button>
-
-                 {% endif %}
   </form>
 
 
 {% endblock pending %}
+
+{% block completed %}
+{% endblock completed %}
 
 {% block script %}
 {%load static %}
