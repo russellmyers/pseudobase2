@@ -1483,10 +1483,10 @@ class ChromosomeImporter():
                     chromosome_reader.finalise()
                 destpath =  settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_IMPORTED_PREFIX #'raw_data/chromosome/'
                 
-                print ('renaming: ',os.path.abspath(self.chromosome_data))
-                print (' ..to: ',os.path.join(destpath,tail))
+                log.info('renaming: ' + os.path.abspath(self.chromosome_data))
+                log.info(' ..to: ' + os.path.join(destpath,tail))
                 os.rename(os.path.abspath(self.chromosome_data), os.path.join(destpath,tail)) 
-                print ('Rename complete!')
+                log.info('Rename complete!')
                 
                 # Finish populating the import metadata.
                 self.import_log.base_count = self.cb.total_bases
