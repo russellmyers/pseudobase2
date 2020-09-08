@@ -180,6 +180,11 @@ LOGGING = {
             'callback': skip_suspicious_operations,
         },
     },
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s [%(levelname)s] [%(module)s / %(funcName)s ] %(message)s'
+        }
+    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
@@ -193,8 +198,15 @@ LOGGING = {
             'filename': "C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2" + "/rbm_logfile.log",
             'maxBytes': 50000,
             'backupCount': 2,
-            #'formatter': 'simple',
+            'formatter': 'verbose',
         },
+
+        'logconsole': {
+            'level' : 'INFO',
+            'class':  'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+
     },
     'loggers': {
         'django.request': {
@@ -203,7 +215,7 @@ LOGGING = {
             'propagate': True,
         },
         '': {
-            'handlers': ['logfile'],
+            'handlers': ['logfile', 'logconsole'],
             'level': 'INFO',
         },
     }

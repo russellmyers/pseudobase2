@@ -23,6 +23,8 @@ from chromosome.utils import VCFRecord
 from django.core.cache import get_cache
 import hashlib
 
+import logging
+log = logging.getLogger(__name__)
 
 from common.models import Strain, StrainSymbol,Chromosome, ImportLog, ImportFileReader, BatchProcess
 
@@ -934,6 +936,7 @@ class ChromosomeImporter():
             s = StrainSymbol.objects.get(symbol=strain.upper()).strain
             return (s, False)
         except Strain.DoesNotExist:
+            log.exception('Strain does not exist: '+ strain.upper())
             raise
   
     def _lookup_chromosome(self, chromosome):
@@ -1456,6 +1459,7 @@ class ChromosomeImporter():
                         self.import_log.chromebase = self.cb
                         self.import_log.save()
                 except:
+                    log.exception('Error creating import_log record')
                     raise
 
                 vcf_meta_data = ''
@@ -1502,6 +1506,7 @@ class ChromosomeImporter():
             
             except:
                 print ('in exception chromosome importer')
+                log.exception('Error in chromosome importer')
                 self.data_file.close()
                 self.index_file.close()
                 self.coverage_file.close()

@@ -14,6 +14,9 @@ distributed, efficient and sane method of batch processing.
 from django.core.management.base import BaseCommand
 from chromosome.models import ChromosomeBatchImportProcess, ChromosomeImporter
 from optparse import make_option
+import logging
+log = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     '''A custom command to process "chromososome batch import" requests.
@@ -74,7 +77,7 @@ class Command(BaseCommand):
     
         running_batches = ChromosomeBatchImportProcess.objects.running_batches()
         if (len(running_batches) > 0):
-            print ('Batch already running. Exiting')
+            log.info('Batch already running. Exiting')
             return
             
         
@@ -83,4 +86,4 @@ class Command(BaseCommand):
         if (len(pending_batches) > 0):
             self._process_batch_import_request(pending_batches[0],options)
         else:
-           print ('No pending batches to process') 
+           print ('No pending batches to process')
