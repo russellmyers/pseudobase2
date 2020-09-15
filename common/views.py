@@ -18,6 +18,8 @@ import chromosome.forms
 from chromosome.models import ChromosomeBase
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
 from common.models import Species, Strain
+from os import listdir
+from os.path import isfile, join
 
 import logging
 #logging.basicConfig(filename='test_logging_rbm.log',level=logging.DEBUG)
@@ -155,7 +157,7 @@ def assemble_general_browse_query_data():
 
 def _submit_new_gene_batch(request, form):
     '''Submit a new batch gene search for processing.'''
-    log.info('Submitting gene batch search')
+    log.info('Submitting gene batch search. '+ str(form.cleaned_data))
     gene_batch = GeneBatchProcess()
     gene_batch.submitted_at = django.utils.timezone.now()
     gene_batch.original_species  = ','.join(
@@ -310,6 +312,50 @@ def delivery(request, code):
     else:
         return render_to_response('gene_delivery_not_ready.html', {}, 
           context_instance=RequestContext(request))
+
+def format_log(log_type, log_line):
+    log_line_data = log_line.split(' ')
+    if len(log_line_data) < 3:
+        formatted_log_line = ['','',' '.join(log_line_data)]
+    else:
+        formatted_log_line = [log_line_data[0], log_line_data[1], log_type, ' '.join(log_line_data[2:])]
+    return formatted_log_line
+
+def logs(request):
+    log.info('In logs')
+
+    log_dir = join(settings.BASE_DIR, settings.LOG_FILE_PREFIX)
+    files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
+    files_info = []
+
+    custom_data = {'files': files}
+
+    custom_data['logs'] = []
+
+    for f in files:
+        full_name = join(log_dir, f)
+        with open(full_name) as file:
+             data = file.read()
+             data_lines = data.split('\n')
+             print('data: ',len(data_lines))
+             for line in data_lines:
+                 line_data = line.split(' ')
+                 if 'Valid form' in line:
+                    if 'render_chromosome_search' in line:
+                        custom_data['logs'].append(format_log('Online Chrom Search', line))
+                    elif 'render_gene_search' in line:
+                        custom_data['logs'].append(format_log('Online Gene Search', line))
+                 elif 'JBrowsing to Gene' in line:
+                     custom_data['logs'].append(format_log('JBrowse to gene', line))
+                 elif 'JBrowsing to Chrom' in line:
+                     custom_data['logs'].append(format_log('JBrowse to chrom region', line))
+                 elif 'Submitting gene batch search' in line:
+                     custom_data['logs'].append(format_log('Batch Gene Search', line))
+    custom_data['logs'].reverse()
+
+    return render_to_response('logs.html', custom_data,
+                              context_instance=RequestContext(request))
+
 
 
 def jb_stats_global(request):

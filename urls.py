@@ -17,6 +17,8 @@ urlpatterns = patterns('',
 
    url(r'^browse/$', 'common.views.browse', name='browse'),
 
+   url(r'^logs/$', 'common.views.logs', name='logs'),
+
    (r'^chromosome/', include('chromosome.urls')),
 
    url(r'^jb/stats/global$','common.views.jb_stats_global',name='jb_stats_global'),

@@ -195,7 +195,7 @@ LOGGING = {
         'logfile': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': "C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2" + "/rbm_logfile.log",
+            'filename': "C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2" + "/logs/rbm_logfile.log",
             'maxBytes': 50000,
             'backupCount': 2,
             'formatter': 'verbose',
@@ -253,3 +253,5 @@ JBROWSE_LOCATION = 'https://pseudotest.a2hosted.com/jb/?data=ps_data'
 JBROWSE_REL_LOCATION = 'jb/?data=ps_data'
 
 JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES = 3
+
+LOG_FILE_PREFIX = 'logs/'
