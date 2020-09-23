@@ -85,7 +85,8 @@ class Command(BaseCommand):
             file_path = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX
 
         if not os.path.exists(file_path):
-            os.makedirs(file_path)
+            os.umask(0)
+            os.makedirs(file_path, mode=0o777)
 
         if filtered:
             first_part = ext_part.split('.vcf.gz')[0]
