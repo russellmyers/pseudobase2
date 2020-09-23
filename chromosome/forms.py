@@ -101,4 +101,11 @@ class ImportForm(forms.Form):
       import_files = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
     )
-    
+
+
+class UploadForm(forms.Form):
+    upload_file_field = forms.FileField(required=False,
+                                        label='Choose files for upload',
+                                        widget=forms.ClearableFileInput(attrs={'multiple': True,'class': 'form-control col-3' }))
+    preprocess_files = forms.MultipleChoiceField(required=False,
+                                                 widget=forms.CheckboxSelectMultiple,)

@@ -70,6 +70,44 @@ class StrainManager(models.Manager):
 
         return strains
 
+    def add_strain(self, strain_name, species_symbol, strain_symbols = [], strain_info = '{"SRA Experiment" : "TBA"}'):
+        strain = None
+        for sym in strain_symbols:
+            try:
+                strain_symbol_record = StrainSymbol.objects.get(symbol=sym)
+                strain = strain_symbol_record.strain
+                print('strain already exists. Not adding. ' + str(strain))
+                break
+            except:
+                pass
+
+        if strain is None:
+            species = None
+            release = None
+            try:
+                species = Species.objects.get(symbol=species_symbol)
+                release = Release.objects.get(name=settings.CURRENT_FLYBASE_RELEASE_VERSION)
+            except:
+                raise Exception('Species or Release not found. Looking for species: ' + species_symbol + ' release: ' + settings.CURRENT_FLYBASE_RELEASE_VERSION + ' found Species: ' + ('None' if species is None else str(species)) + ' Release: ' + ('None' if release is None else str(release)))
+            try:
+                strain = Strain(name=strain_name, species=species, release=release, is_reference=False)
+                strain.save()
+                s_info = StrainCollectionInfo(strain=strain, info=strain_info)
+                s_info.save()
+            except:
+                raise Exception('Add strain failed. Attempted to add: strain_name: ' + strain_name + ' species: ' + str(species) + ' release: ' + str(release))
+            print('strain: ' + str(strain) + ' added successfully')
+
+        for sym in strain_symbols:
+            try:
+                ss = StrainSymbol(symbol=sym, strain=strain)
+                ss.save()
+                print('symbol: ' + str(ss) + ' added successfully')
+            except Exception as e:
+                print('symbol add failed: ' + sym + ' error detail: ' + str(e))
+
+
+
 class Strain(models.Model):
     '''Data about a particular strain.'''
 

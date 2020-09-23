@@ -2,11 +2,12 @@
 
 from django.contrib import admin
 
-from chromosome.models import ChromosomeBase, ChromosomeImportLog, ChromosomeBatchImportLog, ChromosomeBatchImportProcess
+from chromosome.models import ChromosomeBase, ChromosomeImportLog, ChromosomeBatchImportLog, ChromosomeBatchImportProcess, ChromosomeBatchPreprocess
 
 
 admin.site.register(ChromosomeBase)
 admin.site.register(ChromosomeBatchImportProcess)
 admin.site.register(ChromosomeImportLog)
 admin.site.register(ChromosomeBatchImportLog)
+admin.site.register(ChromosomeBatchPreprocess)
 

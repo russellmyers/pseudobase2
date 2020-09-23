@@ -50,3 +50,5 @@ rbm_logfile.log
 rbm_logfile*
 
 *.idea/
+
+staticfiles/jbrowse/pse/*

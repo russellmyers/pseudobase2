@@ -1,0 +1,663 @@
+<html><title>Pseudobase upload</title>
+{% extends "import_base.html" %}
+
+{% block page_title %}Upload{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div>
+
+  <div class = "col-md-10">
+
+    <h1>Upload files</h1>
+
+    <form action="" method="post" enctype="multipart/form-data">
+     {% csrf_token %}
+
+
+    {{  form.upload_file_field }}
+
+    <button type="submit" name="uploadfiles" class = "btn btn-primary mt-2">Upload files</button>
+    </form>
+
+  </div>
+  <div class = "col-md-1">
+  </div>
+  
+ 
+{% endblock header %}
+    
+    
+{% block pending %}
+<h1>Uploaded files - ready for preprocess</h1>
+{{ form.non_field_errors }}
+  <form action="" method="post">
+     {% csrf_token %}
+      <div class = "row">
+        <div class = "col-md-1">
+        </div> 
+    
+        
+     
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table id="uploaded_tab" class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col"> </th>
+                                         <th scope = "col">File name</th>
+                                        {% if verbose > 0 %}
+                                           <th scope = "col"># Chromosomes</th>
+                                        {%  else %}
+                                           <th scope = "col"> </th>
+                                        {%  endif %}
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">File size</th>
+                                         <th scope = "col">File format</th>
+                                         <th scope = "col">Not passed</th>
+                                         <th scope = "col">Uncalled</th>
+                                         <th scope = "col">Hom Ref</th>
+                                         <th scope = "col">SNPs</th>
+                                         <th scope = "col">INDELs</th>
+
+                                     </tr>
+                                
+                                </thead>
+                            
+                                <tbody>
+                                    
+                                         {% for file_info in uploaded_files %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                     {% if file_info.format == 'unknown' %}
+                                                         <td></td>
+                                                         <td class = "small text-muted"><i>{{ file_info.file_name }}</i></td>
+                                                     
+                                                     {% else %}
+                                                         {% if file_info.import_status %}
+                                                            <td></td>
+
+                                                         {% else %}     
+           
+                                                             <td>
+                                                                <input type="checkbox"  value="{{ file_info.file_name }}" name="preprocess_files">
+                                                             </td> 
+                                                        {% endif %}
+                                                         <td class = "small">{{ file_info.file_name }}</td>
+                                                    {% endif %}  
+                                                     
+                   
+                                                         <!--/th-->
+
+                                                 <td class = "small"> <i>{%  if verbose > 0 %}Calculating..{%  endif %}</i> </td>
+                                                     <td class = "small"> {{ file_info.strain_name }} </td>
+                                                     <td class = "small"> {{ file_info.file_size_MB }}</td>
+                                                     <td class = "small"> {{ file_info.format }} </td>
+                                                     <td class = "small"><i>{% if verbose > 1 %}Calculating.. {% endif %}</i></td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.Uncalled }} </td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.HomRef }} </td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.SNP }} </td>
+                                                     <td class = "small"> {{ file_info.summary_flag_dict.INDEL }} </td>
+
+                 
+                                                 
+                                                        
+                
+                                             </tr>
+                                         {% endfor %}
+                                         {% if num_valid_pending_preprocess_files == 0 %}
+                                            <tr>
+                                              <td class = "text-success">No files currently pending preprocessing!</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->        
+                                            </tr>
+                                         {% endif %}   
+                                        
+                                           
+                                       
+                                
+                                </tbody>
+                      
+                           </table>
+                           
+                       
+               
+        </div>
+        <div class = "col-md-1">
+        </div>  
+     </div>
+ 
+                 {% if num_valid_pending_preprocess_files == 0 %}
+                 <p>  
+                 <small class = "text-muted">Please place new pending preprocessing files into folder:  {{ pending_preprocess_path }}</small>
+                 </p>
+                 {% else %}
+                      <button type="submit" name="preprocessfiles" class = "btn btn-primary mt-2">Preprocess selected file(s)</button>
+
+                 {% endif %}
+  </form>    
+
+
+   <hr>
+   <h1>Preprocessed files - ready for import</h1>
+   <br>
+   <h4>Split files: <small class = "text-muted">(To import into Pseudobase2: Move these to pending_import folder and run endpoint /chromosome/import)</small></h4>
+{{ form.non_field_errors }}
+  <form action="" method="post">
+     {% csrf_token %}
+      <div class = "row">
+        <div class = "col-md-1">
+        </div>
+
+
+
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table id="split_tab" class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col"> </th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Type</th>
+                                         <th scope = "col">File name</th>
+                                         <th scope = "col">Chromosome</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">File size</th>
+                                         <th scope = "col">File format</th>
+                                         <th scope = "col">Not passed</th>
+                                         <th scope = "col">Uncalled</th>
+                                         <th scope = "col">Hom Ref</th>
+                                         <th scope = "col">SNPs</th>
+                                         <th scope = "col">INDELs</th>
+                                      </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                         {% for preprocessed_file_info in split_files %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                    <td></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.strain }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.type }} </td>
+                                                    <td class = "small">{{ preprocessed_file_info.file_name }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.chromosome_name }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.strain_name }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.file_size_MB }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.format }} </td>
+                                                    <td class = "small"><i>{%  if verbose > 1 %}Calculating.. {%  endif %}</i></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.Uncalled }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.HomRef }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.SNP }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.INDEL }} </td>
+
+
+
+                                             </tr>
+                                         {% endfor %}
+                                         {% if num_valid_split_files == 0 %}
+                                            <tr>
+                                              <td class = "text-success">No split files preprocessed! (or split files have already been moved to pending_import folder - if so run /chromosome/import endpoint to import into Pseudobase2)</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->
+                                            </tr>
+                                         {% endif %}
+
+
+
+
+                                </tbody>
+
+                           </table>
+
+
+
+        </div>
+        <div class = "col-md-1">
+        </div>
+     </div>
+
+  </form>
+
+       <h4>Filtered files: <small class = "text-muted">(To import into JBrowse as tracks: Run "jbrowse/utils/prepare_vcf_all" then add tracks to trackList.json)</small> </h4>
+{{ form.non_field_errors }}
+  <form action="" method="post">
+     {% csrf_token %}
+      <div class = "row">
+        <div class = "col-md-1">
+        </div>
+
+
+
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table id="filtered_tab" class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col"> </th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Type</th>
+                                         <th scope = "col">File name</th>
+                                         <th scope = "col">Chromosome</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">File size</th>
+                                         <th scope = "col">File format</th>
+                                         <th scope = "col">Not passed</th>
+                                         <th scope = "col">Uncalled</th>
+                                         <th scope = "col">Hom Ref</th>
+                                         <th scope = "col">SNPs</th>
+                                         <th scope = "col">INDELs</th>
+                                      </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                         {% for preprocessed_file_info in filtered_files %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                    <td></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.strain }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.type }} </td>
+                                                    <td class = "small">{{ preprocessed_file_info.file_name }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.chromosome_name }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.strain_name }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.file_size_MB }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.format }} </td>
+                                                    <td class = "small"><i>{%  if verbose > 1 %}Calculating.. {%  endif %}</i></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.Uncalled }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.HomRef }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.SNP }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.INDEL }} </td>
+
+
+
+                                             </tr>
+                                         {% endfor %}
+                                         {% if num_valid_filtered_files == 0 %}
+                                            <tr>
+                                              <td class = "text-success">No filtered files preprocessed!</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->
+                                            </tr>
+                                         {% endif %}
+
+
+
+
+                                </tbody>
+
+                           </table>
+
+
+
+        </div>
+        <div class = "col-md-1">
+        </div>
+     </div>
+
+  </form>
+
+    <h4>Indel files: <small class = "text-muted">(To import into JBrowse as tracks: Run "jbrowse/utils/prepare_vcf_all" then add tracks to trackList.json)</small></h4>
+{{ form.non_field_errors }}
+  <form action="" method="post">
+     {% csrf_token %}
+      <div class = "row">
+        <div class = "col-md-1">
+        </div>
+
+
+
+        <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table id="indels_tab" class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col"> </th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Type</th>
+                                         <th scope = "col">File name</th>
+                                         <th scope = "col">Chromosome</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">File size</th>
+                                         <th scope = "col">File format</th>
+                                         <th scope = "col">Not passed</th>
+                                         <th scope = "col">Uncalled</th>
+                                         <th scope = "col">Hom Ref</th>
+                                         <th scope = "col">SNPs</th>
+                                         <th scope = "col">INDELs</th>
+                                      </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                         {% for preprocessed_file_info in indel_files %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                    <td></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.strain }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.type }} </td>
+                                                    <td class = "small">{{ preprocessed_file_info.file_name }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.chromosome_name }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.strain_name }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.file_size_MB }}</td>
+                                                    <td class = "small"> {{ preprocessed_file_info.format }} </td>
+                                                    <td class = "small"><i>{%  if verbose > 1 %}Calculating.. {%  endif %}</i></td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.Uncalled }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.HomRef }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.SNP }} </td>
+                                                    <td class = "small"> {{ preprocessed_file_info.summary_flag_dict.INDEL }} </td>
+
+
+
+                                             </tr>
+                                         {% endfor %}
+                                         {% if num_valid_indel_files == 0 %}
+                                            <tr>
+                                              <td class = "text-success">No indel files preprocessed!</td>
+                                              <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small> </td-->
+                                            </tr>
+                                         {% endif %}
+
+
+
+
+                                </tbody>
+
+                           </table>
+
+
+
+        </div>
+        <div class = "col-md-1">
+        </div>
+     </div>
+
+  </form>
+
+
+{% endblock pending %}
+
+{% block completed %}
+{% endblock completed %}
+
+{% block script %}
+{%load static %}
+<script>
+    var verbose = JSON.parse("{{verbose|escapejs}}");
+    verbose = parseInt(verbose);
+
+    var x= 1;
+
+    {% for file_info in filtered_files %}
+
+        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True subdir=file_info.strain type=file_info.type verbose=verbose %}", updateBaseCountFiltered);
+
+    {% endfor %}
+
+    {% for file_info in indel_files %}
+
+        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True subdir=file_info.strain type=file_info.type verbose=verbose %}", updateBaseCountIndels);
+
+    {% endfor %}
+
+      {% for file_info in split_files %}
+
+        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True subdir=file_info.strain type=file_info.type verbose=verbose %}", updateBaseCountSplit);
+
+    {% endfor %}
+
+    {% for file_info in uploaded_files %}
+       
+        ajaxGet("{% url 'preprocessfileinfo' fname=file_info.file_name pre=True subdir='_' type='_' verbose=verbose %}", updateBaseCount);
+
+    {% endfor %}
+
+
+
+function ajaxGet(url, callbackFunction) {
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      callbackFunction(this);
+    }
+    else if (this.readyState == 4) {
+        console.log('Ready but not 200: ' + xhttp.responseText)
+    }
+    
+ };
+  xhttp.open("GET", url, true);
+  xhttp.send();
+}
+
+function updateBaseCount(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     console.log('Update Base Count: ' + fname);
+     recCount = info['file_info']['rec_count'];
+     numChromosomes = info['file_info']['num_chromosomes'];
+     numNotPassed = info['file_info']['summary_flag_dict']['Filtered'];
+     numUncalled = info['file_info']['summary_flag_dict']['Uncalled'];
+     numSNPs = info['file_info']['summary_flag_dict']['SNP'];
+     numINDELs = info['file_info']['summary_flag_dict']['INDEL'];
+     numHomRef = info['file_info']['summary_flag_dict']['HomRef'];
+    if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("uploaded_tab");
+     tr = table.getElementsByTagName("tr");
+     var lineType = 'bases';
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[4];
+                tdFormat = tr[i].getElementsByTagName("td")[5];
+                tdChrom = tr[i].getElementsByTagName("td")[2];
+                tdNotPassed = tr[i].getElementsByTagName("td")[6];
+                tdUncalled = tr[i].getElementsByTagName("td")[7];
+                tdHomRef = tr[i].getElementsByTagName("td")[8];
+                tdSNPs = tr[i].getElementsByTagName("td")[9];
+                tdINDELs = tr[i].getElementsByTagName("td")[10];
+                //alert ('size: ' + tdSize.innerHTML)
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
+                if (numChromosomes == 0) {
+
+                }
+                else {
+                    tdChrom.innerHTML = 'x' + numChromosomes + ' chromosomes';
+                }
+                if (numNotPassed == null) {
+                   // variables not retrieved from summary_flag_dict
+                }
+                else {
+                    tdNotPassed.innerHTML = '' + numNotPassed;
+                    tdUncalled.innerHTML = '' + numUncalled;
+                    tdHomRef.innerHTML = '' + numHomRef;
+                    tdSNPs.innerHTML = '' + numSNPs;
+                    tdINDELs.innerHTML = '' + numINDELs;
+                }
+
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }    
+      }  
+     
+}
+
+function updateBaseCountSplit(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     console.log('Update Base Count Split: ' + fname);
+     recCount = info['file_info']['rec_count'];
+     numChromosomes = info['file_info']['num_chromosomes'];
+     numNotPassed = info['file_info']['summary_flag_dict']['Filtered'];
+     numUncalled = info['file_info']['summary_flag_dict']['Uncalled'];
+     numSNPs = info['file_info']['summary_flag_dict']['SNP'];
+     numINDELs = info['file_info']['summary_flag_dict']['INDEL'];
+     numHomRef = info['file_info']['summary_flag_dict']['HomRef'];
+    if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("split_tab");
+     tr = table.getElementsByTagName("tr");
+     var lineType = 'bases';
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[3];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[6];
+                tdFormat = tr[i].getElementsByTagName("td")[7];
+                tdChrom = tr[i].getElementsByTagName("td")[4];
+                tdNotPassed = tr[i].getElementsByTagName("td")[8];
+                tdUncalled = tr[i].getElementsByTagName("td")[9];
+                tdHomRef = tr[i].getElementsByTagName("td")[10];
+                tdSNPs = tr[i].getElementsByTagName("td")[11];
+                tdINDELs = tr[i].getElementsByTagName("td")[12];
+                //alert ('size: ' + tdSize.innerHTML)
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
+                //tdChrom.innerHTML = 'x' + numChromosomes + ' chromosomes';
+
+                if (numNotPassed == null) {
+                   // variables not retrieved from summary_flag_dict
+                }
+                else {
+                    tdNotPassed.innerHTML = '' + numNotPassed;
+                    tdUncalled.innerHTML = '' + numUncalled;
+                    tdHomRef.innerHTML = '' + numHomRef;
+                    tdSNPs.innerHTML = '' + numSNPs;
+                    tdINDELs.innerHTML = '' + numINDELs;
+                }
+
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }
+      }
+
+}
+
+function updateBaseCountFiltered(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     console.log('Update Base Count Filtered: ' + fname);
+     recCount = info['file_info']['rec_count'];
+     numChromosomes = info['file_info']['num_chromosomes'];
+     numNotPassed = info['file_info']['summary_flag_dict']['Filtered'];
+     numUncalled = info['file_info']['summary_flag_dict']['Uncalled'];
+     numSNPs = info['file_info']['summary_flag_dict']['SNP'];
+     numINDELs = info['file_info']['summary_flag_dict']['INDEL'];
+     numHomRef = info['file_info']['summary_flag_dict']['HomRef'];
+    if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("filtered_tab");
+     tr = table.getElementsByTagName("tr");
+     var lineType = 'bases';
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[3];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[6];
+                tdFormat = tr[i].getElementsByTagName("td")[7];
+                tdChrom = tr[i].getElementsByTagName("td")[4];
+                tdNotPassed = tr[i].getElementsByTagName("td")[8];
+                tdUncalled = tr[i].getElementsByTagName("td")[9];
+                tdHomRef = tr[i].getElementsByTagName("td")[10];
+                tdSNPs = tr[i].getElementsByTagName("td")[11];
+                tdINDELs = tr[i].getElementsByTagName("td")[12];
+                //alert ('size: ' + tdSize.innerHTML)
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
+                //tdChrom.innerHTML = 'x' + numChromosomes + ' chromosomes';
+
+                if (numNotPassed == null) {
+                   // variables not retrieved from summary_flag_dict
+                }
+                else {
+                    tdNotPassed.innerHTML = '' + numNotPassed;
+                    tdUncalled.innerHTML = '' + numUncalled;
+                    tdHomRef.innerHTML = '' + numHomRef;
+                    tdSNPs.innerHTML = '' + numSNPs;
+                    tdINDELs.innerHTML = '' + numINDELs;
+                }
+
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }
+      }
+
+}
+
+function updateBaseCountIndels(xhttp) {
+     info  =  JSON.parse(xhttp.responseText);
+     fname = info['file_info']['file_name'];
+     console.log('Update Base Count Indels: ' + fname);
+     recCount = info['file_info']['rec_count'];
+     numChromosomes = info['file_info']['num_chromosomes'];
+     numNotPassed = info['file_info']['summary_flag_dict']['Filtered'];
+     numUncalled = info['file_info']['summary_flag_dict']['Uncalled'];
+     numSNPs = info['file_info']['summary_flag_dict']['SNP'];
+     numINDELs = info['file_info']['summary_flag_dict']['INDEL'];
+     numHomRef = info['file_info']['summary_flag_dict']['HomRef'];
+    if (recCount == null) {
+         return;
+     }
+
+     table = document.getElementById("indels_tab");
+     tr = table.getElementsByTagName("tr");
+     var lineType = 'bases';
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[3];
+        if (td) {
+            if (td.innerHTML == fname) {
+                tdSize = tr[i].getElementsByTagName("td")[6];
+                tdFormat = tr[i].getElementsByTagName("td")[7];
+                tdChrom = tr[i].getElementsByTagName("td")[4];
+                tdNotPassed = tr[i].getElementsByTagName("td")[8];
+                tdUncalled = tr[i].getElementsByTagName("td")[9];
+                tdHomRef = tr[i].getElementsByTagName("td")[10];
+                tdSNPs = tr[i].getElementsByTagName("td")[11];
+                tdINDELs = tr[i].getElementsByTagName("td")[12];
+                //alert ('size: ' + tdSize.innerHTML)
+                if (tdFormat.innerText.substring(0,3) == 'VCF') {
+                    lineType = 'records';
+                }
+
+                tdSize.innerHTML = tdSize.innerHTML + ' (' + recCount +  ' ' +  lineType + ')';
+                //tdChrom.innerHTML = 'x' + numChromosomes + ' chromosomes';
+
+                if (numNotPassed == null) {
+                   // variables not retrieved from summary_flag_dict
+                }
+                else {
+                    tdNotPassed.innerHTML = '' + numNotPassed;
+                    tdUncalled.innerHTML = '' + numUncalled;
+                    tdHomRef.innerHTML = '' + numHomRef;
+                    tdSNPs.innerHTML = '' + numSNPs;
+                    tdINDELs.innerHTML = '' + numINDELs;
+                }
+
+                //alert ('fname: ' + fname +  ' i: ' + i.toString())
+            }
+        }
+      }
+
+}
+
+
+</script>
+{% endblock %}

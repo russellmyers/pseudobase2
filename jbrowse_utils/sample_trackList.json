@@ -158,22 +158,6 @@
         {
             "category": "VCF r304/D. miranda", 
             "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "S9-A12_name", 
-            "label": "S9-A12_VCF", 
-            "urlTemplate": "seq/vcf/Dmir_strainS9-A12/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainS9-A12_filtered.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304/D. miranda", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "S9-A12_name", 
-            "label": "S9-A12_VCF", 
-            "urlTemplate": "seq/vcf/Dmir_strainS9-A12/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainS9-A12_filtered.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304/D. miranda", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
             "key": "MAO3.3", 
             "label": "SRR1873753_VCF", 
             "urlTemplate": "seq/vcf/Dmir_strainMAO3-3/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainMAO3-3_filtered.vcf.gz", 
@@ -198,14 +182,6 @@
         {
             "category": "VCF r304/D. miranda", 
             "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "sym_after_name", 
-            "label": "sym_after_VCF", 
-            "urlTemplate": "seq/vcf/Dmir_strainsym_after/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainsym_after_filtered.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304/D. miranda", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
             "key": "MAO3.4", 
             "label": "SRR1873754_VCF", 
             "urlTemplate": "seq/vcf/Dmir_strainMAO3-4/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainMAO3-4_filtered.vcf.gz", 
@@ -222,9 +198,49 @@
         {
             "category": "VCF r304/D. miranda", 
             "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "DurmyNew", 
+            "label": "NEW_VCF", 
+            "urlTemplate": "seq/vcf/Dmir_strainNEW/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainNEW_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
             "key": "SP138", 
             "label": "SRR1925735_VCF", 
             "urlTemplate": "seq/vcf/Dmir_strainSP138/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainSP138_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "S9-A12_name", 
+            "label": "S9-A12_VCF", 
+            "urlTemplate": "seq/vcf/Dmir_strainS9-A12/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainS9-A12_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "S9-A12_name", 
+            "label": "S9-A12_VCF", 
+            "urlTemplate": "seq/vcf/Dmir_strainS9-A12/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainS9-A12_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Durmy", 
+            "label": "ZZZ_VCF", 
+            "urlTemplate": "seq/vcf/Dmir_strainZZZ/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainZZZ_filtered.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "Durmy", 
+            "label": "ZZZ_VCF", 
+            "urlTemplate": "seq/vcf/Dmir_strainZZZ/filtered/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainZZZ_filtered.vcf.gz", 
             "type": "JBrowse/View/Track/HTMLVariants"
         }, 
         {
@@ -238,105 +254,97 @@
         {
             "category": "VCF r304 INDELS only/D. pseudoobscura", 
             "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "Mao Tse Tung strain", 
-            "label": "MAO90_VCF", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO90/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO90_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
-            "key": "I/D Mao Tse Tung 23 strain", 
-            "label": "MAO23_VCF_INDELS", 
-            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
-            "type": "JBrowse/View/Track/HTMLVariants"
-        }, 
-        {
-            "category": "VCF r304 INDELS only/D. pseudoobscura", 
-            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
             "key": "American Fork Canyon, UT 12", 
             "label": "AFC12_VCF_INDELS", 
             "urlTemplate": "seq/vcf/Dpse_strainAFC12/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainAFC12_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. pseudoobscura", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Mao Tse Tung 23 strain", 
+            "label": "MAO23_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dpse_strainMAO23/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dpse_strainMAO23_indels_only.vcf.gz", 
             "type": "JBrowse/View/Track/HTMLVariants"
         }, 
         {
@@ -345,6 +353,30 @@
             "key": "MAO3.4", 
             "label": "MAO3-4_VCF_INDELS", 
             "urlTemplate": "seq/vcf/Dmir_strainMAO3-4/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainMAO3-4_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D DurmyNew", 
+            "label": "NEW_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dmir_strainNEW/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainNEW_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Durmy", 
+            "label": "ZZZ_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dmir_strainZZZ/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainZZZ_indels_only.vcf.gz", 
+            "type": "JBrowse/View/Track/HTMLVariants"
+        }, 
+        {
+            "category": "VCF r304 INDELS only/D. miranda", 
+            "storeClass": "JBrowse/Store/SeqFeature/VCFTabix", 
+            "key": "I/D Durmy", 
+            "label": "ZZZ_VCF_INDELS", 
+            "urlTemplate": "seq/vcf/Dmir_strainZZZ/indels/chr{refseq}_forPseudobase_mergedSNPS-INDELS_Dmir_strainZZZ_indels_only.vcf.gz", 
             "type": "JBrowse/View/Track/HTMLVariants"
         }
     ], 

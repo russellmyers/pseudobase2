@@ -694,7 +694,58 @@ class ChromosomeBatchImportProcess(BatchProcess):
             transaction.leave_transaction_management()
             raise Exception('Import failed: ' + str(e))   
             return None
-    
+
+
+class ChromosomeBatchPreprocessManager(models.Manager):
+    def current_batches(self):
+        # Pending or Active
+        return self.filter(Q(batch_status='P') | Q(batch_status='A'))
+
+    def pending_batches(self):
+        # Pending
+        return self.filter(Q(batch_status='P'))
+
+    def running_batches(self):
+        # Active
+        return self.filter(Q(batch_status='A'))
+
+    def latest_finished_batch(self):
+        # Last batch to finish (whether it completed successfully or failed)
+        return self.latest('id')
+
+
+class ChromosomeBatchPreprocess(BatchProcess):
+    original_request = models.TextField()
+
+    objects = ChromosomeBatchPreprocessManager()
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return 'Submitted: %s Status: %s' % (self.submitted_at, self.batch_status)
+
+    def num_files_in_batch(self):
+        return len(self.original_request.split('\n'))
+
+    def set_orig_request_from_filenames(self, filenames):
+        # pending_import_rel_path = 'raw_data/chromosome/pending_import/'
+
+        rel_paths = [os.path.join(settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX, filename) for filename in
+                     filenames]
+        self.set_orig_request_from_relpaths(rel_paths)
+
+    def set_orig_request_from_relpaths(self, rel_paths):
+        orig_req = ''
+        for i, rel_path in enumerate(rel_paths):
+            file_path = os.path.abspath(rel_path)
+            orig_req += file_path
+            if i == len(rel_paths) - 1:
+                pass
+            else:
+                orig_req += '\n'
+        self.original_request = orig_req
+
+
+
 
 # Import log for files imported via batch process
 class ChromosomeBatchImportLog(ImportLog):
@@ -806,7 +857,8 @@ class ChromosomeVCFImportFileReader():
 
         return self.chrom,self.strain
 
-    def get_num_records(self,also_retrieve_chromosomes=False):
+    def get_num_records(self,also_retrieve_chromosomes=False, also_retrieve_summary_flags=True):
+       # Note: also_retrieve_summary_flags only takes effect if also_retrieve_chromosomes is True
 
         rec_num = 0
         tot_summary_flags = [0 for i in range(len(VCFRecord.vcf_types))]
@@ -820,9 +872,15 @@ class ChromosomeVCFImportFileReader():
             pass # No cached record found
         else:
             rec_num = hash_record['num_records']
-            if also_retrieve_chromosomes:
+            if also_retrieve_chromosomes and also_retrieve_summary_flags:
                 if ('summary_flags_dict' in hash_record) and ('chromosomes' in hash_record):
                     self.summary_flag_dict = hash_record['summary_flags_dict']
+                    self.chromosomes = hash_record['chromosomes']
+                    return rec_num
+                else:
+                    pass
+            elif also_retrieve_chromosomes:
+                if ('chromosomes' in hash_record):
                     self.chromosomes = hash_record['chromosomes']
                     return rec_num
                 else:
@@ -848,18 +906,23 @@ class ChromosomeVCFImportFileReader():
                     else:
                         self.chromosomes[chrom] = 1
 
-                    v = VCFRecord(line)
-                    record_summary_flags = v.summary_flags()
-                    tot_summary_flags = [prev_tot + record_summary_flags[i] for i, prev_tot in enumerate(tot_summary_flags)]
+                    if also_retrieve_summary_flags:
+                        v = VCFRecord(line)
+                        record_summary_flags = v.summary_flags()
+                        tot_summary_flags = [prev_tot + record_summary_flags[i] for i, prev_tot in enumerate(tot_summary_flags)]
             else:
                 rec_num +=1
 
         hash_record = {'num_records':rec_num}
 
         if also_retrieve_chromosomes:
-            self.summary_flag_dict = VCFRecord.tot_summary_flags_to_meta_data(tot_summary_flags)
-            hash_record['summary_flags_dict'] = self.summary_flag_dict
             hash_record['chromosomes'] = self.chromosomes
+            if also_retrieve_summary_flags:
+                self.summary_flag_dict = VCFRecord.tot_summary_flags_to_meta_data(tot_summary_flags)
+                hash_record['summary_flags_dict'] = self.summary_flag_dict
+            else:
+                self.summary_flag_dict  = {}
+
 
         def_cache.set(hash_key, hash_record,604800)
 
@@ -958,7 +1021,8 @@ class ChromosomeImporter():
         return struct.pack('I', n)
 
 
-    def get_info(self,incl_rec_count = False,incl_all_chromosomes=False):
+    def get_info(self,incl_rec_count = False,incl_all_chromosomes=False, incl_all_summary_flags=True):
+        # Note: include_all_summary_flags only takes effect if incl_all_chromosomse is True
 
             chromosome_reader = None
 
@@ -996,7 +1060,7 @@ class ChromosomeImporter():
                         release_name_formatted = release_name
 
                     if incl_rec_count:
-                        rec_count = vcf_reader.get_num_records(also_retrieve_chromosomes=incl_all_chromosomes)
+                        rec_count = vcf_reader.get_num_records(also_retrieve_chromosomes=incl_all_chromosomes, also_retrieve_summary_flags=incl_all_summary_flags)
                         if incl_all_chromosomes:
                             chromosome_names = vcf_reader.chromosomes
                             summary_flag_dict = vcf_reader.summary_flag_dict

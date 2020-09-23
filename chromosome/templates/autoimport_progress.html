@@ -1,0 +1,125 @@
+<html><title>Pseudobase information</title>
+{% extends "import_base.html" %}
+
+{% block page_title %}Autoimport{% endblock %}
+
+{% block extra_meta %}
+<meta http-equiv="refresh" content="5" />
+{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>Preprocess In progress - <i>Chromosome Sequences</i></h1>
+    <h4>Files currently preprocessing</h4>
+    <!--h6 class = "text-muted">Select a file to import</h6-->
+    </center>
+
+    <h4>File progress</h4>
+
+         <div class="col-md-10 border border-primary" style="background-color:white;">
+                            <table class = "table table-sm">
+                                <thead>
+                                    <tr>
+                                         <th scope = "col"> </th>
+                                         <th scope = "col">Status</th>
+                                         <th scope = "col">File name</th>
+                                         <th scope = "col">Strain</th>
+                                         <th scope = "col">Chromosomes Preprocessed</th>
+
+                                     </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                         {% for file_info in progress_list %}
+                                             <tr>
+                                                 <!--th scope = "row"-->
+                                                     {% if file_info.format == 'unknown' %}
+                                                         <td></td>
+                                                         <td class = "small"></td>
+                                                         <td class = "small     text-muted">{{ file_info.file }}</td>
+
+                                                     {% else %}
+                                                         {% if file_info.status %}
+                                                            <td> </td>
+
+                                                            <td class = "small">
+                                                               {%if file_info.status == 'Pending' %}
+                                                                   <span><b> {{ file_info.status }} </b></span>
+                                                               {% elif file_info.status == 'A'  %}
+                                                                   <span class = "text-success"> In progress: {{ file_info.perc_complete|floatformat:1 }}% ({{ file_info.records_read }} / {{file_info.total_records }}) </span>
+                                                               {% elif file_info.status == 'Complete'  %}
+                                                                   <span class = "text-primary"> {{ file_info.status }} </span>
+
+                                                               {% else %}
+                                                                   <span class = "text-danger"> {{ file_info.status }} </span>
+                                                               {% endif %}
+                                                            </td>
+                                                            <td class = "text-muted">{{ file_info.file }}</td>
+                                                            <td class = "small">{{ file_info.strain }}</td>
+                                                            <td class = "small">{{ file_info.chroms }}</td>
+
+
+
+                                                         {% endif %}
+
+                                                    {% endif %}
+
+
+                                                         <!--/th-->
+                                                     <td class = "small"> {{ file_info.chromosome_name }}</td>
+                                                     <td class = "small"> {{ file_info.strain_name }} </td>
+                                                     <td class = "small"> {{ file_info.position }} </td>
+                                                     <td class = "small"> {{ file_info.file_size_MB }}</td>
+                                                     <td class = "small"> {{ file_info.format }} </td>
+
+
+
+
+                                             </tr>
+                                         {% empty %}
+                                             {%  for batch_file_name in batch_file_filenames %}
+                                               <tr>
+                                                  <td>  </td>
+                                                  <td class = "text-success small text-muted">Queued: {{  batch_file_name }}</td>
+                                                </tr>
+                                             {%  empty  %}
+                                                <tr>
+                                                  <td class = "text-success">No files currently pending preprocess!</td>
+                                                  <!--td> <small class = "text-muted">Please place new import files into folder:  {{ pending_preprocess_path }}</small> </td-->
+                                                </tr>
+                                             {%  endfor %}
+                                        {% endfor %}
+
+
+
+                                </tbody>
+
+                           </table>
+
+  </div>
+  <div class = "col-md-1">
+  </div>
+  
+ 
+{% endblock header %}
+    
+    
+{% block pending %}
+
+
+
+{% endblock pending %}
+
+{%  block completed %}
+
+{%  endblock %}
