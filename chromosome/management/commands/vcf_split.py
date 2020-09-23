@@ -23,6 +23,7 @@ import json
 import logging
 log = logging.getLogger(__name__)
 from jbrowse_utils import add_track
+import subprocess
 from subprocess import Popen, PIPE
 
 from chromosome import utils
@@ -106,11 +107,14 @@ class Command(BaseCommand):
 
         try:
             log.info('Unzipping: ' + file_name)
-            Popen([settings.JBROWSE_PERL_GUNZIP_PATH, '-f', file_name])
+            ret = subprocess.call([settings.JBROWSE_PERL_GUNZIP_PATH, '-f', file_name])
+            log.info('Unzip result: ' + file_name + ' : ' + str(ret))
             log.info('bgzipping: ' + file_name.split('.gz')[0])
-            Popen([settings.JBROWSE_PERL_BGZIP_PATH, '-f', file_name.split('.gz')[0]])
+            ret = subprocess.call([settings.JBROWSE_PERL_BGZIP_PATH, '-f', file_name.split('.gz')[0]])
+            log.info('bgzip result: ' + file_name.split('.gz')[0] + ' : ' + str(ret))
             log.info('tabixing: ' + file_name)
-            Popen([settings.JBROWSE_PERL_TABIX_PATH, file_name, '-p', 'vcf'])
+            ret = subprocess.call([settings.JBROWSE_PERL_TABIX_PATH, file_name, '-p', 'vcf'])
+            log.info('tabix result: ' + file_name + ' : ' + str(ret))
 
         except Exception as e:
             log.warning('Perl postprocessing failed for: ' + file_name + ' Error: ' + str(e))
