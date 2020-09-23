@@ -257,6 +257,10 @@ JBROWSE_INIT_MAX_STRAINS_SHOWN_PER_SPECIES = 3
 JBROWSE_ROOT = 'C:/Users/russellM/OneDrive - Northgate Information Solutions Limited/Documents/GitLab/pseudobase2/staticfiles/jbrowse/pse/'
 JBROWSE_CONFIG_FILE = 'trackList.json'
 JBROWSE_VCF_TRACKS_PREFIX = 'seq/vcf/'
+
 JBROWSE_PERL_POSTPROCESS = True  # Run perl utilities to unzip-> bgzip -> tabix  filtered and indel track files (required for JBrowse) on import
+JBROWSE_PERL_GUNZIP_PATH = '/usr/bin/gunzip'
+JBROWSE_PERL_BGZIP_PATH = '/usr/local/bin/bgzip'
+JBROWSE_PERL_TABIX_PATH = '/usr/local/bin/tabix'
 
 LOG_FILE_PREFIX = 'logs/'

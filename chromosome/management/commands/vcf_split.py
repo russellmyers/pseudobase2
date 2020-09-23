@@ -106,11 +106,11 @@ class Command(BaseCommand):
 
         try:
             log.info('Unzipping: ' + file_name)
-            Popen(['gunzip', '-f', file_name])
+            Popen([settings.JBROWSE_PERL_GUNZIP_PATH, '-f', file_name])
             log.info('bgzipping: ' + file_name)
-            Popen(['bgzip', '-f', file_name])
+            Popen([settings.JBROWSE_PERL_BGZIP_PATH, '-f', file_name])
             log.info('tabixing: ' + file_name)
-            Popen(['tabix', file_name, '-p', 'vcf'])
+            Popen([settings.JBROWSE_PERL_TABIX_PATH, file_name, '-p', 'vcf'])
 
         except Exception as e:
             log.warning('Perl postprocessing failed for: ' + file_name + ' Error: ' + str(e))
