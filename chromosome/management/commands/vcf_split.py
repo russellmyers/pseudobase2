@@ -107,8 +107,8 @@ class Command(BaseCommand):
         try:
             log.info('Unzipping: ' + file_name)
             Popen([settings.JBROWSE_PERL_GUNZIP_PATH, '-f', file_name])
-            log.info('bgzipping: ' + file_name)
-            Popen([settings.JBROWSE_PERL_BGZIP_PATH, '-f', file_name])
+            log.info('bgzipping: ' + file_name.split('.gz')[0])
+            Popen([settings.JBROWSE_PERL_BGZIP_PATH, '-f', file_name.split('.gz')[0]])
             log.info('tabixing: ' + file_name)
             Popen([settings.JBROWSE_PERL_TABIX_PATH, file_name, '-p', 'vcf'])
 
