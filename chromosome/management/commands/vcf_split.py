@@ -104,15 +104,15 @@ class Command(BaseCommand):
         '''
 
         try:
-            print('Unzipping: ', file_name)
+            log.info('Unzipping: ' + file_name)
             Popen(['gunzip', '-f', file_name])
-            print('bgzipping: ', file_name)
+            log.info('bgzipping: ' + file_name)
             Popen(['bgzip', '-f', file_name])
-            print('tabixing: ', file_name)
+            log.info('tabixing: ' + file_name)
             Popen(['tabix', file_name, '-p', 'vcf'])
 
         except Exception as e:
-            print('Perl postprocessing failed for: ' + file_name + ' Error: ' + str(e))
+            log.warning('Perl postprocessing failed for: ' + file_name + ' Error: ' + str(e))
 
 
     def split(self,file_name,ext_part,path,species_strain,reduce=False,indels=False, process_in_batch=False, batch=None):

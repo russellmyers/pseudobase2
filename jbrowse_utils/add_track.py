@@ -2,6 +2,8 @@
 import argparse
 import json
 import copy
+import logging
+log = logging.getLogger(__name__)
 
 def find_track_type(track):
 
@@ -90,7 +92,7 @@ def copy_track(data,copy_from, copy_from_strain, insert_point,strain_symbol_to, 
             new_track[el] = copy_from[el]
 
     data['tracks'].insert(insert_point, new_track)
-    print('track inserted: ',new_track)
+    log.info('track inserted: ' + str(new_track))
 
 def add_track(file_name, species, strain_symbol_to, strain_name_to, verbose=0, test_run=False):
     print(file_name)
@@ -108,7 +110,7 @@ def add_track(file_name, species, strain_symbol_to, strain_name_to, verbose=0, t
                                                                                              source_type='filtered')
 
     if copy_from_filtered is None:
-        print('Species ' + species + ' not found when searching for filtered tracks to copy from. Skipping')
+        log.warning('Species ' + str(species) + ' not found when searching for filtered tracks to copy from. Skipping')
     else:
         copy_track(data_out, copy_from_filtered, strain_from_filtered, insert_point_filtered, strain_symbol_to, strain_name_to)
 
@@ -117,12 +119,12 @@ def add_track(file_name, species, strain_symbol_to, strain_name_to, verbose=0, t
                                                                                        source_type='indels')
 
     if copy_from_indels is None:
-        print('Species ' + species + ' not found when searching for indel tracks to copy from. Skipping')
+        log.warning('Species ' + str(species) + ' not found when searching for indel tracks to copy from. Skipping')
     else:
         copy_track(data_out, copy_from_indels, strain_from_indels, insert_point_indels, strain_symbol_to, strain_name_to, source_type='indels')
 
     if test_run:
-        print('Test run only. No files changed')
+        log.info('Test run only. No files changed')
     else:
         with open(file_name, 'w') as f:
             json.dump(data_out, f, indent=4)
