@@ -225,7 +225,7 @@ class Command(BaseCommand):
                 else:
                        #chroms[v.CHROM] = [line]
                        file_name = self.assemble_output_file(v.CHROM,path,ext_part,species_strain)
-                       print('Creating out file name: ' + file_name)
+                       log.info('Creating out file name: ' + file_name)
                        f = gzip.open(file_name, 'wb')
                        chroms[v.CHROM] = {'file': f,  'file_name': file_name, 'records': 1}
                        out_comments_str = '\n'.join(comments)
@@ -253,7 +253,7 @@ class Command(BaseCommand):
 
                        if reduce:
                            file_name_filtered = self.assemble_output_file(v.CHROM, path, ext_part, species_strain,filtered=True)
-                           print('Creating filtered out file name: ' + file_name_filtered)
+                           log.info('Creating filtered out file name: ' + file_name_filtered)
                            f_filtered = gzip.open(file_name_filtered, 'wb')
                            chroms[v.CHROM]['filtered_file'] =  f_filtered
                            chroms[v.CHROM]['filtered_file_name'] = file_name_filtered
@@ -266,7 +266,7 @@ class Command(BaseCommand):
                                f_filtered.write(line_simplified.encode())
                        if indels:
                            file_name_indels = self.assemble_output_file(v.CHROM, path, ext_part, species_strain, indels=True)
-                           print('Creating indels out file name: ' + file_name_indels)
+                           log.info('Creating indels out file name: ' + file_name_indels)
                            f_indels = gzip.open(file_name_indels, 'wb')
                            chroms[v.CHROM]['indel_file'] = f_indels
                            chroms[v.CHROM]['indel_file_name'] = file_name_indels
@@ -279,33 +279,33 @@ class Command(BaseCommand):
                                f_indels.write(line_simplified.encode())
 
 
-        print(' ')
-        print(' Num comment lines: ' + str(len(comments)))
+        log.info(' ')
+        log.info(' Num comment lines: ' + str(len(comments)))
         if reduce:
-            print(' Ignoring for filtered file:')
-            print('   Not passed: ' + str(not_passed))
-            print('   Hom Ref: ' + str(hom_ref))
-            print('   Uncalled: ' + str(not_called))
-            print('   *: ' + str(stars))
+            log.info(' Ignoring for filtered file:')
+            log.info('   Not passed: ' + str(not_passed))
+            log.info('   Hom Ref: ' + str(hom_ref))
+            log.info('   Uncalled: ' + str(not_called))
+            log.info('   *: ' + str(stars))
         for chrom in chroms:
-            print(' chrom: ' + chrom + ' records: ' + str(chroms[chrom]['records'])  +  ' - closing ')
-            f = chroms[v.CHROM]['file']
+            log.info(' chrom: ' + chrom + ' records: ' + str(chroms[chrom]['records'])  +  ' - closing ')
+            f = chroms[chrom]['file']
             f.close()
             if reduce:
-                print(' chrom: ' + chrom + ' filtered records: ' + str(chroms[chrom]['filtered_records']) + ' - closing ')
-                f = chroms[v.CHROM]['filtered_file']
+                log.info(' chrom: ' + chrom + ' filtered records: ' + str(chroms[chrom]['filtered_records']) + ' - closing ')
+                f = chroms[chrom]['filtered_file']
                 f.close()
                 if settings.JBROWSE_PERL_POSTPROCESS:
-                    self.perl_postprocess(chroms[v.CHROM]['filtered_file_name'])
+                    self.perl_postprocess(chroms[chrom]['filtered_file_name'])
             if indels:
-                print(' chrom: ' + chrom + ' indel records: ' + str(chroms[chrom]['indel_records']) + ' - closing ')
-                f = chroms[v.CHROM]['indel_file']
+                log.info(' chrom: ' + chrom + ' indel records: ' + str(chroms[chrom]['indel_records']) + ' - closing ')
+                f = chroms[chrom]['indel_file']
                 f.close()
                 if settings.JBROWSE_PERL_POSTPROCESS:
-                    self.perl_postprocess(chroms[v.CHROM]['indel_file_name'])
+                    self.perl_postprocess(chroms[chrom]['indel_file_name'])
 
 
-        print(' Finished reading vcf. Num records: ' + str(i))
+        log.info(' Finished reading vcf. Num records: ' + str(i))
 
         vcf_reader.close()
 
@@ -333,7 +333,7 @@ class Command(BaseCommand):
 
         out_str = '\n'.join([out_comments_str, out_vcf_str])
 
-        print('Writing: ' + file_name)
+        log.info('Writing: ' + file_name)
 
 
         f = gzip.open(file_name, 'wb')
@@ -343,8 +343,8 @@ class Command(BaseCommand):
     def _process_batch_preprocess_request(self, batch, options):
 
 
-        self.stdout.write('Number of files to process: ' + str(batch.num_files_in_batch()))
-        print ('Preprocessing: ' + str(batch))
+        log.info('Number of files to process: ' + str(batch.num_files_in_batch()))
+        log.info('Preprocessing: ' + str(batch))
 
         try:
             # Set up our work area.
@@ -372,10 +372,10 @@ class Command(BaseCommand):
             for batch_file in batch_file_list:
                 try:
                     path, ext_part, in_chrom, species_strain = self.assemble_input_file_name_components(batch_file)
-                    self.stdout.write('*******************')
-                    self.stdout.write(' Input file: ' + batch_file)
-                    self.stdout.write(' Chrom group: ' + in_chrom)
-                    self.stdout.write(' Species/Strain: ' + species_strain)
+                    log.info('*******************')
+                    log.info(' Input file: ' + batch_file)
+                    log.info('Chrom group: ' + in_chrom)
+                    log.info(' Species/Strain: ' + species_strain)
 
                     chroms, comments, strain_symbol_in_file = self.split(batch_file, ext_part, path, species_strain,
                                                   reduce=options['filter'], indels=options['indels'], process_in_batch=True, batch=batch)
@@ -398,7 +398,7 @@ class Command(BaseCommand):
                     shutil.move(batch_file, os.path.join(settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX,'processed/'))
 
                 except Exception as e:
-                    print ('chromosome preprocess failed: ', batch_file, ' Reason: ', e)
+                    log.warning('chromosome preprocess failed: ' +  batch_file +  ' Reason: ' + str(e))
                     pass
 
                 # For each unique species/strain encountered in batch files:
@@ -409,7 +409,7 @@ class Command(BaseCommand):
                                               species_symbol=species_strain.split('_strain')[0][1:],
                                               strain_symbols=species_strains[species_strain]['symbols'])
                 except Exception as e:
-                    print('Strain add failed: ' + str(e))
+                    log.warning('Strain add failed: ' + str(e))
 
             # For each unique species/strain encountered in batch files:
             #   - Add JBrowse filtered and indels tracks to JBrowse config trackList.json file in order to show in JBrowse
@@ -455,7 +455,7 @@ class Command(BaseCommand):
         if (len(pending_batches) > 0):
             self._process_batch_preprocess_request(pending_batches[0], options)
         else:
-            print ('No pending batches to process')
+            log.info('No pending batches to process')
 
     def handle(self,  **options):
             '''The main entry point for the Django management command.
@@ -463,21 +463,21 @@ class Command(BaseCommand):
             '''
 
             if options['batch']:
-                self.stdout.write('Running batch preprocess')
+                log.info('Running batch preprocess')
             else:
-                self.stdout.write('Number of files to process: ' + str(len(options['file_list'])))
-            self.stdout.write('Also create reduced VCF with called variants only (SNPS and INDELS) for strain: ' + str(options['filter']))
-            self.stdout.write('Also create reduced VCF with called INDEL variants only for strain: ' + str(options['indels']))
+                log.info('Number of files to process: ' + str(len(options['file_list'])))
+            log.info('Also create reduced VCF with called variants only (SNPS and INDELS) for strain: ' + str(options['filter']))
+            log.info('Also create reduced VCF with called INDEL variants only for strain: ' + str(options['indels']))
 
             if options['batch']:
                self.process_batch(options)
             else:
                for file_name in options['file_list']:
                     path,ext_part,in_chrom,species_strain = self.assemble_input_file_name_components(file_name)
-                    self.stdout.write('*******************')
-                    self.stdout.write(' Input file: ' + file_name)
-                    self.stdout.write(' Chrom group: ' + in_chrom)
-                    self.stdout.write(' Species/Strain: ' + species_strain)
+                    log.info('*******************')
+                    log.info(' Input file: ' + file_name)
+                    log.info(' Chrom group: ' + in_chrom)
+                    log.info(' Species/Strain: ' + species_strain)
 
 
                     chroms,comments, strain_symbol_in_file = self.split(file_name,ext_part,path,species_strain,reduce=options['filter'],indels=options['indels'])
