@@ -174,8 +174,25 @@ class Command(BaseCommand):
                             pass
                         else:
                            prog_rec['perc_complete'] = prog_rec['records_read'] * 1.0  / prog_rec['total_records'] * 100.0
-                        batch.final_report = json.dumps(prog_list)
-                        batch.save()
+                        chroms_list = prog_rec['chroms'].split(', ')
+                        if len(chroms_list) == 1 and (chroms_list[0] == ''):
+                            pass
+                        else:
+                            updated_chroms_list = []
+                            for chrom_rec in chroms_list:
+                                num_filtered = 0
+                                num_indels = 0
+                                chrom = chrom_rec.split(' [')[0]
+                                if chrom in chroms:
+                                   if 'filtered_records' in chroms[chrom]:
+                                      num_filtered = chroms[chrom]['filtered_records']
+                                   if 'indel_records' in chroms[chrom]:
+                                       num_indels = chroms[chrom]['indel_records']
+                                updated_chroms_list.append(chrom + ' [Filtered: ' + str(num_filtered) + ' Indels: ' + str(num_indels) + ']')
+                            prog_rec['chroms'] = ', '.join(updated_chroms_list)
+
+                    batch.final_report = json.dumps(prog_list)
+                    batch.save()
 
 
             line = line.decode('utf-8').rstrip()
@@ -249,8 +266,8 @@ class Command(BaseCommand):
                                if prog_rec['chroms'] == '':
                                    chroms_list = []
                                else:    
-                                   chroms_list = prog_rec['chroms'].split(',')
-                               chroms_list.append(v.CHROM)
+                                   chroms_list = prog_rec['chroms'].split(', ')
+                               chroms_list.append(v.CHROM + ' [Filtered: 0 Indels: 0]')
                                prog_rec['chroms'] = ', '.join(chroms_list)
                                batch.final_report = json.dumps(prog_list)
                                batch.save()

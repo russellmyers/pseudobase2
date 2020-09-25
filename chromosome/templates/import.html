@@ -135,7 +135,7 @@
  
                  {% if num_valid_pending_files == 0 %}
                  <p>  
-                 <small class = "text-muted">Please place new import files into folder:  {{ pending_import_path }}</small>
+                     <span class = "text-muted">No files ready for import. Please  run <a href='{%  url "preprocess" %}'>chromosome/preprocess</a> first</span>
                  </p>
                  {% else %}
                       <button type="submit" name="importfiles" class = "btn btn-primary mt-2">Import selected file(s)</button>     
@@ -143,7 +143,7 @@
                  {% endif %}
   </form>    
 
-
+<hr>
 {% endblock pending %}
 
 {% block script %}

@@ -6,7 +6,7 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('',
   # The main index page
 
-  url(r'^preprocess/$', 'chromosome.views.preprocess_files', name='preprocess'),
+  url(r'^preprocessold/$', 'chromosome.views.preprocess_files_old', name='preprocessold'),
 
   url(r'^preprocess/(?P<fname>.+)/(?P<pre>.+)/(?P<subdir>.+)/(?P<type>.+)/(?P<verbose>.+)/info/$', 'chromosome.views._get_file_info', name='preprocessfileinfo'),
 
@@ -22,9 +22,9 @@ urlpatterns = patterns('',
 
   url(r'^audit/$', 'chromosome.views.audit', name='audit'),
 
-  url(r'^autoimport/$','chromosome.views.autoimport',name='autoimport'),
+  url(r'^preprocess/$','chromosome.views.preprocess',name='preprocess'),
 
-  url(r'^autoimport/progress/$','chromosome.views.autoimport_progress',name='autoimportprogress'),
+  url(r'^preprocess/progress/$','chromosome.views.preprocess_progress',name='preprocessprogress'),
                        )
 
 

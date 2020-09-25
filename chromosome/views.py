@@ -18,7 +18,7 @@ import chromosome.forms
 from chromosome.models import ChromosomeBase, ChromosomeImporter, ChromosomeBatchImportProcess, ChromosomeBatchImportLog, ChromosomeBatchPreprocess
 
 
-def preprocess_files(request):
+def preprocess_files_old(request):
     mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX  # 'raw_data/chromosome/pending_import/'
     abspath = os.path.abspath(mypath)
 
@@ -207,7 +207,7 @@ def preprocess_files(request):
     custom_data['indel_files'] = indel_files_info
 
 
-    return render_to_response('preprocess.html', custom_data,
+    return render_to_response('preprocess_old.html', custom_data,
                               context_instance=RequestContext(request))
 
 def import_files(request):
@@ -610,7 +610,7 @@ def handle_uploaded_files(abspath, files):
                 destination.write(chunk)
 
 
-def autoimport_progress(request):
+def preprocess_progress(request):
     mypath = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_VCF_PREFIX  # 'raw_data/chromosome/pending_import/'
     abspath = os.path.abspath(mypath)
 
@@ -656,7 +656,7 @@ def autoimport_progress(request):
                         len(batch_file_list) - successful_files) + ' failed', extra_tags='html_safe alert alert-warning')
             else:
                 messages.error(request, 'Preprocess failed', extra_tags='html_safe alert alert-danger')
-            return redirect(autoimport)
+            return redirect(preprocess)
 
     custom_data = {}
     custom_data['tab'] = 'Preprocess Progress'
@@ -669,12 +669,12 @@ def autoimport_progress(request):
     custom_data['batch_file_filenames'] = [os.path.split(file_name)[1] for file_name in batch_file_list]
 
 
-    return render_to_response('autoimport_progress.html', custom_data,
+    return render_to_response('preprocess_progress.html', custom_data,
                               context_instance=RequestContext(request))
 
 
-def autoimport(request):
-    log.info('In Autoimport')
+def preprocess(request):
+    log.info('In Preprocess')
 
     verbose = int(request.GET.get('verbose', '0'))
 
@@ -731,18 +731,18 @@ def autoimport(request):
                connection.close()
                messages.success(request, str(len(selected_values)) + ' files selected for preprocess. \nPlease wait for preprocessing to auto start',
                                 extra_tags='html_safe alert alert-success')
-               return redirect(autoimport_progress)
+               return redirect(preprocess_progress)
            except Exception as e:
                transaction.rollback()
                transaction.leave_transaction_management()
 
                messages.error(request, 'Batch import process failed: ' + str(e),
                               extra_tags='html_safe alert alert-danger')
-               return redirect(autoimport)
+               return redirect(preprocess)
 
     current_batches = ChromosomeBatchPreprocess.objects.current_batches()  # ChromosomeBatchImportProcess.objects.filter(Q(batch_status='P') | Q(batch_status='I'))
     if (len(current_batches) > 0):
-        return redirect(autoimport_progress)
+        return redirect(preprocess_progress)
 
     form = chromosome.forms.UploadForm()
     custom_data['form'] = form
@@ -776,7 +776,37 @@ def autoimport(request):
     dirs_info = []
 
     preprocessed_files_info = []
-    split_files_info = []
+    pending_import_files_info = []
+
+    # Handle pending import files (ie already preprocessed/split):
+    from os import listdir
+    from os.path import isfile, join
+    pending_import_path = settings.PSEUDOBASE_CHROMOSOME_RAW_DATA_PENDING_PREFIX  # 'raw_data/chromosome/pending_import/'
+    pending_import_abspath = os.path.abspath(pending_import_path)
+    custom_data['pending_import_path'] = pending_import_abspath
+    pending_import_files = [f for f in listdir(pending_import_abspath) if isfile(join(pending_import_abspath, f))]
+
+    pending_import_files_info = []
+    for f in pending_import_files:
+        c_importer = ChromosomeImporter(join(pending_import_abspath, f))
+        pending_import_file_info = c_importer.get_info(incl_rec_count=False)
+
+        if 'file_size' in pending_import_file_info:
+            pending_import_file_info['file_size_MB'] = "%.2fMB" % pending_import_file_info['file_size']
+
+        pending_import_files_info.append(pending_import_file_info)
+
+    num_valid_pending_import_files = 0
+    for pending_import_f_info in pending_import_files_info:
+        if (pending_import_f_info['format'] == 'unknown'):
+            pass
+        else:
+            num_valid_pending_import_files += 1
+    custom_data['num_valid_pending_import_files'] = num_valid_pending_import_files
+
+    custom_data['pending_import_files'] = pending_import_files_info
+
+    split_files_info  = [] # No longer used, now uses pending_import_files_info
     filtered_files_info = []
     indel_files_info = []
 
@@ -870,5 +900,5 @@ def autoimport(request):
 
     custom_data['verbose'] = verbose
 
-    return render_to_response('upload.html', custom_data,
+    return render_to_response('preprocess.html', custom_data,
                               context_instance=RequestContext(request))
