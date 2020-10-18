@@ -17,11 +17,18 @@ h1 {
 }
 */
 
-/*
+
 ul.errorlist {
-    color: #9E0000;
+    color: #FF0000;
+    font-weight: bold;
 }
-*/
+
+errorlist {
+    list-style: none;
+}
+
+
+
 
 .search_content {
    background-color: white;

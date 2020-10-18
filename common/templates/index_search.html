@@ -35,4 +35,9 @@
 
 {% block script %}
 {% if display_counter %}{% include "stat_counter.html" %}{% endif %}
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
 {% endblock %}

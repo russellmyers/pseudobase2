@@ -1,5 +1,5 @@
 {% extends "index_search.html" %}
-
+{%  load static %}
 
 {% block searchtab %}
 <div class = "container">
@@ -13,51 +13,9 @@
         
         <div class = "row border mt-3 search_content ml-5 mr-5">
         
-         <div class = "form-group col-md-5"> 
-                <br>
-                <div class="row fieldWrapper">
-                          
-                    <div class = "col-md-1">
-                        <b> {{ gene_form.species.label_tag }} </b>
-         
-                    </div>    
-                    <div class = "col-md-11">
-                        {% if gene_form.species.errors  %}
-                            <div class="alert-message block-message error">
-                                {{ gene_form.species.errors }}
-                            </div>
-                        {% endif %}  
-                        {{ gene_form.species }}
-                        {% if gene_form.species.help_text %}
-                              <!--p class = "help"-->
-                            {{ gene_form.species.help_text|safe }}
-                              <!--/p-->   
-                        {% endif %}
-                    </div>    
-                </div>
-               <br>
-               <div class="row fieldWrapper">
-
-                    <div align="left" class = "col-md-5">
-                        <b> {{ gene_form.show_aligned.label_tag }} </b>
-
-                    </div>
-                    <div align="left" class = "col-md-7">
-                        {% if gene_form.show_aligned.errors  %}
-                            <div class="alert-message block-message error">
-                                {{ gene_form.show_aligned.errors }}
-                            </div>
-                        {% endif %}
-                        {{ gene_form.show_aligned }}
-                        {% if gene_form.show_aligned.help_text %}
-                              <!--p class = "help"-->
-                            {{ gene_form.show_aligned.help_text|safe }}
-                              <!--/p-->
-                        {% endif %}
-                    </div>
-                </div>
-            </div>        
            <div class = "form-group col-md-7">
+
+               <div class = "row" style="align-items:center;"><h4><i>&nbsp;Search criteria</i></h4> <img class="ml-1" src="{% static  'img/info.png' %}" data-placement="right" data-toggle="tooltip" data-html="true"  width="15px" height = "15px"  valign="middle" alt="info" title="See <b>'Info'</b> menu above for detailed infomation on search criteria and output options"/></div>
 
 
                 {% for field in gene_form %}
@@ -69,11 +27,11 @@
                         <br>
                         <div class="row fieldWrapper">
 
-                            <div align="left" class = "col-md-3">
+                            <div align="left" class = "col-md-4">
                                 <b> {{ field.label_tag }} </b>
 
                             </div>
-                            <div align="left" class = "col-md-9">
+                            <div align="left" class = "col-md-8">
                                 {% if field.errors  %}
                                     <div class="alert-message block-message error">
                                         {{ field.errors }}
@@ -92,12 +50,61 @@
                     {% endif %}
                 {% endfor %}
             </div>
+         <div class = "form-group col-md-5">
+
+             <div class = "row"><h4><i>&nbsp;Output</i></h4></div>
+
+                <br>
+                <div class="row fieldWrapper">
+
+                    <div class = "col-md-1">
+                        <b> {{ gene_form.species.label_tag }} </b>
+
+                    </div>
+                    <div class = "col-md-11">
+                        {% if gene_form.species.errors  %}
+                            <div class="alert-message block-message error">
+                                {{ gene_form.species.errors }}
+                            </div>
+                        {% endif %}
+                        {{ gene_form.species }}
+                        {% if gene_form.species.help_text %}
+                              <!--p class = "help"-->
+                            {{ gene_form.species.help_text|safe }}
+                              <!--/p-->
+                        {% endif %}
+                    </div>
+                </div>
+               <br>
+               <div class="row fieldWrapper" style="align-items:center;">
+
+                    <div align="left" class = "col-md-5">
+                        <b> {{ gene_form.show_aligned.label_tag }} </b>
+                        <img src="{% static  'img/info.png' %}" data-placement="top" data-toggle="tooltip" data-html="true"  width="15px" alt="info" title="<b>Note</b>: Aligned vs unaligned output only differs in the presence of insertion or deletion polymorphisms"/>
+
+                    </div>
+                    <div align="left" class = "col-md-7">
+                        {% if gene_form.show_aligned.errors  %}
+                            <div class="alert-message block-message error">
+                                {{ gene_form.show_aligned.errors }}
+                            </div>
+                        {% endif %}
+                        {{ gene_form.show_aligned }}
+                        {% if gene_form.show_aligned.help_text %}
+                              <!--p class = "help"-->
+                            {{ gene_form.show_aligned.help_text|safe }}
+                              <!--/p-->
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
         </div>
        <div class = "row justify-content-center">
-           <input type="submit" class="btn btn-primary mt-3" title="Show FASTA-formatted results for selected gene/gene batch" name="gene_search_type" value="FASTA results" />
+           <input type="submit" class="btn btn-primary mt-3"  data-placement="left" data-toggle="tooltip" data-html="true" title="Show FASTA-formatted results for selected gene/gene batch" name="gene_search_type" value="FASTA results" />
            <!--/td></tr-->
-           <input type="submit" class="btn btn-primary mt-3 ml-3" title="Browse to selected gene using JBrowse
-(Note: Within JBrowse only first 3 strains initially shown for each species selected. Select in JBrowse for more)"   name="gene_browse_type" value="JBrowse to gene" />
+           <input type="submit" class="btn btn-primary mt-3 ml-3" data-placement="right" data-toggle="tooltip" data-html="true" title="Browse to selected gene using JBrowse<br><br>
+<small><i><b>Note</b>: Within JBrowse only max 3 strains initially shown for each species selected.<br> Select in JBrowse for more</i></small>"   name="gene_browse_type" value="JBrowse to gene" />
         </div>
         	
     </form>        	

@@ -74,6 +74,7 @@ class SearchForm(forms.Form):
 
     gene_batch_file = BatchFileField(required=False,
         #Added widget for ootstrap
+        label='or Gene batch file',
         widget=forms.FileInput(
         attrs={'class': 'form-control-file col-9'}),                               
       help_text='<div class="mt-0 pt-0 help_text">Example gene batch file: <a '

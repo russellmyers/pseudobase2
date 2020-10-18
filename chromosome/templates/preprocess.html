@@ -131,7 +131,7 @@
  
                  {% if num_valid_pending_preprocess_files == 0 %}
                  <p>  
-                 <span class = "text-muted">Please upload (or ftp) new pending preprocessing files into folder:  {{ pending_preprocess_path }}</>
+                     <span class = "text-muted">Please upload files using button above</span><br><span class = "small text-muted">(or ftp directly into folder:  {{ pending_preprocess_path }} on server)</span>
                  </p>
                  {% else %}
                       <button type="submit" name="preprocessfiles" class = "btn btn-primary mt-2">Preprocess selected file(s)</button>

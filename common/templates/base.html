@@ -2,7 +2,7 @@
 {% load static %}
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Pseudobase -- Noor lab, Duke -- {% block page_title %}Main{% endblock %}</title>
+	<title>PseudoBase -- Noor lab, Duke -- {% block page_title %}Main{% endblock %}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="description" content="Searchable genome sequences of Drosophila pseudoobscura subgroup species" />
@@ -25,7 +25,7 @@
 {% endblock %}
 <!--hr /-->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #5f788a;"> <!--style= "background-color: #e3f2fd;-->
-      <a href="#" class="navbar-brand"><img src="{{ STATIC_URL }}img/pseudobase_header_a_rounded.gif" alt="Pseudobase" width="250px"></a>
+      <a href="{%  url 'index' %}" class="navbar-brand"><img src="{{ STATIC_URL }}img/pseudobase_header2_rounded.png" alt="PseudoBase" width="250px"></a>
       <!--a class="navbar-brand" href="#"> Pseudobase</a-->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -120,7 +120,7 @@ Brought to you by the <a href="http://sites.google.com/site/noorlabduke/home">No
     Original research sponsored by the <a href="http://nigms.nih.gov/">National Institutes of Health</a><br />
     This research sponsored by the <a href="http://nsf.gov">National Science Foundation</a> <br />
     Original database and interface designed and constructed by <a href="http://fds.duke.edu/db/aas/Biology/staff/rh87">Ryan Hardy</a><br/>
-    Pseudobase v2.0<small> </small> redesign and construction by <a href="mailto:flipside@netspace.net.au">Russell B Myers</a> </a><br>
+    PseudoBase v2.0<small> </small> redesign and construction by <a href="mailto:flipside@netspace.net.au">Russell B Myers</a> </a><br>
     Genome alignment and variant calling by <a href="https://github.com/kkorunes/PseudobaseScripts">Katharine Korunes Ph.D.</a>
     <br> <span>Powered by <a href="http://jbrowse.org/references.html">JBrowse</a></span>
 
@@ -129,7 +129,7 @@ Brought to you by the <a href="http://sites.google.com/site/noorlabduke/home">No
 	<a href="http://jigsaw.w3.org/css-validator/check/referer"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" /></a-->
     <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangopowered126x54_grey.gif" border="0" width="4%" alt="Powered by Django." title="Powered by Django." /></a>
     <!--a href="http://jbrowse.org/references.html"><img src="{% static 'img/gen_jbrowse_icon.PNG' %}" alt="Powered by JBrowse" title="Powered by JBrowse."/></a-->
-    <br><small>Patch: 2.0.0i</small>
+    <br><small>Patch: 2.0.0j</small>
 </center>
 </h6>
 </p>
