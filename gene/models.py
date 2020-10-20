@@ -427,6 +427,7 @@ class GeneSymbol(models.Model):
         fbgn_match = re.compile(r'fbgn(\d+)', flags=re.I).match
         gleanr_match = re.compile(r'gleanr_(\d+)', flags=re.I).match
         dpse_gleanr_match = re.compile(r'dpse_gleanr_(\d+)', flags=re.I).match
+
         normalized_symbol = symbol
 
         # The "Dpse\" prefix should be stripped.
@@ -448,6 +449,18 @@ class GeneSymbol(models.Model):
         fbgn_matched = fbgn_match(normalized_symbol)
         if fbgn_matched:
             normalized_symbol = ''.join(('FBgn', fbgn_matched.group(1)))
+            try:
+                sym = GeneSymbol.objects.get(symbol=normalized_symbol)
+            except:
+                try:
+                    sym =  GeneSymbol.objects.get(symbol='dmel_' + normalized_symbol)
+                    normalized_symbol = 'dmel_' + normalized_symbol
+                except:
+                    try:
+                        sym = GeneSymbol.objects.get(symbol='dper_' + normalized_symbol)
+                        normalized_symbol = 'dper_' + normalized_symbol
+                    except:
+                        pass
 
         # "GLEANR" symbols should be in the format: dpse_GLEANR_XXXXXX
         gleanr_matched = gleanr_match(normalized_symbol)
