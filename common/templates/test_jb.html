@@ -8,8 +8,9 @@
 
 {% block content %}
 <!--div class="container"-->
-
+    See <a href = "{%  url 'info' %}">Info</a> menu for more information about data sources and annotation tracks
     <div class = "frame" style="width: 97%; margin: 5px auto 10px;">
+
       <iframe
         id="jbrowse_iframe"
         src="{{ STATIC_URL }}{{jbrowse_rel_location }}&menu=0&loc={{ chr }}:{{ pos_from }}.. {{ pos_to }}&{{ tracks_query }}"
