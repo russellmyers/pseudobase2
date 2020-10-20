@@ -288,6 +288,21 @@ def browse(request):
                               context_instance=RequestContext(request))
 
 
+def about(request):
+    custom_data = {}
+    custom_data['tab'] = 'About'
+
+    return render_to_response('about.html', custom_data,
+                              context_instance=RequestContext(request))
+
+def contact(request):
+    custom_data = {}
+    custom_data['tab'] = 'Contact'
+
+    return render_to_response('contact.html', custom_data,
+                              context_instance=RequestContext(request))
+
+
 def delivery(request, code):
     '''Handle requests for the "delivery" page.'''
 

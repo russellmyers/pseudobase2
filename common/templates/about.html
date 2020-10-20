@@ -1,0 +1,39 @@
+<html><title>About PseudoBase</title>
+{% extends "base.html" %}
+
+{% block page_title %}About PseudoBase{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>About PseudoBase</h1>
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div>
+    {% endblock header %}
+    
+    
+    {% block content %}
+
+
+<div class = "col-md-1">
+</div>   
+<div class="col-md-10 border border-primary" style="background-color:white";>
+    <p class="lead"><i>Drosophila pseudoobscura</i> is a classic model system for the study of evolutionary genetics and genomics, and many genome sequences have accumulated for D. pseudoobscura and closely related species.</p>
+    <p>To facilitate the exploration of genetic variation within species and comparative genomics across species, we present PseudoBase. This database contains genetic variation (SNPs and indels) from D. pseudoobscura and several related species.</p>
+    <p>All genetic data within the database are derived from the same workflow, so variants are easily comparable across data sets. Features include an embedded JBrowse interface, ability to pull out alignments of individual genes/regions, and batch access for gene lists. Anyone can take advantage of this database without the burden of obtaining and downloading raw data, assembling genomes, or calling variants.</p>
+    <p>We hope that this resource will be of use in both research and educational settings. See the <a href="{%  url 'info' %}">Info</a> menu for additional details, or <a href="{%  url 'contact' %}">contact us</a> with any questions.</p>
+
+
+<div class = "col-md-1">
+</div>
+
+{% endblock content %}

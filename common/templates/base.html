@@ -45,9 +45,9 @@
           </li>
            <li class = "nav-item {%if tab == 'More Info' %}active{% endif %}"> 
              <a class="nav-link" href="{% url 'info' %}">Info</a>
-          </li> 
-          
-          <li class="nav-item dropdown">
+          </li>
+
+           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Links
             </a>
@@ -63,10 +63,12 @@
               <a class="dropdown-item" href="https://www.ncbi.nlm.nih.gov/sra/?term=SRP007802">NIH NCBI Short Read Archive</a>
 
             </div>
-          </li>  
-                 
-      
+          </li>
+
+
+
       </ul>
+      </div>
       <!--ul class="navbar-nav ml-auto">
           <li class = "nav-item {%if tab == 'Preprocess' %}active{% endif %}">
              <a class="nav-link" href="{% url 'preprocess' %}">Preprocess</a>
@@ -82,7 +84,17 @@
           <a class="nav-item nav-link" href="#">Links</a>
         </div> 
         -->
-       </div>
+     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+
+            <li class="nav-item {%if tab == 'Contact' %}active{% endif %}">
+                <a class="nav-link" href="{% url 'contact' %}">Contact Us</a>
+            </li>
+            <li class="nav-item {%if tab == 'About' %}active{% endif %}">
+                <a class="nav-link" href="{% url 'about' %}">About</a>
+            </li>
+        </ul>
+     </div>
     
 </nav>
 <br>
@@ -133,7 +145,7 @@ Brought to you by the <a href="http://sites.google.com/site/noorlabduke/home">No
 	<a href="http://jigsaw.w3.org/css-validator/check/referer"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" /></a-->
     <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangopowered126x54_grey.gif" border="0" width="4%" alt="Powered by Django." title="Powered by Django." /></a>
     <!--a href="http://jbrowse.org/references.html"><img src="{% static 'img/gen_jbrowse_icon.PNG' %}" alt="Powered by JBrowse" title="Powered by JBrowse."/></a-->
-    <br><small>Patch: 2.0.0l</small>
+    <br><small>Patch: 2.0.0m</small>
 </center>
 </h6>
 </p>

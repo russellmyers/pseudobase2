@@ -17,6 +17,10 @@ urlpatterns = patterns('',
 
    url(r'^browse/$', 'common.views.browse', name='browse'),
 
+   url(r'^about/$','common.views.about',name='about'),
+
+   url(r'^contact/$','common.views.contact',name='contact'),
+
    url(r'^logs/$', 'common.views.logs', name='logs'),
 
    (r'^chromosome/', include('chromosome.urls')),
