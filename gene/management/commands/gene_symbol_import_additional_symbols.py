@@ -70,9 +70,6 @@ class Command(BaseCommand):
                 sys.stdout.write('.')
                 sys.stdout.flush()
 
-            if count > 10:
-               break
-
             symbol = translation_rec[0]
             dpse_fbgn_id = translation_rec[1]
 
