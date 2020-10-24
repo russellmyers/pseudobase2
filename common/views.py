@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from django.http import Http404
+from django.utils.datastructures import MultiValueDict
 
 # for jbrowse rest api
 from django.http import HttpResponse
@@ -17,7 +18,7 @@ import gene.forms
 import chromosome.forms
 from chromosome.models import ChromosomeBase
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
-from common.models import Species, Strain
+from common.models import Species, Strain, Chromosome
 from os import listdir
 from os.path import isfile, join
 
@@ -222,6 +223,58 @@ def _convert_bytes(n):
     else:
         return '%dB' % n
 
+def check_query_params(request):
+    query_chrom   = request.GET.get('chrom', None)
+    query_pos     = request.GET.get('pos', None)
+    query_gene    = request.GET.get('gene', None)
+    query_species = request.GET.get('species', None)
+    query_output  = request.GET.get('output', None)
+    if (query_chrom is None) and (query_gene) is None and (query_pos) is None and (query_species is None) and (query_output is None):
+        return False
+
+    if query_species is None:
+        query_species = 'pse'
+    if query_output is None:
+        query_output = 'fasta'
+
+    saved_post = request.POST
+    request.POST = request.POST.copy()
+
+    try:
+        if query_gene is not None:
+            request.POST['gene'] = query_gene
+            if query_output == 'jbrowse':
+                request.POST['gene_browse_type'] = 'JBrowse to gene'
+            else:
+                request.POST['gene_search_type'] = 'FASTA results'
+        elif query_chrom is not None:
+            request.POST = request.POST.copy()
+            request.POST['chromosome'] = str(Chromosome.objects.get(name=query_chrom).id)
+            if query_output == 'jbrowse':
+               request.POST['chrom_browse_type']  = 'JBrowse to region'
+            else:
+               request.POST['chrom_search_type'] = 'FASTA results'
+
+            if query_pos is None:
+               raise Exception('Query - chrom query must contain pos')
+            else:
+                request.POST['position'] = query_pos
+        else:
+            raise Exception('Query - must contain gene or chrom')
+        species_ids = []
+        for species in query_species.split(','):
+            species = species.strip()
+            species_ids.append(str(Species.objects.get(symbol=species).id))
+        d = {'species': species_ids}
+        request.POST.update(MultiValueDict(d) if isinstance(species_ids, list) else d)
+        log.info('Query parameters entered successfully - chrom: ' + ('None' if query_chrom is None else query_chrom) + ' pos: ' + ('None' if query_pos is None else query_pos) + ' gene: ' + ('None' if query_gene is None else query_gene) + ' species: ' + query_species + ' output: ' + query_output)
+
+    except Exception as e:
+        log.warning('Query parameter issue - ignoring query params. ' + str(e))
+        request.POST = saved_post
+        return False
+
+    return True
 
 
 def index(request):
@@ -233,7 +286,10 @@ def index(request):
     print ('in index')
     log.info('In  index')
 
-    if request.method == 'POST':
+    if request.method == 'GET':
+        valid_query_params_supplied = check_query_params(request)
+
+    if (request.method == 'POST') or ((request.method=='GET') and (valid_query_params_supplied)):
         print ('Posting')
         log.info('Posting')
 
