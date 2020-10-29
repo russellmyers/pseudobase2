@@ -206,7 +206,8 @@ def _render_gene_search(request):
 
         fasta_objects = Gene.multi_gene_fasta(gene_symbol,
           form.cleaned_data['species'],form.cleaned_data['show_aligned'])
-    except GeneSymbol.DoesNotExist:
+    except Exception as e:
+        log.warning('Gene symbol not found: ' + form.cleaned_data['gene'] + ' error: ' + str(e))
         return render_to_response('gene_fasta.html',
           {'errors': 'Gene identified "%s" does not exist in Pseudobase.' % \
             form.cleaned_data['gene']}, 

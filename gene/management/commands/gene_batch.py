@@ -28,6 +28,8 @@ from django.template.loader import render_to_string
 
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
 from common.models import Species
+import logging
+log = logging.getLogger(__name__)
 
 
 
@@ -152,7 +154,8 @@ class Command(BaseCommand):
                     self._write_file('%s-results.txt' % gene_symbol, 
                       fasta_output)
                     gene_status[gene_symbol]['success'] = True
-                except GeneSymbol.DoesNotExist:
+                except Exception as e:
+                    log.warning('Gene symbol not found: ' + gene_symbol + ' error: ' + str(e))
                     request_status['partial'] = True
                     gene_status[gene_symbol]['message'] = \
                       'Gene symbol "%s" does not exist in Pseudobase.' % \
