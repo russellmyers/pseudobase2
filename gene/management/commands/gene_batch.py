@@ -143,7 +143,11 @@ class Command(BaseCommand):
                         # Try case insensitive
                         symbol_record = GeneSymbol.objects.get(
                             symbol__iexact=GeneSymbol.normalize(gene_symbol))
+                        # Found case-insensitive matching symbol, re-initialise gene_symbol:
+                        del gene_status[gene_symbol]
                         gene_symbol = symbol_record.symbol
+                        gene_status[gene_symbol] = {'success': False, 'message': None}
+
                     for h, b in Gene.multi_gene_fasta(gene_symbol, 
                       gene_species,show_aligned=show_aligned):
                         fasta_output.append(h)
