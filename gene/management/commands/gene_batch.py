@@ -134,6 +134,14 @@ class Command(BaseCommand):
                 gene_status[gene_symbol] = {'success': False, 'message': None}
                 try:
                     fasta_output = []
+                    try:
+                        symbol_record = GeneSymbol.objects.get(
+                            symbol=GeneSymbol.normalize(gene_symbol))
+                    except:
+                        # Try case insensitive
+                        symbol_record = GeneSymbol.objects.get(
+                            symbol__iexact=GeneSymbol.normalize(gene_symbol))
+                        gene_symbol = symbol_record.symbol
                     for h, b in Gene.multi_gene_fasta(gene_symbol, 
                       gene_species,show_aligned=show_aligned):
                         fasta_output.append(h)

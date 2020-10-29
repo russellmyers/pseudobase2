@@ -193,9 +193,18 @@ def _render_gene_search(request):
 
     try:
         log.info('In _render_gene_search. Valid form.. Gene: %s Aligned?: %s Species: %s' % (form.cleaned_data['gene'], form.cleaned_data['show_aligned'], form.cleaned_data['species']) )
-        symbols = GeneSymbol.objects.get(
-          symbol=GeneSymbol.normalize(form.cleaned_data['gene'])).all_symbols()
-        fasta_objects = Gene.multi_gene_fasta(form.cleaned_data['gene'],
+        gene_symbol = form.cleaned_data['gene']
+        try:
+            symbols = GeneSymbol.objects.get(
+              symbol=GeneSymbol.normalize(form.cleaned_data['gene'])).all_symbols()
+        except:
+            # Try case insensitive
+            symbol_record = GeneSymbol.objects.get(
+                symbol__iexact=GeneSymbol.normalize(form.cleaned_data['gene']))
+            symbols = symbol_record.all_symbols()
+            gene_symbol = symbol_record.symbol
+
+        fasta_objects = Gene.multi_gene_fasta(gene_symbol,
           form.cleaned_data['species'],form.cleaned_data['show_aligned'])
     except GeneSymbol.DoesNotExist:
         return render_to_response('gene_fasta.html',
