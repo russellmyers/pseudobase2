@@ -1,0 +1,135 @@
+- fields: {doctype: 2, sequence: 20, text: "<tr>\r\n<td scope=\"row\"><b>V2.0</b></td>\r\
+      \n<td><b>OCT 2020</b></td>\r\n<td>Major update from old server to PseudoBase\
+      \ 2.0. All <a href=\"../info\">documentation</a> is up-to-date and future releases\
+      \ will be described here.</td>\r\n</tr>"}
+  model: common.documentation
+  pk: 3
+- fields: {doctype: 1, sequence: 10, text: "  <h2>About PseudoBase</h2>\r\n   <p class\
+      \ = \"text-left\"><i>Drosophila pseudoobscura</i> is a classic model system\
+      \ for the study of evolutionary genetics and genomics, and many genome sequences\
+      \ have accumulated for D. pseudoobscura and closely related species.</p>\r\n\
+      \    <p class = \"text-left\">To facilitate the exploration of genetic variation\
+      \ within species and comparative genomics across species, we present PseudoBase.\
+      \ This database contains genetic variation (SNPs and indels) from D. pseudoobscura\
+      \ and several related species.</p>\r\n    <p class = \"text-left\">All genetic\
+      \ data within the database are derived from the same workflow, so variants are\
+      \ easily comparable across data sets. Features include an embedded JBrowse interface,\
+      \ ability to pull out alignments of individual genes/regions, and batch access\
+      \ for gene lists. Anyone can take advantage of this database without the burden\
+      \ of obtaining and downloading raw data, assembling genomes, or calling variants.</p>\r\
+      \n    <p class = \"text-left\">We hope that this resource will be of use in\
+      \ both research and educational settings.</p>\r\n"}
+  model: common.documentation
+  pk: 5
+- fields: {doctype: 1, sequence: 20, text: "<h2>Contact</h2>\r\n<p class = \"text-left\"\
+      >Please contact us at <span class=\"lead\"><a href=\"mailto:pseudobase.help@gmail.com\"\
+      >pseudobase.help@gmail.com</a></span> with any questions or comments regarding\
+      \ PseudoBase.</p>\r\n"}
+  model: common.documentation
+  pk: 6
+- fields: {doctype: 1, sequence: 30, text: "<h2>PseudoBase Data</h2>\r\n<p class=\"\
+      text-left\">\r\nPseudoBase uses whole genome paired-end Illumina sequencing\
+      \ from multiple laboratory groups and experiments (associated publications include:\
+      \ Fuller, Leonard, Young, Schaeffer, & Phadnis, 2018; Korunes et al., 2019;\
+      \ McGaugh et al., 2012; McGaugh & Noor, 2012; Samuk, Manzano-Winkler, Ritz,\
+      \ & Noor, 2020). Raw sequencing data and associated details are available on\
+      \ the NCBI Short Read Archive under the sample accessions provided in the \"\
+      lines availabel\" tab.  <p class=\"text-left\">A brief note on naming conventions:\
+      \ there are two named subspecies of <i>D. pseudoobscura\u2014D. pseudoobscura\
+      \ pseudoobscura</i> and <i>D. pseudoobscura bogotana.</i> In PseudoBase and\
+      \ in our associated paper, we use <i>D. pseudoobscura</i> to refer to both subspecies.\
+      \ We specify <i>D. pseudoobscura pseudoobscura</i> or <i>D. pseudoobscura bogotana</i>\
+      \ when we are specifically referring to only one of the two subspecies</p><p\
+      \ class=\"text-left\">The pipeline used for genome alignment and variant calling\
+      \ is available on GitHub (<a href=\"https://github.com/kkorunes/PseudobaseScripts\"\
+      >https://github.com/kkorunes/PseudobaseScripts</a>). <br>\r\n    In summary,\
+      \ we first used BWA-0.7.17 (Li & Durbin 2009) to align all sequences to the\
+      \ D. pseudoobscura genome assembly, obtained from FlyBase (Dpse_3.04: GCA_000001765.2;\
+      \ Thurmond et al. 2019). We used Picard to mark adapters and duplicates that\
+      \ might introduce bias from data generation steps such as PCR amplification\
+      \ (<a href=\"http://broadinstitute.github.io/picard/\">http://broadinstitute.github.io/picard/</a>).\
+      \ Variants were then called and filtered using GATK v4.1.1 (McKenna et al. 2010;\
+      \ Van der Auwera et al. 2013). We filtered SNPs and INDELs separately, according\
+      \ to the hard filtering recommendations provide by GATK. Specifically, we excluded\
+      \ SNPs with QualByDepth (QD) < 2.0 , FisherStrand (FS) > 60, and StrandOddsRatio\
+      \ (SOR) > 3.0, MQ < 40, MQRankSum < -12.5, ReadPosRankSum < -8. INDELs were\
+      \ filtered to exclude variants with QualByDepth (QD) < 2.0 , FisherStrand (FS)\
+      \ > 200, and StrandOddsRatio (SOR) > 10.0, ReadPosRankSum < 20.</p>\r\n</p>"}
+  model: common.documentation
+  pk: 7
+- fields: {doctype: 1, sequence: 40, text: "<h2>PseudoBase User Interface</h2>\r\n\
+      <h4 class=\"mt-4\">Pseudobase Home search page</h4>\r\n<p class=\"text-left\"\
+      >The PseudoBase <a href = \"../\">homepage</a> allows the user to query by gene\
+      \ (or genes if the user uploads a batch query) or by chromosomal region. By\
+      \ selecting one or more species of interest, the user can either generate a\
+      \ FASTA-formatted alignment or navigate to the JBrowse interface (Buels et al.,\
+      \ 2016). The JBrowse interface can also be reached directly, using the \u201C\
+      <a href = \"../browse\">Browse</a>\u201D tab.</p>\r\n\r\n<h4>PseudoBase Embedded\
+      \ JBrowse</h4>\r\n<p class = \"text-left\">The embedded JBrowse interface allows\
+      \ for browsing of specific genes/regions. All strains imported into PseudoBase\
+      \ are automatically made available for browsing within JBrowse, and the user\
+      \ can view or hide strains by checking/unchecking boxes in the \u201CAvailable\
+      \ Tracks\u201D panel to the left of the JBrowse viewer. JBrowse allows the user\
+      \ to visualize SNPs and indels (tracks with the \u201CI/D\u201D prefix) specific\
+      \ to each selected track. Clicking on any of the displayed variants brings up\
+      \ further details, such as the specific allele and its attributes (e.g., sequencing\
+      \ depth).</p>\r\n\r\n<p class = \"text-left\">The top of the JBrowse interface\
+      \ includes arrows to navigate along the selected chromosome, -/+ options to\
+      \ zoom out or in, a chromosome dropdown menu to jump to a different chromosome,\
+      \ and a chromosome coordinate entry box to jump to a different region of the\
+      \ selected chromosome.</p>\r\n\r\n<p class=\"text-left\">For the genomic region\
+      \ selected in the JBrowse viewer, the reference sequence and accompanying annotations\
+      \ are pulled from FlyBase (<a href=\"ftp://ftp.flybase.net/genomes/Drosophila_pseudoobscura/dpse_r3.04_FB2018_05/gff/dpse-all-3.04.gff.gz\"\
+      >ftp://ftp.flybase.net/genomes/Drosophila_pseudoobscura/dpse_r3.04_FB2018_05/gff/dpse-all-3.04.gff.gz</a>).\
+      \ The displayed features include genes, coding sequences (CDSs), exons, introns,\
+      \ untranslated regions (5\u2019 and 3\u2019 UTRs), mRNA, ncRNA, orthologous\
+      \ regions, \u201Corthologous to\" annotations, proteins, and syntenic_regions.\
+      \ See the <a href=\"https://wiki.flybase.org/wiki/FlyBase:Downloads_Overview#FASTA_files\"\
+      >FlyBase documentation</a> for descriptions of these data types. Clicking on\
+      \ any of these features brings up detailed information, including coordinates,\
+      \ the feature length, any aliases, the full nucleotide sequence, and the nucleotide\
+      \ sequence of each subfeature (e.g., introns).</p>\r\n"}
+  model: common.documentation
+  pk: 8
+- fields: {doctype: 1, sequence: 50, text: "<h2>Citations</h2>\r\n<ul>\r\n<li>\r\n\
+      <p class=\"text-left\">\r\n    Buels, R., Yao, E., Diesh, C. M., Hayes, R. D.,\
+      \ Munoz-Torres, M., Helt, G., \u2026 Holmes, I. H. (2016). JBrowse: a dynamic\
+      \ web platform for genome visualization and analysis. <i>Genome Biology</i>,\
+      \ 17(66). doi: 10.1186/s13059-016-0924-1</p>\r\n</li>\r\n\r\n<li>\r\n<p class=\"\
+      text-left\">\r\n    Fuller, Z. L., Leonard, C. J., Young, R. E., Schaeffer,\
+      \ S. W., & Phadnis, N. (2018). Ancestral polymorphisms explain the role of chromosomal\
+      \ inversions in speciation. PLoS Genetics, 14(7), e1007526. doi: 10.1371/journal.pgen.1007526</p>\r\
+      \n</li>\r\n\r\n<li>\r\n<p class=\"text-left\">Korunes, K. L., Machado, C. A.,\
+      \ & Noor, M. A. (2019). Inversions shape the divergence of Drosophila pseudoobscura\
+      \ and D. persimilis on multiple timescales. BioRxiv, 842047. doi: 10.1101/842047</p>\r\
+      \n</li>\r\n\r\n<li>\r\n<p class=\"text-left\">\r\nLi H, Durbin R (2009) Fast\
+      \ and accurate short read alignment with Burrows-Wheeler Transform. <i>Bioinformatics,</i>\
+      \ 25, 1754\u201360. doi:10.1093/bioinformatics/btp324</p>\r\n</li>\r\n\r\n<li>\r\
+      \n<p class=\"text-left\">\r\nMcGaugh, S. E., Heil, C. S. S., Manzano-Winkler,\
+      \ B., Loewe, L., Goldstein, S., Himmel, T. L., & Noor, M. A. F. (2012). Recombination\
+      \ modulates how selection affects linked sites in Drosophila. PLoS Biology,\
+      \ 10(11), e1001422. doi: 10.1371/journal.pbio.1001422</p>\r\n</li>\r\n\r\n<li>\r\
+      \n<p class=\"text-left\">\r\nMcGaugh, S. E., & Noor, M. A. F. (2012). Genomic\
+      \ impacts of chromosomal inversions in parapatric Drosophila species. Philosophical\
+      \ Transactions of the Royal Society B: Biological Sciences, 367(1587), 422\u2013\
+      429. doi: 10.1098/rstb.2011.0250</p>\r\n</li>\r\n\r\n<li>\r\n<p class=\"text-left\"\
+      >\r\n    McKenna A, Hanna M, Banks E et al. (2010) The Genome Analysis Toolkit:\
+      \ a MapReduce framework for analyzing next-generation DNA sequencing data. <i>Genome\
+      \ Research,</i> 20, 1297\u2013303. doi:10.1101/gr.107524.110</p>\r\n</li>\r\n\
+      \r\n<li>\r\n<p class=\"text-left\">\r\nSamuk, K., Manzano-Winkler, B., Ritz,\
+      \ K. R., & Noor, M. A. F. (2020). Natural selection shapes variation in genome-wide\
+      \ recombination rate in Drosophila pseudoobscura. Current Biology, 30(8), 1517-1528.E6.\
+      \ doi: 10.1016/j.cub.2020.03.0</p>\r\n</li>\r\n\r\n<li><p class=\"text-left\"\
+      >\r\n    Thurmond J, Goodman JL, Strelets VB et al. (2019) FlyBase 2.0: The\
+      \ next generation. <i>Nucleic Acids Research,</i> 47, D759\u2013D765. doi:10.1093/nar/gk\r\
+      \n</p>\r\n</li>\r\n\r\n<li>\r\n<p class=\"text-left\">\r\n    Van der Auwera\
+      \ GA, Carneiro MO, Hartl C <i>et al.</i> (2013) From FastQ data to high-confidence\
+      \ variant calls: The Genome Analysis Toolkit best practices pipeline. <i>Current\
+      \ Protocols in Bioinformatics,</i> 43, 11.10.1-11.10.33. doi:10.1002/0471250953.bi1110s43</p>\r\
+      \n</li>\r\n\r\n</ul>"}
+  model: common.documentation
+  pk: 9
+- fields: {doctype: 2, sequence: 10, text: "<tr>\r\n<td scope = \"row\">V1.0</td>\r\
+      \n<td>  </td>\r\n<td>Original version</td>\r\n</tr>"}
+  model: common.documentation
+  pk: 10

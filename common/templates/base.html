@@ -86,6 +86,9 @@
         -->
      <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item {%if tab == 'Updates' %}active{% endif %}">
+                <a class="nav-link" href="{% url 'updates' %}">Updates</a>
+            </li>
 
             <li class="nav-item {%if tab == 'Contact' %}active{% endif %}">
                 <a class="nav-link" href="{% url 'contact' %}">Contact Us</a>

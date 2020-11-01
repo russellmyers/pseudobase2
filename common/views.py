@@ -18,7 +18,7 @@ import gene.forms
 import chromosome.forms
 from chromosome.models import ChromosomeBase
 from gene.models import Gene, GeneSymbol, GeneBatchProcess
-from common.models import Species, Strain, Chromosome
+from common.models import Species, Strain, Chromosome, Documentation
 from os import listdir
 from os.path import isfile, join
 
@@ -342,6 +342,8 @@ def info(request):
         
     custom_data['species_tab'] = species_tab
 
+    custom_data['info_html'] = Documentation.objects.all_info()
+
     return render_to_response('info.html', custom_data,
       context_instance=RequestContext(request))
 
@@ -360,6 +362,16 @@ def about(request):
 
     return render_to_response('about.html', custom_data,
                               context_instance=RequestContext(request))
+
+def updates(request):
+    custom_data = {}
+    custom_data['tab'] = 'Updates'
+
+    custom_data['rel_html'] = Documentation.objects.all_updates()
+
+    return render_to_response('updates.html', custom_data,
+                              context_instance=RequestContext(request))
+
 
 def contact(request):
     custom_data = {}

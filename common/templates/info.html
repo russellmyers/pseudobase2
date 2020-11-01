@@ -106,6 +106,10 @@
 </div>
 <div class="col-md-10 mt-4 border border-primary" style="background-color:white";>
 
+
+   {{ info_html | safe}}
+
+{%  comment %}
    <h2>About PseudoBase</h2>
    <p class = "text-left"><i>Drosophila pseudoobscura</i> is a classic model system for the study of evolutionary genetics and genomics, and many genome sequences have accumulated for D. pseudoobscura and closely related species.</p>
     <p class = "text-left">To facilitate the exploration of genetic variation within species and comparative genomics across species, we present PseudoBase. This database contains genetic variation (SNPs and indels) from D. pseudoobscura and several related species.</p>
@@ -209,6 +213,7 @@ Samuk, K., Manzano-Winkler, B., Ritz, K. R., & Noor, M. A. F. (2020). Natural se
 
         <p class = "text-left">The top of the JBrowse interface includes arrows to navigate along the selected chromosome, -/+ options to zoom out or in, a chromosome dropdown menu to jump to a different chromosome, and a chromosome coordinate entry box to jump to a different region of the selected chromosome.</p>
         <p class="text-left">For the genomic region selected in the JBrowse viewer, the reference sequence and accompanying annotations are pulled from FlyBase (<a href="ftp://ftp.flybase.net/genomes/Drosophila_pseudoobscura/dpse_r3.04_FB2018_05/gff/dpse-all-3.04.gff.gz">ftp://ftp.flybase.net/genomes/Drosophila_pseudoobscura/dpse_r3.04_FB2018_05/gff/dpse-all-3.04.gff.gz</a>). The displayed features include genes, coding sequences (CDSs), exons, introns, untranslated regions (5’ and 3’ UTRs), mRNA, ncRNA, orthologous regions, “orthologous to" annotations, proteins, and syntenic_regions. See the <a href="https://wiki.flybase.org/wiki/FlyBase:Downloads_Overview#FASTA_files">FlyBase documentation</a> for descriptions of these data types. Clicking on any of these features brings up detailed information, including coordinates, the feature length, any aliases, the full nucleotide sequence, and the nucleotide sequence of each subfeature (e.g., introns).</>
+{%  endcomment %}
     </div>
     <div class = "col-md-1">
     </div>

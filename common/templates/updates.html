@@ -1,0 +1,45 @@
+<html><title>Updates</title>
+{% extends "base.html" %}
+
+{% block page_title %}PseudoBase Updates{% endblock %}
+
+{% block links %}{% endblock %}
+
+
+{% block header %}
+
+  <div class = "col-md-1">
+  </div> 
+  <div class = "col-md-10">
+    <center>
+    
+    <h1>PseudoBase Updates</h1>
+    </center>
+  </div>
+  <div class = "col-md-1">
+  </div>
+    {% endblock header %}
+    
+    
+    {% block content %}
+
+
+<div class = "col-md-1">
+</div>   
+<div class="col-md-10 border border-primary" style="background-color:white";>
+   <table class ="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Version #</th>
+      <th scope="col">Date</th>
+      <th scope="col">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ rel_html | safe }}
+  </tbody>
+    </table>
+<div class = "col-md-1">
+</div>
+
+{% endblock content %}

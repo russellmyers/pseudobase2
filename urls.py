@@ -19,6 +19,8 @@ urlpatterns = patterns('',
 
    url(r'^about/$','common.views.about',name='about'),
 
+   url(r'^updates/$', 'common.views.updates', name='updates'),
+
    url(r'^contact/$','common.views.contact',name='contact'),
 
    url(r'^logs/$', 'common.views.logs', name='logs'),

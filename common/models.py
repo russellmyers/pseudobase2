@@ -10,6 +10,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 import json
+from django.contrib import admin
 
 
 class Species(models.Model):
@@ -335,6 +336,48 @@ class BatchProcess(models.Model):
     class Meta:
         '''Define Django-specific metadata.'''
         abstract = True
+
+class DocumentationType(models.Model):
+    code        = models.CharField(max_length=50)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return '%s (%s)' % (self.code, self.description)
+
+class DocumentationManager(models.Manager):
+
+    def all_with_type(self, doc_type, reverse=False):
+        if reverse:
+            sections = self.filter(doctype__code=doc_type).order_by('-sequence')
+        else:
+            sections = self.filter(doctype__code=doc_type).order_by('sequence')
+        sections_str = ''.join([section.text.replace("\r\n","") for section in sections])
+        return sections_str
+
+    def all_info(self):
+        return self.all_with_type('InfoSection')
+
+    def all_updates(self):
+        return self.all_with_type('ReleaseUpdate', reverse=True)
+
+class DocumentationAdmin(admin.ModelAdmin):
+    ordering = ['doctype', 'sequence']
+
+
+class Documentation(models.Model):
+    doctype = models.ForeignKey(DocumentationType)
+    sequence = models.IntegerField()
+    text     = models.TextField(blank=True)
+
+    objects = DocumentationManager()
+
+    def __str__(self):
+        '''Define the string representation of this class of object.'''
+        return '%s [section %i]' % (self.doctype.code, self.sequence)
+
+    class Meta:
+        verbose_name_plural = 'Documentation'
 
 __metaclass__ = type
 class ImportFileReader():

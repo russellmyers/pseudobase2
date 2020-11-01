@@ -1,0 +1,8 @@
+- fields: {code: InfoSection, description: Section within Information tab on Info
+      menu}
+  model: common.documentationtype
+  pk: 1
+- fields: {code: ReleaseUpdate, description: Release update in Update tab within Info
+      menu}
+  model: common.documentationtype
+  pk: 2
