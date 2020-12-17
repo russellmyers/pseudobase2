@@ -106,7 +106,12 @@ def assemble_jbrowse_gene_query_data(request):
 
     if form.is_valid():
         try:
-            symbol = GeneSymbol.objects.get(symbol=form.cleaned_data['gene'])
+            try:
+                symbol = GeneSymbol.objects.get(symbol=GeneSymbol.normalize(form.cleaned_data['gene']))
+            except:
+                # Try case insensitive
+                symbol = GeneSymbol.objects.get(
+                    symbol__iexact=GeneSymbol.normalize(form.cleaned_data['gene']))
             flybase_id = symbol.flybase_ID()
             strain_genes = Gene.objects.filter(import_code=flybase_id).order_by('-strain__is_reference')
             gene = strain_genes[0]
