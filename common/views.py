@@ -342,7 +342,7 @@ def info(request):
     all_species = Species.objects.all()
     species_tab = []
     for species in all_species:
-        lines = Strain.objects.filter(species = species)
+        lines = Strain.objects.filter(species = species).order_by('-is_reference', 'name')
         species_tab.append({'name':species.name,'num_lines':len(lines),'lines':lines})
         
     custom_data['species_tab'] = species_tab
