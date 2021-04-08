@@ -9,6 +9,8 @@ from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from django.http import Http404
 from django.utils.datastructures import MultiValueDict
+from django.core.cache import get_cache
+import urllib
 
 # for jbrowse rest api
 from django.http import HttpResponse
@@ -26,6 +28,35 @@ import logging
 #logging.basicConfig(filename='test_logging_rbm.log',level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
+
+def get_ip_details(request):
+    def_cache = get_cache('default')
+
+    ip_address = None
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        ip_address = request.environ['REMOTE_ADDR']
+    else:
+        ip_address = request.environ['HTTP_X_FORWARDED_FOR']
+
+    cached_ip_dets = def_cache.get('ip_' + ip_address)
+    if cached_ip_dets is None:
+        #result = requests.get(f"http://ip-api.com/json/#{ip_address}")
+        try:
+            response = urllib.urlopen("https://ipapi.co/" + ip_address + "/json/")
+            status_code = response.getcode()
+            if status_code == 200:
+                data = response.read()
+                ip_dets = json.loads(data)
+            else:
+                ip_dets = {}
+            def_cache.set('ip_' + ip_address, json.dumps(ip_dets), 900)
+            return ip_address, ip_dets
+        except:
+            return ip_address, {}
+    else:
+        cached_ip_dets = json.loads(cached_ip_dets)
+        cached_ip_dets['from_cache'] = True
+        return ip_address, cached_ip_dets
 
 def _render_search_forms(request,
   chromosome_form=chromosome.forms.SearchForm(),
@@ -56,7 +87,8 @@ def _render_chromosome_search(request):
     custom_data = {}
     form = chromosome.forms.SearchForm(request.POST)
     if form.is_valid():
-        log.info('In _render_chrom_search. Valid form.. Chr: %s From: %s To: %s Aligned?: %s Species: %s' % (form.cleaned_data['chromosome'].name, form.cleaned_data['position'][0], form.cleaned_data['position'][1], form.cleaned_data['show_aligned'], form.cleaned_data['species']) )
+        ip_address, ip_details = get_ip_details(request)
+        log.info('In _render_chrom_search. Valid form.. Chr: %s From: %s To: %s Aligned?: %s Species: %s' % (form.cleaned_data['chromosome'].name, form.cleaned_data['position'][0], form.cleaned_data['position'][1], form.cleaned_data['show_aligned'], form.cleaned_data['species']) + 'IP: ' + ip_address + ' IP Details: ' + json.dumps(ip_details) )
         custom_data['fasta_objects'] = ChromosomeBase.multi_strain_fasta(
           form.cleaned_data['chromosome'],
           form.cleaned_data['species'],
@@ -163,7 +195,8 @@ def assemble_general_browse_query_data():
 
 def _submit_new_gene_batch(request, form):
     '''Submit a new batch gene search for processing.'''
-    log.info('Submitting gene batch search. '+ str(form.cleaned_data))
+    ip_address, ip_details = get_ip_details(request)
+    log.info('Submitting gene batch search. '+ str(form.cleaned_data) + 'IP: ' + ip_address + ' IP Details: ' + json.dumps(ip_details))
     gene_batch = GeneBatchProcess()
     gene_batch.submitted_at = django.utils.timezone.now()
     gene_batch.original_species  = ','.join(
@@ -197,7 +230,8 @@ def _render_gene_search(request):
         return _submit_new_gene_batch(request, form=form)
 
     try:
-        log.info('In _render_gene_search. Valid form.. Gene: %s Aligned?: %s Species: %s' % (form.cleaned_data['gene'], form.cleaned_data['show_aligned'], form.cleaned_data['species']) )
+        ip_address, ip_details = get_ip_details(request)
+        log.info('In _render_gene_search. Valid form.. Gene: %s Aligned?: %s Species: %s' % (form.cleaned_data['gene'], form.cleaned_data['show_aligned'], form.cleaned_data['species']) + 'IP: ' + ip_address + ' IP Details: ' + json.dumps(ip_details) )
         gene_symbol = form.cleaned_data['gene']
         try:
             symbols = GeneSymbol.objects.get(
@@ -312,7 +346,8 @@ def index(request):
             form = chromosome.forms.SearchForm(request.POST)
             if form.is_valid():
                 custom_data = assemble_jbrowse_chromosome_query_data(request)
-                log.info('JBrowsing to Chrom region: %s' % custom_data)
+                ip_address, ip_details = get_ip_details(request)
+                log.info('JBrowsing to Chrom region: %s' % custom_data +  'IP: ' + ip_address + ' IP Details: ' + json.dumps(ip_details))
                 return render_to_response('test_jb.html', custom_data,
                                           context_instance=RequestContext(request))
             else:
@@ -321,7 +356,8 @@ def index(request):
             form = gene.forms.SearchForm(request.POST, request.FILES)
             if form.is_valid():
                 custom_data = assemble_jbrowse_gene_query_data(request)
-                log.info('JBrowsing to Gene: %s' % custom_data)
+                ip_address, ip_details = get_ip_details(request)
+                log.info('JBrowsing to Gene: %s' % custom_data + 'IP: ' + ip_address + ' IP Details: ' + json.dumps(ip_details))
                 return render_to_response('test_jb.html', custom_data,
                                           context_instance=RequestContext(request))
             else:
